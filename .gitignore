@@ -1,0 +1,18 @@
+# IntelliJ IDEA
+server/.idea/
+serverForum/.idea/
+
+# Maven
+server/target/
+serverForum/target/
+
+# Logs
+*.log
+
+# Config
+application.yaml
+
+# Scripts
+push.sh
+build_restart.sh
+build_local.sh

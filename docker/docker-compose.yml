@@ -1,0 +1,39 @@
+services:
+  # MySQL 服务
+  mysql:
+    image: mysql:8.0
+    container_name: nfc-mysql
+    ports:
+      - "33061:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: qfgnyj233
+      MYSQL_DATABASE: nfc
+    volumes:
+      - nfc_mysql_data:/var/lib/mysql
+    networks:
+      - nfc-network
+
+  # Redis 服务
+  redis:
+    image: redis:6.2.6
+    container_name: nfc-redis
+    ports:
+      - "63791:6379"
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - nfc_redis_data:/data
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    networks:
+      - nfc-network
+
+# 定义网络
+networks:
+  nfc-network:
+    driver: bridge
+
+# 显式命名数据卷
+volumes:
+  nfc_mysql_data:
+    name: nfc_mysql_data
+  nfc_redis_data:
+    name: nfc_redis_data
