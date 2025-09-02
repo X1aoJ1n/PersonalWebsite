@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 @Data
 public class UploadedFile {
 
-    private Long id;
+    private String id;
 
     private String fileUrl;
 

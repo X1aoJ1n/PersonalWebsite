@@ -5,10 +5,7 @@ import com.bettercallxiaojin.home.pojo.entity.UploadedFile;
 import com.bettercallxiaojin.home.service.FileUploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -35,6 +32,19 @@ public class FileController {
             UploadedFile uploadedFile = fileUploadService.uploadFile(file, category);
 
             return Response.success(uploadedFile);
+
+        } catch (IOException e) {
+            return Response.error("上传失败：" + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/delete")
+    public Response<UploadedFile> uploadFile(@RequestParam("fileUrl") String fileUrl) {
+        try {
+
+            fileUploadService.deleteFileByUrl(fileUrl);
+
+            return Response.success();
 
         } catch (IOException e) {
             return Response.error("上传失败：" + e.getMessage());

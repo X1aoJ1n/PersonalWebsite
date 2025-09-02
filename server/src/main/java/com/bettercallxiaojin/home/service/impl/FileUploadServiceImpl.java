@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -31,12 +32,27 @@ public class FileUploadServiceImpl implements FileUploadService {
 
     @Override
     public UploadedFile uploadFile(MultipartFile file, String category) throws IOException {
-        String fileName = file.getOriginalFilename();
+        String originalFileName = file.getOriginalFilename();
+        String fileName = originalFileName; // 临时变量用于动态修改
         Path filePath = Paths.get(uploadDir, fileName);
+
+        int count = 1;
+        while (Files.exists(filePath)) {
+            String name = originalFileName.substring(0, originalFileName.lastIndexOf("."));
+            String ext = originalFileName.substring(originalFileName.lastIndexOf("."));
+            fileName = name + "(" + count + ")" + ext;
+            filePath = Paths.get(uploadDir, fileName);
+            count++;
+        }
+
         Files.createDirectories(filePath.getParent());
         file.transferTo(filePath.toFile());
 
         UploadedFile uploadedFile = new UploadedFile();
+
+        String fileId = UUID.randomUUID().toString();
+
+        uploadedFile.setId(fileId);
         uploadedFile.setFileName(fileName);
         uploadedFile.setFileUrl(filePrefix + "/files/" + fileName);
         uploadedFile.setCategory(category);
@@ -45,4 +61,31 @@ public class FileUploadServiceImpl implements FileUploadService {
 
         return uploadedFile;
     }
+
+
+    @Override
+    public void deleteFileByUrl(String fileUrl) {
+        try {
+            String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+
+            Path filePath = Paths.get(uploadDir, fileName);
+
+            Files.deleteIfExists(filePath);
+
+
+            UploadedFile uploadedFile = uploadedFileMapper.selectByUrl(fileUrl);
+
+            if (uploadedFile == null) {
+                throw new RuntimeException("url对应的文件不存在");
+            }
+            String fileId = uploadedFile.getId();
+
+            uploadedFileMapper.deleteFilebyId(fileId);
+
+        } catch (IOException e) {
+            log.error("删除文件失败: {}", fileUrl, e);
+        }
+    }
+
+
 }
