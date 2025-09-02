@@ -1,6 +1,5 @@
 package com.bettercallxiaojin.home.service.impl;
 
-import com.bettercallxiaojin.home.pojo.entity.Response;
 import com.bettercallxiaojin.home.pojo.entity.UploadedFile;
 import com.bettercallxiaojin.home.mapper.UploadedFileMapper;
 import com.bettercallxiaojin.home.service.FileUploadService;

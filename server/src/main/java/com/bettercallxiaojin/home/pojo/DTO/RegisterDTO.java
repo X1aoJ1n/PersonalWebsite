@@ -1,4 +1,5 @@
 package com.bettercallxiaojin.home.pojo.DTO;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(description = "注册Request")
 public class RegisterDTO {
 
     @NotBlank(message = "Verification code cannot be empty")
