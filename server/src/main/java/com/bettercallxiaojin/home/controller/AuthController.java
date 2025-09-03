@@ -1,6 +1,7 @@
 package com.bettercallxiaojin.home.controller;
 
 import com.bettercallxiaojin.home.common.util.PasswordEncodeUtil;
+import com.bettercallxiaojin.home.pojo.DTO.ChangePasswordDTO;
 import com.bettercallxiaojin.home.pojo.DTO.LoginPasswordDTO;
 import com.bettercallxiaojin.home.pojo.DTO.RegisterDTO;
 import com.bettercallxiaojin.home.pojo.VO.UserLoginVO;
@@ -34,9 +35,8 @@ public class AuthController {
     @PostMapping("/login/password")
     @Operation(summary = "使用密码登录")
     public Response<UserLoginVO> loginByPassword(@Valid @RequestBody LoginPasswordDTO loginPasswordDTO) {
-        String encodedPassword = PasswordEncodeUtil.encode(loginPasswordDTO.getPassword());
         try {
-            UserLoginVO userLoginVO = authService.loginByPassword(loginPasswordDTO.getEmail(), encodedPassword);
+            UserLoginVO userLoginVO = authService.loginByPassword(loginPasswordDTO.getEmail(), loginPasswordDTO.getPassword());
             return Response.success(userLoginVO);
         } catch (Exception e) {
             return Response.error(e.getMessage());

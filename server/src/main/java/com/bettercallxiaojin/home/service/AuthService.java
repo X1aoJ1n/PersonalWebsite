@@ -1,5 +1,6 @@
 package com.bettercallxiaojin.home.service;
 
+import com.bettercallxiaojin.home.pojo.DTO.ChangePasswordDTO;
 import com.bettercallxiaojin.home.pojo.VO.UserLoginVO;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -16,4 +17,8 @@ public interface AuthService {
     void getRegisterCode(String email);
 
     UserLoginVO register(String code, String email, String password, String username);
+
+    void getChangePasswordCode();
+
+    void changePassword(String code, String password);
 }
