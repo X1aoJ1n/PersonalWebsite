@@ -53,10 +53,6 @@ public class UserServiceImpl implements UserService {
 
         userMapper.updateUserById(userId, username, introduction);
 
-        List<Organization> organizations = organizationMapper.selectByUserId(userId);
-        List<Contact> contacts = contactMapper.selectByUserId(userId);
-        user.setOrganizations(organizations);
-        user.setContacts(contacts);
 
         if (username != null && !username.isEmpty()) {
             user.setUsername(username);

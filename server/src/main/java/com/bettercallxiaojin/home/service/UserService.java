@@ -1,9 +1,6 @@
 package com.bettercallxiaojin.home.service;
 
 import com.bettercallxiaojin.home.pojo.VO.UserVO;
-import com.bettercallxiaojin.home.pojo.entity.User;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 public interface UserService {
 

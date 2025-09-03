@@ -1,7 +1,6 @@
 package com.bettercallxiaojin.home.controller;
 
-import com.bettercallxiaojin.home.common.util.PasswordEncodeUtil;
-import com.bettercallxiaojin.home.pojo.DTO.ChangePasswordDTO;
+
 import com.bettercallxiaojin.home.pojo.DTO.LoginPasswordDTO;
 import com.bettercallxiaojin.home.pojo.DTO.RegisterDTO;
 import com.bettercallxiaojin.home.pojo.VO.UserLoginVO;

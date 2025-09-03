@@ -1,17 +1,12 @@
-package com.bettercallxiaojin.home.pojo.entity;
+package com.bettercallxiaojin.home.pojo.VO;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class Organization {
+public class OrganizationVO {
     private String id;
-    private String userId;
     private String type;
     private String name;
     private LocalDate startDate;
