@@ -28,4 +28,8 @@ public class Response<T> {
     public static <T> Response<T> error(String message) {
         return new Response<>(500, message, null);
     }
+
+    public static <T> Response<T> error(String message, int code) {
+        return new Response<>(code, message, null);
+    }
 }

@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 public class Contact {
     private String id;
     private String userId;
-    private String contactType;
-    private String contactData;
+    private String type;
+    private String data;
 }

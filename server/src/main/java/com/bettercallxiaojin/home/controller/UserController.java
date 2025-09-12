@@ -1,5 +1,7 @@
 package com.bettercallxiaojin.home.controller;
 
+import com.bettercallxiaojin.home.common.BaseContext;
+import com.bettercallxiaojin.home.pojo.DTO.ChangeEmailDTO;
 import com.bettercallxiaojin.home.pojo.DTO.ChangePasswordDTO;
 import com.bettercallxiaojin.home.pojo.DTO.UserUpdateDTO;
 import com.bettercallxiaojin.home.pojo.VO.UserVO;
@@ -27,6 +29,18 @@ public class UserController {
         if (id == null || id.isEmpty()) {
             return Response.error("id is empty or null");
         }
+        try {
+            UserVO user = userService.getUserById(id);
+            return Response.success(user);
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
+    @GetMapping()
+    @Operation(summary = "获取当前用户")
+    public Response<UserVO> getCurrentUser() {
+        String id = BaseContext.getUserId();
         try {
             UserVO user = userService.getUserById(id);
             return Response.success(user);
@@ -70,6 +84,29 @@ public class UserController {
         try {
             authService.changePassword(changePasswordDTO.getCode(), changePasswordDTO.getPassword());
             return Response.success();
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
+    @PutMapping("/changeEmail")
+    @Operation(summary = "用户更改邮箱")
+    public Response<Object> changeEmail(@Valid @RequestBody ChangeEmailDTO changeEmailDTO) {
+        try {
+            userService.changeEmail(changeEmailDTO.getCode(), changeEmailDTO.getEmail());
+            return Response.success();
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
+    @PutMapping("/changeIcon")
+    @Operation(summary = "用户更改头像")
+    public Response<UserVO> changeIcon(@Valid @RequestParam String iconUrl) {
+
+        try {
+            UserVO user = userService.updateIcon(iconUrl);
+            return Response.success(user);
         } catch (Exception e) {
             return Response.error(e.getMessage());
         }

@@ -19,6 +19,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public Response<Object> handleJsonParseException(HttpMessageNotReadableException ex) {
-        return Response.error("Invalid request format: " + ex.getMostSpecificCause().getMessage());
+        return Response.error("Invalid request format: " + ex.getMostSpecificCause().getMessage(), 400);
     }
 }

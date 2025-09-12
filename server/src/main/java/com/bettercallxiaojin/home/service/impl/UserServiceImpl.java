@@ -1,6 +1,7 @@
 package com.bettercallxiaojin.home.service.impl;
 
 import com.bettercallxiaojin.home.common.BaseContext;
+import com.bettercallxiaojin.home.common.util.PasswordEncodeUtil;
 import com.bettercallxiaojin.home.mapper.ContactMapper;
 import com.bettercallxiaojin.home.mapper.OrganizationMapper;
 import com.bettercallxiaojin.home.mapper.UserMapper;
@@ -12,6 +13,7 @@ import com.bettercallxiaojin.home.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +26,9 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final OrganizationMapper organizationMapper;
     private final ContactMapper contactMapper;
+    private final StringRedisTemplate redisTemplate;
+
+    private static final String CHANGE_PREFIX = "change:code:";
 
     @Override
     public UserVO getUserById(String id) {
@@ -51,8 +56,6 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("user is null");
         }
 
-        userMapper.updateUserById(userId, username, introduction);
-
 
         if (username != null && !username.isEmpty()) {
             user.setUsername(username);
@@ -62,9 +65,54 @@ public class UserServiceImpl implements UserService {
             user.setIntroduction(introduction);
         }
 
+        userMapper.updateUserById(user);
+
+
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);
         return userVO;
+    }
+
+    @Override
+    public UserVO updateIcon(String iconUrl) {
+        String userId = BaseContext.getUserId();
+        log.info(userId);
+
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new RuntimeException("user is null");
+        }
+
+        userMapper.updateIcon(userId, iconUrl);
+
+        user.setIcon(iconUrl);
+
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+        return userVO;
+    }
+
+    @Override
+    public void changeEmail(String code, String email) {
+        User user = userMapper.selectByEmail(email);
+        String userId = BaseContext.getUserId();
+        if (user != null) {
+            throw new RuntimeException("email is bind to user:" + userId);
+        }
+
+        user = userMapper.selectById(userId);
+
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        String realCode = redisTemplate.opsForValue().get(CHANGE_PREFIX + email);
+        if (realCode == null || !realCode.equals(code)) {
+            throw new RuntimeException("code not match");
+        }
+        redisTemplate.delete(CHANGE_PREFIX + email);
+
+        userMapper.updateEmail(userId, email);
     }
 
 }

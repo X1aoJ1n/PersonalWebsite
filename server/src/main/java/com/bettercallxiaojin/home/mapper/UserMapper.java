@@ -19,6 +19,12 @@ public interface UserMapper {
     @Update("UPDATE user_db set password = #{encodePassword} WHERE id = #{userId}")
     void updatePassword(String userId, String encodePassword);
 
-    @Update("UPDATE user_db set username = #{username}, introduction = #{introduction} WHERE id = #{userId}")
-    void updateUserById(String userId, String username, String introduction);
+    @Update("UPDATE user_db set username = #{username}, introduction = #{introduction} WHERE id = #{id}")
+    void updateUserById(User user);
+
+    @Update("UPDATE user_db set email = #{email} WHERE id = #{userId}")
+    void updateEmail(String userId, String email);
+
+    @Update("UPDATE user_db set icon = #{iconUrl} WHERE id = #{userId}")
+    void updateIcon(String userId, String iconUrl);
 }
