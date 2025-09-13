@@ -1,15 +1,8 @@
 package com.bettercallxiaojin.home.pojo.VO;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class PostVO {
+public class SimplePostVO {
     private String id;
     private SimpleUserVO userVO;
     private String title;
@@ -17,7 +10,5 @@ public class PostVO {
     private String content;
     private Integer likeCount;
     private Integer commentCount;
-    private Boolean isLike;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

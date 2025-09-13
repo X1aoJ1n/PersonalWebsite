@@ -11,7 +11,7 @@ public interface FollowService {
 
     Boolean checkFollowStatus(String followId);
 
-    List<SimpleUserVO> getFollowingList(String pageNum, String pageSize);
+    List<SimpleUserVO> getFollowingList(String userId, Integer pageNum, Integer pageSize);
 
-    List<SimpleUserVO> getFollowerList(String pageNum, String pageSize);
+    List<SimpleUserVO> getFollowerList(String userId, Integer pageNum, Integer pageSize);
 }

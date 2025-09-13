@@ -1,7 +1,10 @@
 package com.bettercallxiaojin.home.mapper;
 
+import com.bettercallxiaojin.home.pojo.VO.SimpleUserVO;
 import com.bettercallxiaojin.home.pojo.entity.User;
 import org.apache.ibatis.annotations.*;
+
+import java.util.List;
 
 @Mapper
 public interface UserMapper {
@@ -33,4 +36,17 @@ public interface UserMapper {
 
     @Update("UPDATE user_db set icon = #{iconUrl} WHERE id = #{userId}")
     void updateIcon(String userId, String iconUrl);
+
+    @Select({
+            "<script>",
+            "SELECT * FROM user_db",
+            "<if test='userIds != null and userIds.size() > 0'>",
+            "WHERE id IN",
+            "<foreach item='id' collection='userIds' open='(' separator=',' close=')'>",
+            "#{id}",
+            "</foreach>",
+            "</if>",
+            "</script>"
+    })
+    List<SimpleUserVO> selectSimpleUsersByIds(@Param("userIds") List<String> userIds);
 }

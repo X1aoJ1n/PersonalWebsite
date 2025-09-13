@@ -8,12 +8,14 @@ import com.bettercallxiaojin.home.pojo.VO.SimpleUserVO;
 import com.bettercallxiaojin.home.pojo.entity.User;
 import com.bettercallxiaojin.home.service.FollowService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FollowServiceImpl implements FollowService {
 
     private final UserMapper userMapper;
@@ -89,19 +91,44 @@ public class FollowServiceImpl implements FollowService {
     }
 
     @Override
-    public List<SimpleUserVO> getFollowingList(String pageNum, String pageSize) {
-        String userId = BaseContext.getUserId();
+    public List<SimpleUserVO> getFollowingList(String userId, Integer pageNum, Integer pageSize) {
+        if (userId == null || userId.isEmpty()) {
+            userId = BaseContext.getUserId();
+        }
 
-        List<SimpleUserVO> followingList = followMapper.selectFollowingByUserId(userId);
+        List<String> userIds = followMapper.selectFollowingByUserId(userId);
+
+        if (userIds.isEmpty()) {
+            return List.of();
+        }
+
+        List<SimpleUserVO> followingList = userMapper.selectSimpleUsersByIds(userIds);
+
+        for (SimpleUserVO simpleUserVO : followingList) {
+            simpleUserVO.setIsFollow(followMapper.existsByUserIdAndFollowId(BaseContext.getUserId(), simpleUserVO.getId()));
+            simpleUserVO.setBeingFollow(followMapper.existsByUserIdAndFollowId(simpleUserVO.getId(), BaseContext.getUserId()));
+        }
 
         return PageQueryUtil.paginate(followingList, pageNum, pageSize);
     }
 
     @Override
-    public List<SimpleUserVO> getFollowerList(String pageNum, String pageSize) {
-        String userId = BaseContext.getUserId();
+    public List<SimpleUserVO> getFollowerList(String userId, Integer pageNum, Integer pageSize) {
+        if (userId == null || userId.isEmpty()) {
+            userId = BaseContext.getUserId();
+        }
+        List<String> userIds = followMapper.selectFollowerByUserId(userId);
+        if (userIds.isEmpty()) {
+            return List.of();
+        }
 
-        List<SimpleUserVO> followerList = followMapper.selectFollowerByUserId(userId);
+        List<SimpleUserVO> followerList = userMapper.selectSimpleUsersByIds(userIds);
 
-        return PageQueryUtil.paginate(followerList, pageNum, pageSize);    }
+        for (SimpleUserVO simpleUserVO : followerList) {
+            simpleUserVO.setBeingFollow(followMapper.existsByUserIdAndFollowId(simpleUserVO.getId(), BaseContext.getUserId()));
+            simpleUserVO.setIsFollow(followMapper.existsByUserIdAndFollowId(BaseContext.getUserId(), simpleUserVO.getId()));
+        }
+
+        return PageQueryUtil.paginate(followerList, pageNum, pageSize);
+    }
 }

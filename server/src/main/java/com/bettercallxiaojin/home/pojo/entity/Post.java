@@ -13,6 +13,7 @@ public class Post {
     private String id;
     private String userId;
     private String title;
+    private String preview;
     private String content;
     private Integer likeCount;
     private Integer commentCount;
