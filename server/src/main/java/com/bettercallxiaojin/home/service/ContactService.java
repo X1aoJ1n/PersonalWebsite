@@ -13,4 +13,6 @@ public interface ContactService {
     List<ContactVO> updateContact(String id, String type, String data);
 
     List<ContactVO> addContact(String type, String data);
+
+    List<ContactVO> deleteContact(String id);
 }

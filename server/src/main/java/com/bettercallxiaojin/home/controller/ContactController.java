@@ -4,6 +4,7 @@ import com.bettercallxiaojin.home.common.BaseContext;
 import com.bettercallxiaojin.home.pojo.DTO.AddContactDTO;
 import com.bettercallxiaojin.home.pojo.DTO.ContactDTO;
 import com.bettercallxiaojin.home.pojo.VO.ContactVO;
+import com.bettercallxiaojin.home.pojo.VO.OrganizationVO;
 import com.bettercallxiaojin.home.pojo.entity.Response;
 import com.bettercallxiaojin.home.service.ContactService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -77,6 +78,21 @@ public class ContactController {
                     contactDTO.getType(),
                     contactDTO.getData()
             );
+            return Response.success(contactVOS);
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "删除联系方式")
+    public Response<List<ContactVO>> deleteContactById(@PathVariable String id) {
+        if (id == null || id.isEmpty()) {
+            return Response.error("id is empty or null");
+        }
+
+        try {
+            List<ContactVO> contactVOS = contactService.deleteContact(id);
             return Response.success(contactVOS);
         } catch (Exception e) {
             return Response.error(e.getMessage());

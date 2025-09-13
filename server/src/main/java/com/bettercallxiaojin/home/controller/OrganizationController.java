@@ -97,4 +97,18 @@ public class OrganizationController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    @Operation(summary = "删除组织")
+    public Response<List<OrganizationVO>> deleteOrganizationById(@PathVariable String id) {
+        if (id == null || id.isEmpty()) {
+            return Response.error("id is empty or null");
+        }
+
+        try {
+            List<OrganizationVO> organizations = organizationService.deleteOrganization(id);
+            return Response.success(organizations);
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
 }

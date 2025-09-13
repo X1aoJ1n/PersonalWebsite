@@ -9,7 +9,7 @@ public interface FollowService {
 
     void unfollow(String followId);
 
-    void checkFollowStatus(String followId);
+    Boolean checkFollowStatus(String followId);
 
     List<SimpleUserVO> getFollowingList(String pageNum, String pageSize);
 

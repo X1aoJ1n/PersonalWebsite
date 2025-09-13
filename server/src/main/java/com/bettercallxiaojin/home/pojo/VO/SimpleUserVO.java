@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SimpleUserVO {
     private String id;
-    private String name;
+    private String username;
 }

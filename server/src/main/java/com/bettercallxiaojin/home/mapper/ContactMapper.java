@@ -21,4 +21,7 @@ public interface ContactMapper {
 
     @Update("UPDATE contact set type = #{type}, data = #{data} WHERE id = #{id}")
     int update(Contact contact);
+
+    @Delete("DELETE FROM contact WHERE id = #{id}")
+    void deleteById(String id);
 }

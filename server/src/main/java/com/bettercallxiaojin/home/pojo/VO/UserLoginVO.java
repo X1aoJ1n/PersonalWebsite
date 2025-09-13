@@ -20,4 +20,6 @@ public class UserLoginVO {
     private String introduction;
     private List<Contact> contacts;
     private List<Organization> organizations;
+    private Integer followerCount;
+    private Integer followingCount;
 }

@@ -4,7 +4,9 @@ import com.bettercallxiaojin.home.common.BaseContext;
 import com.bettercallxiaojin.home.mapper.ContactMapper;
 import com.bettercallxiaojin.home.mapper.UserMapper;
 import com.bettercallxiaojin.home.pojo.VO.ContactVO;
+import com.bettercallxiaojin.home.pojo.VO.OrganizationVO;
 import com.bettercallxiaojin.home.pojo.entity.Contact;
+import com.bettercallxiaojin.home.pojo.entity.Organization;
 import com.bettercallxiaojin.home.pojo.entity.User;
 import com.bettercallxiaojin.home.service.ContactService;
 import lombok.RequiredArgsConstructor;
@@ -96,5 +98,26 @@ public class ContactServiceImpl implements ContactService {
 
         return getContactByUserId(BaseContext.getUserId());
 
+    }
+
+
+    @Override
+    public List<ContactVO> deleteContact(String id) {
+        String userId = BaseContext.getUserId();
+        Contact contact = contactMapper.selectById(id);
+        if (contact == null) {
+            throw new RuntimeException("contact is null");
+        }
+
+        if (!(userId.equals(contact.getUserId()))) {
+            throw new RuntimeException("cannot delete contact of others");
+        }
+
+        try {
+            contactMapper.deleteById(id);
+        } catch (Exception e) {
+            throw new RuntimeException("delete organization failed: " + e.getMessage());
+        }
+        return getContactByUserId(BaseContext.getUserId());
     }
 }

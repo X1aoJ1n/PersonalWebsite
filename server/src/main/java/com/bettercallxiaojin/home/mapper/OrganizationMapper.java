@@ -20,4 +20,7 @@ public interface OrganizationMapper {
 
     @Update("UPDATE organization set type = #{type}, name = #{name}, start_date = #{startDate}, end_date = #{endDate}, position = #{position}, description = #{description} WHERE id = #{id}")
     int update(Organization organization);
+
+    @Delete("DELETE FROM organization WHERE id = #{id}")
+    int deleteById(@Param("id") String id);
 }

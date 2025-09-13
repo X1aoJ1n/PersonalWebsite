@@ -56,8 +56,8 @@ public class FollowController {
             return Response.error("id is empty or null");
         }
         try {
-            followService.checkFollowStatus(followId);
-            return Response.success();
+            Boolean exists = followService.checkFollowStatus(followId);
+            return Response.success(exists);
         } catch (Exception e) {
             return Response.error(e.getMessage());
         }
@@ -65,7 +65,7 @@ public class FollowController {
 
     @GetMapping("/list-following")
     @Operation(summary = "获取关注列表", description = "获取当前用户的关注列表")
-    public Response<List<SimpleUserVO>> getFollowingList(@RequestBody @Valid PageQuery pageQuery) {
+    public Response<List<SimpleUserVO>> getFollowingList( PageQuery pageQuery) {
         try {
             List<SimpleUserVO> simpleUserVOS = followService.getFollowingList(pageQuery.getPageNum(), pageQuery.getPageSize());
             return Response.success(simpleUserVOS);

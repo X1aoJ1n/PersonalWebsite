@@ -85,17 +85,7 @@ public class OrganizationServiceImpl implements OrganizationService {
             throw new RuntimeException("insert organization failed: " + e.getMessage());
         }
 
-        List<Organization> organizations = organizationMapper.selectByUserId(BaseContext.getUserId());
-
-        List<OrganizationVO> organizationVOS = new ArrayList<>();
-
-        for (Organization org : organizations) {
-            OrganizationVO organizationVO = new OrganizationVO();
-            BeanUtils.copyProperties(org, organizationVO);
-            organizationVOS.add(organizationVO);
-        }
-
-        return organizationVOS;
+        return getOrganizationByUserId(BaseContext.getUserId());
     }
 
     @Override
@@ -119,16 +109,27 @@ public class OrganizationServiceImpl implements OrganizationService {
             throw new RuntimeException("insert organization failed: " + e.getMessage());
         }
 
-        List<Organization> organizations = organizationMapper.selectByUserId(BaseContext.getUserId());
+        return getOrganizationByUserId(BaseContext.getUserId());
 
-        List<OrganizationVO> organizationVOS = new ArrayList<>();
+    }
 
-        for (Organization org : organizations) {
-            OrganizationVO organizationVO = new OrganizationVO();
-            BeanUtils.copyProperties(org, organizationVO);
-            organizationVOS.add(organizationVO);
+    @Override
+    public List<OrganizationVO> deleteOrganization(String id) {
+        String userId = BaseContext.getUserId();
+        Organization organization = organizationMapper.selectById(id);
+
+        if  (organization == null) {
+            throw new RuntimeException("organization is null");
+        }
+        if (!(userId.equals(organization.getUserId()))) {
+            throw new RuntimeException("cannot delete organization of others");
         }
 
-        return organizationVOS;
+        try {
+            organizationMapper.deleteById(id);
+        } catch (Exception e) {
+            throw new RuntimeException("delete organization failed: " + e.getMessage());
+        }
+        return getOrganizationByUserId(BaseContext.getUserId());
     }
 }
