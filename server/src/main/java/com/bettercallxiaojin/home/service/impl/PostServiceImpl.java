@@ -1,11 +1,14 @@
 package com.bettercallxiaojin.home.service.impl;
 
 import com.bettercallxiaojin.home.common.BaseContext;
+import com.bettercallxiaojin.home.mapper.FollowMapper;
 import com.bettercallxiaojin.home.mapper.PostMapper;
 import com.bettercallxiaojin.home.mapper.UserMapper;
 import com.bettercallxiaojin.home.pojo.VO.PostVO;
 import com.bettercallxiaojin.home.pojo.VO.SimpleUserVO;
+import com.bettercallxiaojin.home.pojo.VO.UserVO;
 import com.bettercallxiaojin.home.pojo.entity.Post;
+import com.bettercallxiaojin.home.pojo.entity.User;
 import com.bettercallxiaojin.home.service.LikeService;
 import com.bettercallxiaojin.home.service.PostService;
 import com.bettercallxiaojin.home.service.UserService;
@@ -26,6 +29,7 @@ public class PostServiceImpl implements PostService {
     private final PostMapper postMapper;
     private final UserService userService;
     private final LikeService likeService;
+    private final FollowMapper followMapper;
 
     @Override
     public PostVO createPost(String title, String preview, String content) {
@@ -46,7 +50,7 @@ public class PostServiceImpl implements PostService {
         try {
             postMapper.insert(post);
         } catch (Exception e) {
-            throw new RuntimeException("insert organization failed: " + e.getMessage());
+            throw new RuntimeException("insert failed: " + e.getMessage());
         }
 
         PostVO postVO = convertToVO(post);
@@ -142,12 +146,16 @@ public class PostServiceImpl implements PostService {
 
         BeanUtils.copyProperties(post,postVO);
 
-        SimpleUserVO userVO = new SimpleUserVO();
-        userVO.setId(BaseContext.getUserId());
-        userVO.setUsername(userService.getUsernameById(BaseContext.getUserId()));
+        UserVO userVO = userService.getUserById(post.getUserId());
 
-        postVO.setUserVO(userVO);
+        SimpleUserVO simpleUserVO = new SimpleUserVO();
+        simpleUserVO.setId(BaseContext.getUserId());
+        simpleUserVO.setUsername(userVO.getUsername());
+        simpleUserVO.setIcon(userVO.getIcon());
+        simpleUserVO.setBeingFollow(followMapper.existsByUserIdAndFollowId(simpleUserVO.getId(), BaseContext.getUserId()));
+        simpleUserVO.setIsFollow(followMapper.existsByUserIdAndFollowId(BaseContext.getUserId(), simpleUserVO.getId()));
+        postVO.setUserVO(simpleUserVO);
 
-        return  postVO;
+        return postVO;
     }
 }
