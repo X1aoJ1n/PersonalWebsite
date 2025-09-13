@@ -5,10 +5,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication(scanBasePackages = "com.bettercallxiaojin.home")
-@Slf4j
 public class HomeApplication  {
     public static void main(String[] args) {
-        log.info("Starting HomeApplication...");
         SpringApplication.run(HomeApplication.class, args);
     }
 }

@@ -6,7 +6,6 @@ import com.bettercallxiaojin.home.pojo.DTO.OrganizationDTO;
 import com.bettercallxiaojin.home.pojo.VO.OrganizationVO;
 import com.bettercallxiaojin.home.pojo.entity.Response;
 import com.bettercallxiaojin.home.service.OrganizationService;
-import com.bettercallxiaojin.home.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

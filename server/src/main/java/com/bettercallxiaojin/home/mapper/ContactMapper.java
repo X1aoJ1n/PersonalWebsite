@@ -1,7 +1,6 @@
 package com.bettercallxiaojin.home.mapper;
 
 import com.bettercallxiaojin.home.pojo.entity.Contact;
-import com.bettercallxiaojin.home.pojo.entity.Organization;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

@@ -4,7 +4,6 @@ import com.bettercallxiaojin.home.common.BaseContext;
 import com.bettercallxiaojin.home.pojo.DTO.AddContactDTO;
 import com.bettercallxiaojin.home.pojo.DTO.ContactDTO;
 import com.bettercallxiaojin.home.pojo.VO.ContactVO;
-import com.bettercallxiaojin.home.pojo.VO.OrganizationVO;
 import com.bettercallxiaojin.home.pojo.entity.Response;
 import com.bettercallxiaojin.home.service.ContactService;
 import io.swagger.v3.oas.annotations.Operation;

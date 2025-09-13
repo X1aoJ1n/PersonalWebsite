@@ -1,8 +1,6 @@
 package com.bettercallxiaojin.home.pojo.DTO;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +16,6 @@ public class ContactDTO {
     private String id;
 
     private String type;
-    
+
     private String data;
 }

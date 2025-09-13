@@ -1,6 +1,5 @@
 package com.bettercallxiaojin.home.pojo.VO;
 
-import com.bettercallxiaojin.home.pojo.entity.Comment;
 import com.bettercallxiaojin.home.pojo.entity.Reply;
 import lombok.AllArgsConstructor;
 import lombok.Data;
