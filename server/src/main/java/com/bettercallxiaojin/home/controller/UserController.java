@@ -37,6 +37,20 @@ public class UserController {
         }
     }
 
+    @GetMapping("/username")
+    @Operation(summary = "根据id获取用户")
+    public Response<String> getUsernameById(@RequestParam String id) {
+        if (id == null || id.isEmpty()) {
+            return Response.error("id is empty or null");
+        }
+        try {
+            String username = userService.getUsernameById(id);
+            return Response.success(username);
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
     @GetMapping()
     @Operation(summary = "获取当前用户")
     public Response<UserVO> getCurrentUser() {

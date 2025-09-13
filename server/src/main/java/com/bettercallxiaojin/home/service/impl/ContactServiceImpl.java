@@ -2,15 +2,11 @@ package com.bettercallxiaojin.home.service.impl;
 
 import com.bettercallxiaojin.home.common.BaseContext;
 import com.bettercallxiaojin.home.mapper.ContactMapper;
-import com.bettercallxiaojin.home.mapper.OrganizationMapper;
 import com.bettercallxiaojin.home.mapper.UserMapper;
 import com.bettercallxiaojin.home.pojo.VO.ContactVO;
-import com.bettercallxiaojin.home.pojo.VO.OrganizationVO;
 import com.bettercallxiaojin.home.pojo.entity.Contact;
-import com.bettercallxiaojin.home.pojo.entity.Organization;
 import com.bettercallxiaojin.home.pojo.entity.User;
 import com.bettercallxiaojin.home.service.ContactService;
-import com.bettercallxiaojin.home.service.OrganizationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;

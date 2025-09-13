@@ -2,7 +2,6 @@ package com.bettercallxiaojin.home.pojo.VO;
 
 import lombok.Data;
 
-import java.time.LocalDate;
 
 @Data
 public class ContactVO {

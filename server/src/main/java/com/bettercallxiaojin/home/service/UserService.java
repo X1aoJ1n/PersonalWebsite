@@ -2,9 +2,6 @@ package com.bettercallxiaojin.home.service;
 
 import com.bettercallxiaojin.home.pojo.VO.UserVO;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 
 public interface UserService {
 
@@ -15,4 +12,6 @@ public interface UserService {
     void changeEmail(String code, String email);
 
     UserVO updateIcon(@Valid String iconUrl);
+
+    String getUsernameById(String id);
 }

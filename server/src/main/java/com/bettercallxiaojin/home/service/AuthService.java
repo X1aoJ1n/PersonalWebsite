@@ -1,10 +1,6 @@
 package com.bettercallxiaojin.home.service;
 
-import com.bettercallxiaojin.home.pojo.DTO.ChangePasswordDTO;
 import com.bettercallxiaojin.home.pojo.VO.UserLoginVO;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import org.springframework.stereotype.Service;
 
 

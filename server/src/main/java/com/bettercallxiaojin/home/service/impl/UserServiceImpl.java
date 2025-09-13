@@ -1,7 +1,6 @@
 package com.bettercallxiaojin.home.service.impl;
 
 import com.bettercallxiaojin.home.common.BaseContext;
-import com.bettercallxiaojin.home.common.util.PasswordEncodeUtil;
 import com.bettercallxiaojin.home.mapper.ContactMapper;
 import com.bettercallxiaojin.home.mapper.OrganizationMapper;
 import com.bettercallxiaojin.home.mapper.UserMapper;
@@ -48,6 +47,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public String getUsernameById(String id) {
+        User user = userMapper.selectById(id);
+        if (user == null) {
+            throw new RuntimeException("user is null");
+        }
+        return user.getUsername();
+    }
+
+    @Override
     public UserVO updateUser(String username, String introduction) {
         String userId = BaseContext.getUserId();
 
@@ -91,6 +99,8 @@ public class UserServiceImpl implements UserService {
         BeanUtils.copyProperties(user, userVO);
         return userVO;
     }
+
+
 
     @Override
     public void changeEmail(String code, String email) {

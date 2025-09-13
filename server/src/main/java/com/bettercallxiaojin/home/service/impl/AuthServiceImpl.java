@@ -4,7 +4,6 @@ import com.bettercallxiaojin.home.common.BaseContext;
 import com.bettercallxiaojin.home.common.util.CodeGenerator;
 import com.bettercallxiaojin.home.mapper.ContactMapper;
 import com.bettercallxiaojin.home.mapper.OrganizationMapper;
-import com.bettercallxiaojin.home.mapper.UploadedFileMapper;
 import com.bettercallxiaojin.home.pojo.VO.UserLoginVO;
 import com.bettercallxiaojin.home.common.util.JwtUtil;
 import com.bettercallxiaojin.home.common.util.PasswordEncodeUtil;
