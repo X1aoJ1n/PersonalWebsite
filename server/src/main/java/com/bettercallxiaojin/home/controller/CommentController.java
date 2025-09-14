@@ -28,30 +28,45 @@ public class CommentController {
     @PostMapping("/create")
     @Operation(summary = "创建评论", description = "对帖子发表评论或回复其他评论")
     public Response<CommentVO> createComment(@RequestBody @Valid AddCommentDTO addCommentDTO) {
-
-        return null;
-
+        try {
+            return Response.success(commentService.createComment(addCommentDTO.getPostId(), addCommentDTO.getContent()));
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
     }
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除评论", description = "删除自己发表的评论")
     public Response<Boolean> deleteComment(@RequestParam String id) {
-
-        return null;
+        try {
+            return Response.success(commentService.deleteComment(id));
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
     }
 
 
     @GetMapping("/list/by-post")
     @Operation(summary = "获取帖子评论", description = "获取指定帖子下的评论列表")
     public Response<List<CommentVO>> getCommentsByPostId(@RequestBody @Valid PageQuery pageQuery) {
-
-        return null;
+        if  (pageQuery.getId() == null) {
+            return Response.error("id cannot be empty");
+        }
+        try {
+            return Response.success(commentService.getCommentsByPostId(pageQuery.getId(), pageQuery.getPageNum(),pageQuery.getPageSize()));
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
     }
 
 
     @PutMapping("/update")
     @Operation(summary = "修改评论", description = "修改用户的评论")
     public Response<CommentVO> updateComment(@RequestBody @Valid CommentDTO commentDTO) {
-        return null;
+        try {
+            return Response.success(commentService.updateComment(commentDTO.getId(), commentDTO.getContent()));
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
     }
 }

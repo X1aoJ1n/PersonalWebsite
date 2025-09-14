@@ -63,12 +63,13 @@ public class AuthServiceImpl implements AuthService {
         List<Contact> contacts = contactMapper.selectByUserId(user.getId());
         List<Organization> organizations = organizationMapper.selectByUserId(user.getId());
 
-        user.setContacts(contacts);
-        user.setOrganizations(organizations);
 
         UserLoginVO userLoginVO = new UserLoginVO();
 
         BeanUtils.copyProperties(user, userLoginVO);
+
+        userLoginVO.setContacts(contacts);
+        userLoginVO.setOrganizations(organizations);
 
         String token = JwtUtil.generateToken(user.getId(), secretKey, ttl);
 
@@ -92,12 +93,11 @@ public class AuthServiceImpl implements AuthService {
         List<Contact> contacts = contactMapper.selectByUserId(user.getId());
         List<Organization> organizations = organizationMapper.selectByUserId(user.getId());
 
-        user.setContacts(contacts);
-        user.setOrganizations(organizations);
-
         UserLoginVO userLoginVO = new UserLoginVO();
 
         BeanUtils.copyProperties(user, userLoginVO);
+        userLoginVO.setContacts(contacts);
+        userLoginVO.setOrganizations(organizations);
 
         String token = JwtUtil.generateToken(user.getId(), secretKey, ttl);
 

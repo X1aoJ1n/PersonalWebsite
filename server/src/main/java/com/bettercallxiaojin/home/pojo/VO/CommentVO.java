@@ -13,11 +13,12 @@ import java.util.List;
 @AllArgsConstructor
 public class CommentVO {
     private String id;
-    private String userId;
+    private SimpleUserVO userVO;
     private String postId;
     private String content;
     private List<Reply> replies;
     private Integer likeCount;
+    private Boolean isLike;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

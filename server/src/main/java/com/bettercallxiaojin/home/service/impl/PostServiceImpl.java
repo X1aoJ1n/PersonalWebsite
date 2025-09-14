@@ -111,7 +111,7 @@ public class PostServiceImpl implements PostService {
         try {
             rows = postMapper.deleteById(id);
         } catch (Exception e) {
-            throw new RuntimeException("delete organization failed: " + e.getMessage());
+            throw new RuntimeException("delete post failed: " + e.getMessage());
         }
         return rows > 0;
     }

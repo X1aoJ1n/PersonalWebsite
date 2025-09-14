@@ -15,8 +15,8 @@ public class Comment {
     private String userId;
     private String postId;
     private String content;
-    private List<Reply> replies;
     private Integer likeCount;
+    private Integer replyCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

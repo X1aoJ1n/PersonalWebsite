@@ -38,11 +38,13 @@ public class UserServiceImpl implements UserService {
 
         List<Organization> organizations = organizationMapper.selectByUserId(id);
         List<Contact> contacts = contactMapper.selectByUserId(id);
-        user.setOrganizations(organizations);
-        user.setContacts(contacts);
+
 
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);
+        userVO.setContacts(contacts);
+        userVO.setOrganizations(organizations);
+
         return userVO;
     }
 
