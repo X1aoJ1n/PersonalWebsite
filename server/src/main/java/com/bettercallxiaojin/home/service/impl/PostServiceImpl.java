@@ -3,12 +3,12 @@ package com.bettercallxiaojin.home.service.impl;
 import com.bettercallxiaojin.home.common.BaseContext;
 import com.bettercallxiaojin.home.mapper.FollowMapper;
 import com.bettercallxiaojin.home.mapper.PostMapper;
-import com.bettercallxiaojin.home.mapper.UserMapper;
 import com.bettercallxiaojin.home.pojo.VO.PostVO;
+import com.bettercallxiaojin.home.pojo.VO.SimplePostVO;
 import com.bettercallxiaojin.home.pojo.VO.SimpleUserVO;
 import com.bettercallxiaojin.home.pojo.VO.UserVO;
 import com.bettercallxiaojin.home.pojo.entity.Post;
-import com.bettercallxiaojin.home.pojo.entity.User;
+import com.bettercallxiaojin.home.service.FollowService;
 import com.bettercallxiaojin.home.service.LikeService;
 import com.bettercallxiaojin.home.service.PostService;
 import com.bettercallxiaojin.home.service.UserService;
@@ -18,6 +18,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -53,8 +54,7 @@ public class PostServiceImpl implements PostService {
             throw new RuntimeException("insert failed: " + e.getMessage());
         }
 
-        PostVO postVO = convertToVO(post);
-        postVO.setIsLike(false);
+        PostVO postVO = convertToPostVO(post);
 
         return postVO;
     }
@@ -90,8 +90,7 @@ public class PostServiceImpl implements PostService {
             throw new RuntimeException("update post failed: " + e.getMessage());
         }
 
-        PostVO postVO = convertToVO(post);
-        postVO.setIsLike(likeService.checkLikeStatus(userId, postVO.getId()));
+        PostVO postVO = convertToPostVO(post);
 
         return postVO;
     }
@@ -120,28 +119,59 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostVO getPostById(String id) {
         Post post = postMapper.selectById(id);
-        PostVO postVO = convertToVO(post);
-        postVO.setIsLike(likeService.checkLikeStatus(BaseContext.getUserId(), postVO.getId()));
+        PostVO postVO = convertToPostVO(post);
 
         return postVO;
     }
 
     @Override
-    public List<PostVO> getUserPost(String userId, Integer pageNum, Integer pageSize) {
-        return null;
+    public List<SimplePostVO> getUserPost(String userId, Integer pageNum, Integer pageSize) {
+
+        List<Post> posts = postMapper.selectByUserId(userId, pageSize, (pageNum - 1) * pageSize);
+
+        List<SimplePostVO> simplePostVOs = new ArrayList<>();
+        for  (Post post : posts) {
+            SimplePostVO simplePostVO = convertToSimplePostVO(post);
+            simplePostVOs.add(simplePostVO);
+        }
+
+        return simplePostVOs;
     }
 
     @Override
-    public List<PostVO> getVisiblePost(Integer pageNum, Integer pageSize) {
-        return null;
+    public List<SimplePostVO> getVisiblePost(Integer pageNum, Integer pageSize) {
+        List<Post> posts = postMapper.selectAll( pageSize, (pageNum - 1) * pageSize);
+
+        List<SimplePostVO> simplePostVOs = new ArrayList<>();
+        for  (Post post : posts) {
+            SimplePostVO simplePostVO = convertToSimplePostVO(post);
+            simplePostVOs.add(simplePostVO);
+        }
+
+        return simplePostVOs;
     }
 
     @Override
-    public List<PostVO> getFollowPost(Integer pageNum, Integer pageSize) {
-        return List.of();
+    public List<SimplePostVO> getFollowPost(Integer pageNum, Integer pageSize) {
+        List<String> userIds = followMapper.selectFollowingByUserId(BaseContext.getUserId());
+
+        if (userIds == null || userIds.isEmpty()) {
+            return List.of();
+        }
+
+        int offset = (pageNum - 1) * pageSize;
+        List<Post> posts = postMapper.selectByUserIds(userIds, pageSize, offset);
+
+        List<SimplePostVO> simplePostVOs = new ArrayList<>();
+        for  (Post post : posts) {
+            SimplePostVO simplePostVO = convertToSimplePostVO(post);
+            simplePostVOs.add(simplePostVO);
+        }
+
+        return simplePostVOs;
     }
 
-    private PostVO convertToVO(Post post) {
+    private PostVO convertToPostVO(Post post) {
         PostVO postVO = new PostVO();
 
         BeanUtils.copyProperties(post,postVO);
@@ -155,7 +185,27 @@ public class PostServiceImpl implements PostService {
         simpleUserVO.setBeingFollow(followMapper.existsByUserIdAndFollowId(simpleUserVO.getId(), BaseContext.getUserId()));
         simpleUserVO.setIsFollow(followMapper.existsByUserIdAndFollowId(BaseContext.getUserId(), simpleUserVO.getId()));
         postVO.setUserVO(simpleUserVO);
+        postVO.setIsLike(likeService.checkLikeStatus(BaseContext.getUserId(), postVO.getId()));
 
         return postVO;
+    }
+
+    private SimplePostVO convertToSimplePostVO(Post post) {
+        SimplePostVO simplePostVO = new SimplePostVO();
+
+        BeanUtils.copyProperties(post,simplePostVO);
+
+        UserVO userVO = userService.getUserById(post.getUserId());
+
+        SimpleUserVO simpleUserVO = new SimpleUserVO();
+        simpleUserVO.setId(userVO.getId());
+        simpleUserVO.setUsername(userVO.getUsername());
+        simpleUserVO.setIcon(userVO.getIcon());
+        simpleUserVO.setBeingFollow(followMapper.existsByUserIdAndFollowId(simpleUserVO.getId(), BaseContext.getUserId()));
+        simpleUserVO.setIsFollow(followMapper.existsByUserIdAndFollowId(BaseContext.getUserId(), simpleUserVO.getId()));
+
+        simplePostVO.setUserVO(simpleUserVO);
+
+        return simplePostVO;
     }
 }

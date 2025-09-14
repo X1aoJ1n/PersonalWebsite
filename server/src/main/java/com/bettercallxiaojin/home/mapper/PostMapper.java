@@ -1,6 +1,7 @@
 package com.bettercallxiaojin.home.mapper;
 
 import com.bettercallxiaojin.home.pojo.VO.PostVO;
+import com.bettercallxiaojin.home.pojo.VO.SimplePostVO;
 import com.bettercallxiaojin.home.pojo.entity.Post;
 import org.apache.ibatis.annotations.*;
 
@@ -22,25 +23,28 @@ public interface PostMapper {
     @Delete("DELETE FROM post WHERE id = #{id}")
     int deleteById(String id);
 
-    @Select("SELECT p.id, p.title, p.content, p.like_count, p.comment_count, " +
-            "p.created_at, p.updated_at, " +
-            "u.id AS userVO_id, u.username AS userVO_username " +
-            "FROM post p " +
-            "JOIN user_db u ON p.user_id = u.id " +
-            "WHERE p.user_id = #{userId} " +
-            "ORDER BY p.created_at DESC " +
-            "LIMIT #{pageSize} OFFSET #{offset}")
-    List<PostVO> selectByUserId(@Param("userId") String userId,
-                                        @Param("offset") int offset,
-                                        @Param("pageSize") int pageSize);
+    @Select("SELECT * FROM post WHERE user_id = #{userId} ORDER BY created_at DESC LIMIT #{pageSize} OFFSET #{offset}")
+    List<Post> selectByUserId(@Param("userId") String userId,
+                              @Param("pageSize") int pageSize,
+                              @Param("offset") int offset);
 
-    @Select("SELECT p.id, p.title, p.content, p.like_count, p.comment_count, " +
-            "p.created_at, p.updated_at, " +
-            "u.id AS userVO_id, u.username AS userVO_username " +
-            "FROM post p " +
-            "JOIN user_db u ON p.user_id = u.id " +
-            "WHERE p.user_id = #{userId} " +
-            "ORDER BY p.created_at DESC " +
-            "LIMIT #{pageSize} OFFSET #{offset}")
-    List<PostVO> selectAll(Integer pageNum, Integer pageSize);
+    @Select("SELECT * FROM post ORDER BY created_at DESC LIMIT #{pageSize} OFFSET #{offset}")
+    List<Post> selectAll(@Param("pageSize") int pageSize,
+                         @Param("offset") int offset);
+
+    @Select({
+            "<script>",
+            "SELECT id, user_id AS userId, title, like_count AS likeCount, comment_count AS commentCount, created_at AS createdAt ",
+            "FROM post ",
+            "WHERE user_id IN ",
+            "<foreach collection='userIds' item='id' open='(' separator=',' close=')'>",
+            "#{id}",
+            "</foreach>",
+            "ORDER BY created_at DESC ",
+            "LIMIT #{pageSize} OFFSET #{offset}",
+            "</script>"
+    })
+    List<Post> selectByUserIds(@Param("userIds") List<String> userIds,
+                              @Param("pageSize") int pageSize,
+                              @Param("offset") int offset);
 }

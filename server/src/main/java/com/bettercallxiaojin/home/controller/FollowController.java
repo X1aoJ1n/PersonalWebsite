@@ -65,9 +65,9 @@ public class FollowController {
 
     @GetMapping("/list-following")
     @Operation(summary = "获取关注列表", description = "获取当前用户的关注列表")
-    public Response<List<SimpleUserVO>> getFollowingList( PageQuery pageQuery) {
+    public Response<List<SimpleUserVO>> getFollowingList(PageQuery pageQuery) {
         try {
-            List<SimpleUserVO> simpleUserVOS = followService.getFollowingList(pageQuery.getId(), pageQuery.getPageNumOrDefault(), pageQuery.getPageSizeOrDefault());
+            List<SimpleUserVO> simpleUserVOS = followService.getFollowingList(pageQuery.getId(), pageQuery.getPageNum(), pageQuery.getPageSize());
             return Response.success(simpleUserVOS);
         } catch (Exception e) {
             return Response.error(e.getMessage());
@@ -78,7 +78,7 @@ public class FollowController {
     @Operation(summary = "获取粉丝列表", description = "获取当前用户的粉丝列表")
     public Response<List<SimpleUserVO>> getFollowerList(PageQuery pageQuery) {
         try {
-            List<SimpleUserVO> simpleUserVOS = followService.getFollowerList(pageQuery.getId(), pageQuery.getPageNumOrDefault(), pageQuery.getPageSizeOrDefault());
+            List<SimpleUserVO> simpleUserVOS = followService.getFollowerList(pageQuery.getId(), pageQuery.getPageNum(), pageQuery.getPageSize());
             return Response.success(simpleUserVOS);
         } catch (Exception e) {
             return Response.error(e.getMessage());

@@ -15,11 +15,11 @@ public class PageQuery {
     private static final Integer DEFAULT_PAGE_NUM = 1;
     private static final Integer DEFAULT_PAGE_SIZE = 10;
 
-    public Integer getPageNumOrDefault() {
+    public Integer getPageNum() {
         return pageNum == null ? DEFAULT_PAGE_NUM : pageNum;
     }
 
-    public Integer getPageSizeOrDefault() {
+    public Integer getPageSize() {
         return pageSize == null ? DEFAULT_PAGE_SIZE : pageSize;
     }
 }

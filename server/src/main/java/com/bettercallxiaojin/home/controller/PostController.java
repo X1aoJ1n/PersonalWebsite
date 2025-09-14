@@ -3,6 +3,7 @@ package com.bettercallxiaojin.home.controller;
 import com.bettercallxiaojin.home.pojo.DTO.AddPostDTO;
 import com.bettercallxiaojin.home.pojo.DTO.PostDTO;
 import com.bettercallxiaojin.home.pojo.VO.PostVO;
+import com.bettercallxiaojin.home.pojo.VO.SimplePostVO;
 import com.bettercallxiaojin.home.pojo.VO.SimpleUserVO;
 import com.bettercallxiaojin.home.pojo.entity.PageQuery;
 import com.bettercallxiaojin.home.pojo.entity.Response;
@@ -73,12 +74,12 @@ public class PostController {
 
     @GetMapping("/list/byUser")
     @Operation(summary = "获取用户发布的帖子列表", description = "获取指定用户发布的帖子列表，支持分页")
-    public Response<List<PostVO>> getUserPost(@RequestBody @Valid PageQuery pageQuery) {
+    public Response<List<SimplePostVO>> getUserPost(PageQuery pageQuery) {
         if  (pageQuery.getId() == null) {
             return Response.error("id cannot be empty");
         }
         try {
-            return Response.success(postService.getUserPost(pageQuery.getId(), pageQuery.getPageNumOrDefault(),pageQuery.getPageSizeOrDefault()));
+            return Response.success(postService.getUserPost(pageQuery.getId(), pageQuery.getPageNum(),pageQuery.getPageSize()));
         } catch (Exception e) {
             return Response.error(e.getMessage());
         }
@@ -86,9 +87,9 @@ public class PostController {
 
     @GetMapping("/list/all")
     @Operation(summary = "获取所有帖子", description = "获取当前用户可见的所有帖子列表")
-    public Response<List<PostVO>> getVisiblePost(@RequestBody @Valid PageQuery pageQuery) {
+    public Response<List<SimplePostVO>> getVisiblePost(PageQuery pageQuery) {
         try {
-            return Response.success(postService.getVisiblePost(pageQuery.getPageNumOrDefault(),pageQuery.getPageSizeOrDefault()));
+            return Response.success(postService.getVisiblePost(pageQuery.getPageNum(),pageQuery.getPageSize()));
         } catch (Exception e) {
             return Response.error(e.getMessage());
         }
@@ -96,9 +97,9 @@ public class PostController {
 
     @PostMapping("/list/favorite")
     @Operation(summary = "获取关注帖子", description = "获取收藏用户的公开帖子列表")
-    public Response<List<PostVO>> getFollowPost(@RequestBody @Valid PageQuery pageQuery) {
+    public Response<List<SimplePostVO>> getFollowPost(PageQuery pageQuery) {
         try {
-            return Response.success(postService.getFollowPost(pageQuery.getPageNumOrDefault(),pageQuery.getPageSizeOrDefault()));
+            return Response.success(postService.getFollowPost(pageQuery.getPageNum(),pageQuery.getPageSize()));
         } catch (Exception e) {
             return Response.error(e.getMessage());
         }
