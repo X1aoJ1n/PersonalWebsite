@@ -128,7 +128,9 @@ public class PostServiceImpl implements PostService {
     public List<SimplePostVO> getUserPost(String userId, Integer pageNum, Integer pageSize) {
 
         List<Post> posts = postMapper.selectByUserId(userId, pageSize, (pageNum - 1) * pageSize);
-
+        if (posts == null || posts.isEmpty()) {
+            return List.of();
+        }
         List<SimplePostVO> simplePostVOs = new ArrayList<>();
         for  (Post post : posts) {
             SimplePostVO simplePostVO = convertToSimplePostVO(post);
@@ -141,7 +143,9 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<SimplePostVO> getVisiblePost(Integer pageNum, Integer pageSize) {
         List<Post> posts = postMapper.selectAll( pageSize, (pageNum - 1) * pageSize);
-
+        if (posts == null || posts.isEmpty()) {
+            return List.of();
+        }
         List<SimplePostVO> simplePostVOs = new ArrayList<>();
         for  (Post post : posts) {
             SimplePostVO simplePostVO = convertToSimplePostVO(post);
@@ -161,7 +165,9 @@ public class PostServiceImpl implements PostService {
 
         int offset = (pageNum - 1) * pageSize;
         List<Post> posts = postMapper.selectByUserIds(userIds, pageSize, offset);
-
+        if (posts == null || posts.isEmpty()) {
+            return List.of();
+        }
         List<SimplePostVO> simplePostVOs = new ArrayList<>();
         for  (Post post : posts) {
             SimplePostVO simplePostVO = convertToSimplePostVO(post);
@@ -184,8 +190,11 @@ public class PostServiceImpl implements PostService {
         simpleUserVO.setIcon(userVO.getIcon());
         simpleUserVO.setBeingFollow(followMapper.existsByUserIdAndFollowId(simpleUserVO.getId(), BaseContext.getUserId()));
         simpleUserVO.setIsFollow(followMapper.existsByUserIdAndFollowId(BaseContext.getUserId(), simpleUserVO.getId()));
+
         postVO.setUserVO(simpleUserVO);
         postVO.setIsLike(likeService.checkLikeStatus(BaseContext.getUserId(), postVO.getId()));
+
+        postVO.setIsCreator(post.getUserId().equals(BaseContext.getUserId()));
 
         return postVO;
     }

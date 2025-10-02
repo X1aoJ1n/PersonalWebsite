@@ -1,0 +1,71 @@
+package com.bettercallxiaojin.home.controller;
+
+
+import com.bettercallxiaojin.home.pojo.DTO.AddReplyDTO;
+import com.bettercallxiaojin.home.pojo.DTO.ReplyDTO;
+import com.bettercallxiaojin.home.pojo.VO.ReplyVO;
+import com.bettercallxiaojin.home.pojo.entity.PageQuery;
+import com.bettercallxiaojin.home.pojo.entity.Response;
+import com.bettercallxiaojin.home.service.ReplyService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+
+@RestController
+@RequestMapping("/reply")
+@RequiredArgsConstructor
+@Tag(name = "评论回复管理", description = "回复评论的内容相关接口")
+public class ReplyController {
+
+    private final ReplyService replyService;
+
+    @PostMapping("/create")
+    @Operation(summary = "创建回复", description = "对帖子发表评论或回复其他评论")
+    public Response<ReplyVO> createReply(@RequestBody @Valid AddReplyDTO addReplyDTO) {
+        try {
+            return Response.success(replyService.createReply(addReplyDTO.getCommentId(), addReplyDTO.getReplyTo(), addReplyDTO.getContent()));
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/delete")
+    @Operation(summary = "删除回复", description = "删除自己发表的评论")
+    public Response<Boolean> deleteReply(@RequestParam String id) {
+        try {
+            return Response.success(replyService.deleteReply(id));
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
+    @PutMapping("/update")
+    @Operation(summary = "修改回复", description = "修改用户的回复")
+    public Response<ReplyVO> updateReply(@RequestBody @Valid ReplyDTO replyDTO) {
+        try {
+            return Response.success(replyService.updateReply(replyDTO.getId(), replyDTO.getContent()));
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
+
+    @GetMapping("/list/by-comment")
+    @Operation(summary = "获取评论回复", description = "获取指定评论下的回复列表")
+    public Response<List<ReplyVO>> getRepliesByPostId(@RequestBody @Valid PageQuery pageQuery) {
+        if (pageQuery.getId() == null) {
+            return Response.error("id cannot be empty");
+        }
+        try {
+            return Response.success(replyService.getRepliesByPostId(pageQuery.getId(), pageQuery.getPageNum(), pageQuery.getPageSize()));
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
+}

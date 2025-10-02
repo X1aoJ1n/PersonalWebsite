@@ -7,18 +7,15 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class PostVO {
+@AllArgsConstructor
+public class ReplyVO {
     private String id;
     private SimpleUserVO userVO;
-    private String title;
-    private String preview;
+    private String commentId;
+    private ReplyToVO replyToVO;
     private String content;
     private Integer likeCount;
-    private Integer commentCount;
-    private Boolean isLike;
-    private Boolean isCreator;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

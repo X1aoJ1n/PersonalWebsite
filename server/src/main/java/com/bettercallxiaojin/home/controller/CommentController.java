@@ -59,7 +59,6 @@ public class CommentController {
         }
     }
 
-
     @PutMapping("/update")
     @Operation(summary = "修改评论", description = "修改用户的评论")
     public Response<CommentVO> updateComment(@RequestBody @Valid CommentDTO commentDTO) {

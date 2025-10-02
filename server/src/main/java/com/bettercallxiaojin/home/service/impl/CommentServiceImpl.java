@@ -6,10 +6,7 @@ import com.bettercallxiaojin.home.mapper.FollowMapper;
 import com.bettercallxiaojin.home.pojo.VO.*;
 import com.bettercallxiaojin.home.pojo.entity.Comment;
 import com.bettercallxiaojin.home.pojo.entity.Post;
-import com.bettercallxiaojin.home.service.CommentService;
-import com.bettercallxiaojin.home.service.LikeService;
-import com.bettercallxiaojin.home.service.PostService;
-import com.bettercallxiaojin.home.service.UserService;
+import com.bettercallxiaojin.home.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -27,6 +24,7 @@ public class CommentServiceImpl implements CommentService {
     private final UserService userService;
     private final FollowMapper followMapper;
     private final LikeService likeService;
+    private final ReplyService replyService;
 
     @Override
     public CommentVO createComment(String postId, String content) {
@@ -82,9 +80,13 @@ public class CommentServiceImpl implements CommentService {
 
         List<Comment> comments = commentMapper.selectByPostId(id, pageSize, (pageNum - 1) * pageSize);
 
+        if (comments == null || comments.isEmpty()) {
+            return List.of();
+        }
         List<CommentVO> commentVOS = new ArrayList<>();
         for  (Comment comment : comments) {
             CommentVO commentVO = convertToCommentVO(comment);
+            commentVO.setReplies(replyService.getOverviewReplies(commentVO.getId()));
             commentVOS.add(commentVO);
         }
 
@@ -133,8 +135,11 @@ public class CommentServiceImpl implements CommentService {
         simpleUserVO.setIcon(userVO.getIcon());
         simpleUserVO.setBeingFollow(followMapper.existsByUserIdAndFollowId(simpleUserVO.getId(), BaseContext.getUserId()));
         simpleUserVO.setIsFollow(followMapper.existsByUserIdAndFollowId(BaseContext.getUserId(), simpleUserVO.getId()));
+
         commentVO.setUserVO(simpleUserVO);
         commentVO.setIsLike(likeService.checkLikeStatus(BaseContext.getUserId(), commentVO.getId()));
+
+        commentVO.setIsCreator(comment.getUserId().equals(BaseContext.getUserId()));
 
         return commentVO;
     }
