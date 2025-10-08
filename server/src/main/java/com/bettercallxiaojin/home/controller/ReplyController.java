@@ -1,6 +1,7 @@
 package com.bettercallxiaojin.home.controller;
 
 
+import com.bettercallxiaojin.home.common.Constant.StatusConstant;
 import com.bettercallxiaojin.home.pojo.DTO.AddReplyDTO;
 import com.bettercallxiaojin.home.pojo.DTO.ReplyDTO;
 import com.bettercallxiaojin.home.pojo.VO.ReplyVO;
@@ -25,7 +26,7 @@ public class ReplyController {
     private final ReplyService replyService;
 
     @PostMapping("/create")
-    @Operation(summary = "创建回复", description = "对帖子发表评论或回复其他评论")
+    @Operation(summary = "创建回复", description = "对帖子发表回复或回复其他评论")
     public Response<ReplyVO> createReply(@RequestBody @Valid AddReplyDTO addReplyDTO) {
         try {
             return Response.success(replyService.createReply(addReplyDTO.getCommentId(), addReplyDTO.getReplyTo(), addReplyDTO.getContent()));
@@ -34,11 +35,31 @@ public class ReplyController {
         }
     }
 
-    @DeleteMapping("/delete")
-    @Operation(summary = "删除回复", description = "删除自己发表的评论")
-    public Response<Boolean> deleteReply(@RequestParam String id) {
+    @PutMapping("/delete")
+    @Operation(summary = "删除回复", description = "删除自己发表的回复")
+    public Response<Boolean> deleteComment(@RequestParam String id) {
         try {
-            return Response.success(replyService.deleteReply(id));
+            return Response.success(replyService.changeReplyStatus(id, StatusConstant.DELETED));
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
+    @PutMapping("/archive")
+    @Operation(summary = "隐藏回复", description = "隐藏自己发表的回复")
+    public Response<Boolean> archiveComment(@RequestParam String id) {
+        try {
+            return Response.success(replyService.changeReplyStatus(id, StatusConstant.ARCHIVE));
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
+    @PutMapping("/unarchive")
+    @Operation(summary = "删除回复", description = "删除自己发表的回复")
+    public Response<Boolean> unarchiveComment(@RequestParam String id) {
+        try {
+            return Response.success(replyService.changeReplyStatus(id, StatusConstant.OK));
         } catch (Exception e) {
             return Response.error(e.getMessage());
         }
@@ -57,12 +78,12 @@ public class ReplyController {
 
     @GetMapping("/list/by-comment")
     @Operation(summary = "获取评论回复", description = "获取指定评论下的回复列表")
-    public Response<List<ReplyVO>> getRepliesByPostId(@RequestBody @Valid PageQuery pageQuery) {
+    public Response<List<ReplyVO>> getRepliesByCommentId(@RequestBody @Valid PageQuery pageQuery) {
         if (pageQuery.getId() == null) {
             return Response.error("id cannot be empty");
         }
         try {
-            return Response.success(replyService.getRepliesByPostId(pageQuery.getId(), pageQuery.getPageNum(), pageQuery.getPageSize()));
+            return Response.success(replyService.getRepliesByCommentId(pageQuery.getId(), pageQuery.getPageNum(), pageQuery.getPageSize()));
         } catch (Exception e) {
             return Response.error(e.getMessage());
         }

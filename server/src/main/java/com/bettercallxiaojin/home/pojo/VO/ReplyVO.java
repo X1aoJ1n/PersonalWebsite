@@ -16,6 +16,8 @@ public class ReplyVO {
     private ReplyToVO replyToVO;
     private String content;
     private Integer likeCount;
+    private Boolean isLike;
+    private Boolean isCreator;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

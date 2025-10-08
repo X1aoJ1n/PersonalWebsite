@@ -1,8 +1,10 @@
 package com.bettercallxiaojin.home.service.impl;
 
 import com.bettercallxiaojin.home.common.BaseContext;
+import com.bettercallxiaojin.home.common.Constant.StatusConstant;
 import com.bettercallxiaojin.home.mapper.CommentMapper;
 import com.bettercallxiaojin.home.mapper.FollowMapper;
+import com.bettercallxiaojin.home.mapper.PostMapper;
 import com.bettercallxiaojin.home.pojo.VO.*;
 import com.bettercallxiaojin.home.pojo.entity.Comment;
 import com.bettercallxiaojin.home.pojo.entity.Post;
@@ -20,6 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
+    private final PostMapper postMapper;
     private final CommentMapper commentMapper;
     private final UserService userService;
     private final FollowMapper followMapper;
@@ -28,6 +31,12 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentVO createComment(String postId, String content) {
+
+        Post post = postMapper.selectById(postId);
+        if (post == null) {
+            throw new RuntimeException("Post Not Found");
+        }
+
         String userId = BaseContext.getUserId();
 
         Comment comment = new Comment();
@@ -37,6 +46,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setLikeCount(0);
         comment.setReplyCount(0);
         comment.setCreatedAt(LocalDateTime.now());
+        comment.setStatus(StatusConstant.OK);
 
         String id =  UUID.randomUUID().toString();
         comment.setId(id);
@@ -52,10 +62,8 @@ public class CommentServiceImpl implements CommentService {
         return commentVO;
     }
 
-
-
     @Override
-    public Boolean deleteComment(String id) {
+    public Boolean changeCommentStatus(String id, Integer status) {
         String userId = BaseContext.getUserId();
         Comment comment = commentMapper.selectById(id);
 
@@ -63,20 +71,26 @@ public class CommentServiceImpl implements CommentService {
             throw new RuntimeException("comment is null");
         }
         if (!(userId.equals(comment.getUserId()))) {
-            throw new RuntimeException("cannot delete comment of others");
+            throw new RuntimeException("cannot change status of others");
         }
 
         int rows = 0;
         try {
-            rows = commentMapper.deleteById(id);
+            rows = commentMapper.updateStatus(id, status);
         } catch (Exception e) {
-            throw new RuntimeException("delete comment failed: " + e.getMessage());
+            throw new RuntimeException("change status failed: " + e.getMessage());
         }
         return rows > 0;
     }
 
+
     @Override
     public List<CommentVO> getCommentsByPostId(String id, Integer pageNum, Integer pageSize) {
+
+        Post post = postMapper.selectById(id);
+        if (post == null) {
+            throw new RuntimeException("Post Not Found");
+        }
 
         List<Comment> comments = commentMapper.selectByPostId(id, pageSize, (pageNum - 1) * pageSize);
 
@@ -121,6 +135,7 @@ public class CommentServiceImpl implements CommentService {
 
         return commentVO;
     }
+
 
     private CommentVO convertToCommentVO(Comment comment) {
         CommentVO commentVO = new CommentVO();

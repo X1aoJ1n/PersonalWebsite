@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReplyToVO {
 
-    private String id;
+    private String replyId;
 
     private String userId;
 

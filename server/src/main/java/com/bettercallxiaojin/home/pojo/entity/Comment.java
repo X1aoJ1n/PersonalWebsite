@@ -15,6 +15,7 @@ public class Comment {
     private String userId;
     private String postId;
     private String content;
+    private Integer status;
     private Integer likeCount;
     private Integer replyCount;
     private LocalDateTime createdAt;

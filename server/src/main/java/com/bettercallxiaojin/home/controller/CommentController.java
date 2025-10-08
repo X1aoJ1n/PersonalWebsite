@@ -1,6 +1,7 @@
 package com.bettercallxiaojin.home.controller;
 
 
+import com.bettercallxiaojin.home.common.Constant.StatusConstant;
 import com.bettercallxiaojin.home.pojo.DTO.AddCommentDTO;
 import com.bettercallxiaojin.home.pojo.DTO.CommentDTO;
 import com.bettercallxiaojin.home.pojo.VO.CommentVO;
@@ -35,11 +36,31 @@ public class CommentController {
         }
     }
 
-    @DeleteMapping("/delete")
+    @PutMapping("/delete")
     @Operation(summary = "删除评论", description = "删除自己发表的评论")
     public Response<Boolean> deleteComment(@RequestParam String id) {
         try {
-            return Response.success(commentService.deleteComment(id));
+            return Response.success(commentService.changeCommentStatus(id, StatusConstant.DELETED));
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
+    @PutMapping("/archive")
+    @Operation(summary = "隐藏评论", description = "隐藏自己发表的评论")
+    public Response<Boolean> archiveComment(@RequestParam String id) {
+        try {
+            return Response.success(commentService.changeCommentStatus(id, StatusConstant.ARCHIVE));
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
+    @PutMapping("/unarchive")
+    @Operation(summary = "删除评论", description = "删除自己发表的评论")
+    public Response<Boolean> unarchiveComment(@RequestParam String id) {
+        try {
+            return Response.success(commentService.changeCommentStatus(id, StatusConstant.OK));
         } catch (Exception e) {
             return Response.error(e.getMessage());
         }
