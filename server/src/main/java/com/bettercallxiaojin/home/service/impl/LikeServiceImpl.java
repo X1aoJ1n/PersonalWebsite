@@ -83,6 +83,10 @@ public class LikeServiceImpl implements LikeService {
     public Boolean checkLikeStatus(Integer targetType, String targetId) {
         String userId = BaseContext.getUserId();
 
+        if (userId == null || userId.isEmpty()) {
+            return false;
+        }
+
         try {
             return (likeMapper.selectLikeRecord(userId, targetId, targetType)>0);
         } catch (Exception e) {

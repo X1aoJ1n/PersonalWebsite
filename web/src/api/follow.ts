@@ -1,17 +1,18 @@
 import axios from 'axios';
 import type { BaseResponse, SimpleUserVO, PageQuery } from '@/models';
+import axiosInstance from './axiosInstance';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // 关注用户
 export const follow = async (followId: string) => {
-  const res = await axios.post<BaseResponse<null>>(`${BASE_URL}/follow?followId=${followId}`);
+  const res = await axiosInstance.post<BaseResponse<null>>(`${BASE_URL}/follow?followId=${followId}`);
   return res.data;
 };
 
 // 取消关注
 export const unfollow = async (followId: string) => {
-  const res = await axios.delete<BaseResponse<null>>(`${BASE_URL}/follow/cancel?followId=${followId}`);
+  const res = await axiosInstance.delete<BaseResponse<null>>(`${BASE_URL}/follow/cancel?followId=${followId}`);
   return res.data;
 };
 
@@ -29,6 +30,6 @@ export const getFollowerList = async (pageQuery: PageQuery) => {
 
 // 检查关注状态
 export const checkFollowStatus = async (followId: string) => {
-  const res = await axios.get<BaseResponse<boolean>>(`${BASE_URL}/follow/check?followId=${followId}`);
+  const res = await axiosInstance.get<BaseResponse<boolean>>(`${BASE_URL}/follow/check?followId=${followId}`);
   return res.data;
 };

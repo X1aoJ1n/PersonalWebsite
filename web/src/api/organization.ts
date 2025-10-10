@@ -1,5 +1,6 @@
 import axios from 'axios';
 import type { BaseResponse, OrganizationData, OrganizationRequest, AddOrganizationRequest } from '@/models';
+import axiosInstance from './axiosInstance';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -17,18 +18,18 @@ export const getOrganizationById = async (id: string) => {
 
 // 添加组织
 export const addOrganization = async (params: AddOrganizationRequest) => {
-  const res = await axios.post<BaseResponse<OrganizationData[]>>(`${BASE_URL}/organization/add`, params);
+  const res = await axiosInstance.post<BaseResponse<OrganizationData[]>>(`${BASE_URL}/organization/add`, params);
   return res.data;
 };
 
 // 修改组织
 export const updateOrganizationById = async (params: OrganizationRequest) => {
-  const res = await axios.put<BaseResponse<OrganizationData[]>>(`${BASE_URL}/organization/update`, params);
+  const res = await axiosInstance.put<BaseResponse<OrganizationData[]>>(`${BASE_URL}/organization/update`, params);
   return res.data;
 };
 
 // 删除组织
 export const deleteOrganizationById = async (id: string) => {
-  const res = await axios.delete<BaseResponse<OrganizationData[]>>(`${BASE_URL}/organization/${id}`);
+  const res = await axiosInstance.delete<BaseResponse<OrganizationData[]>>(`${BASE_URL}/organization/${id}`);
   return res.data;
 };

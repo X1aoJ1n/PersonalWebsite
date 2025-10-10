@@ -24,6 +24,7 @@ public class FollowServiceImpl implements FollowService {
     @Override
     public void follow(String followId) {
         String userId = BaseContext.getUserId();
+
         User user = userMapper.selectById(userId);
         User followedUser = userMapper.selectById(followId);
 
@@ -85,6 +86,10 @@ public class FollowServiceImpl implements FollowService {
     @Override
     public Boolean checkFollowStatus(String followId) {
         String userId = BaseContext.getUserId();
+
+        if (userId == null || userId.isEmpty()) {
+            return false;
+        }
 
         boolean exists = followMapper.existsByUserIdAndFollowId(userId, followId);
         return exists;

@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -51,9 +53,11 @@ public class FileUploadServiceImpl implements FileUploadService {
 
         String fileId = UUID.randomUUID().toString();
 
+        String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
+        uploadedFile.setFileUrl(filePrefix + "/files/" + encodedFileName);
+
         uploadedFile.setId(fileId);
         uploadedFile.setFileName(fileName);
-        uploadedFile.setFileUrl(filePrefix + "/files/" + fileName);
         uploadedFile.setCategory(category);
         uploadedFile.setCreatedAt(LocalDateTime.now());
         uploadedFileMapper.insert(uploadedFile);

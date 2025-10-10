@@ -1,36 +1,33 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom' 
-import { useEffect } from 'react';
-import HomePage from './pages/HomePage' 
-import AuthPage from './pages/AuthPage' 
+// src/App.tsx
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-const SITE_NAME = 'Better Call XiaoJin'; // 固定后缀
+// 引入布局和页面组件
+import RootLayout from '@/layouts/RootLayout';
+import HomePage from '@/pages/HomePage';
+import AuthPage from '@/pages/AuthPage';
+// import ProfilePage from '@/pages/ProfilePage';
 
-const titleMap: Record<string, string> = {
-  '/': '首页',
-  '/auth': '登录',
-};
-
-function TitleHandler() {
-  const location = useLocation();
-  useEffect(() => {
-    const pageTitle = titleMap[location.pathname] || '';
-    document.title = pageTitle ? `${pageTitle} - ${SITE_NAME}` : SITE_NAME;
-  }, [location.pathname]);
-
-  return null;
-}
-
+// 将路由配置定义在组件外部，这是最佳实践
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <RootLayout />, // RootLayout 作为根元素
+    children: [
+      {
+        index: true,
+        element: <HomePage />,
+      },
+      {
+        path: 'auth',
+        element: <AuthPage />,
+      },
+      // { path: 'profile', element: <ProfilePage /> },
+    ],
+  },
+]);
 
 function App() {
-  return (
-    <BrowserRouter>
-      <TitleHandler />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/auth" element={<AuthPage />} />
-      </Routes>
-    </BrowserRouter>
-  );
+  return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;
