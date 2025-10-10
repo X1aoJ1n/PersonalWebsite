@@ -1,11 +1,12 @@
 import axios from 'axios';
+import axiosInstance from './axios';
 import type { BaseResponse, UserData, UserUpdateRequest, ChangeEmailRequest, ChangePasswordRequest } from '@/models';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // 获取当前用户
 export const getCurrentUser = async () => {
-  const res = await axios.get<BaseResponse<UserData>>(`${BASE_URL}/user`);
+  const res = await axiosInstance.get<BaseResponse<UserData>>(`${BASE_URL}/user`);
   return res.data;
 };
 

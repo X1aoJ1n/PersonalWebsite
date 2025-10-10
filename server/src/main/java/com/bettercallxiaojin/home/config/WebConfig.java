@@ -33,7 +33,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/auth/**")
                 .excludePathPatterns("/v3/**")
                 .excludePathPatterns("/swagger-ui/**")
-                .excludePathPatterns("/files/**");
+                .excludePathPatterns("/files/**")
+                .excludePathPatterns("/user//{id}");
     }
 
     @Override

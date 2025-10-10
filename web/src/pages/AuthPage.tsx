@@ -1,124 +1,135 @@
-// src/pages/AuthPage.tsx
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginByPassword, loginByCode, getRegisterCode } from '@/api/auth';
-import type { LoginRequest, BaseResponse } from '@/models';
 
-export default function AuthPage() {
+// Define TypeScript interfaces based on the OpenAPI spec
+interface LoginPasswordRequest {
+  email: string;
+  password: string;
+}
+
+interface UserLoginData {
+  id: string;
+  token: string;
+  username: string;
+  email: string;
+  icon?: string;
+  introduction?: string;
+  contacts: Array<{ id: string; userId: string; type: string; data: string }>;
+  organizations: Array<{
+    id: string;
+    userId: string;
+    type: string;
+    name: string;
+    startDate: string;
+    endDate?: string;
+    position: string;
+    description?: string;
+  }>;
+  followerCount: number;
+  followingCount: number;
+}
+
+interface ResponseUserLoginVO {
+  code: number;
+  message: string;
+  data: UserLoginData;
+}
+
+const Login: React.FC = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [code, setCode] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState<'password' | 'code'>('password'); // 登录方式
+  const [formData, setFormData] = useState<LoginPasswordRequest>({
+    email: '',
+    password: '',
+  });
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async () => {
-    setLoading(true);
-    try {
-      const params: LoginRequest =
-        mode === 'password' ? { email, password } : { email, password };
-
-      const res: BaseResponse<any> =
-        mode === 'password'
-          ? await loginByPassword(params)
-          : await loginByCode(params);
-
-      if (res.code === 200) {
-        alert('登录成功！');
-        // 跳转首页
-        navigate('/');
-      } else {
-        alert(res.message || '登录失败');
-      }
-    } catch (err: any) {
-      alert(err.message || '网络错误');
-    } finally {
-      setLoading(false);
-    }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleGetCode = async () => {
-    if (!email) {
-      alert('请输入邮箱');
-      return;
-    }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+
     try {
-      const res: BaseResponse<null> = await getRegisterCode(email);
-      if (res.code === 200) {
-        alert('验证码已发送，请注意查收邮箱');
+      const response = await fetch('http://localhost:8081/auth/login/password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result: ResponseUserLoginVO = await response.json();
+
+      if (response.ok && result.code === 200) {
+        // Store token and user data (e.g., in localStorage or a state management solution)
+        localStorage.setItem('token', result.data.token);
+        localStorage.setItem('user', JSON.stringify(result.data));
+        // Redirect to home page
+        navigate('/');
       } else {
-        alert(res.message || '获取验证码失败');
+        setError(result.message || 'Login failed');
       }
-    } catch (err: any) {
-      alert(err.message || '网络错误');
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-6 bg-white rounded shadow">
-        <h1 className="text-2xl font-bold mb-6 text-center">登录</h1>
-
-        <div className="mb-4">
-          <label className="block mb-1">邮箱</label>
-          <input
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            className="w-full px-3 py-2 border rounded"
-          />
-        </div>
-
-        {mode === 'password' ? (
-          <div className="mb-4">
-            <label className="block mb-1">密码</label>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Login</h2>
+        {error && (
+          <div className="mb-4 text-red-500 text-center">{error}</div>
+        )}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
             <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border rounded"
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder="Enter your email"
             />
           </div>
-        ) : (
-          <div className="mb-4 flex gap-2">
-            <div className="flex-1">
-              <label className="block mb-1">验证码</label>
-              <input
-                type="text"
-                value={code}
-                onChange={e => setCode(e.target.value)}
-                className="w-full px-3 py-2 border rounded"
-              />
-            </div>
-            <button
-              type="button"
-              onClick={handleGetCode}
-              className="px-4 py-2 bg-blue-500 text-white rounded"
-            >
-              获取验证码
-            </button>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder="Enter your password"
+            />
           </div>
-        )}
-
-        <button
-          type="button"
-          onClick={handleLogin}
-          disabled={loading}
-          className="w-full py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
-        >
-          {loading ? '登录中...' : '登录'}
-        </button>
-
-        <div className="mt-4 text-center">
           <button
-            type="button"
-            onClick={() => setMode(mode === 'password' ? 'code' : 'password')}
-            className="text-blue-500 underline"
+            type="submit"
+            disabled={isLoading}
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-400"
           >
-            {mode === 'password' ? '使用验证码登录' : '使用密码登录'}
+            {isLoading ? 'Logging in...' : 'Login'}
           </button>
-        </div>
+        </form>
       </div>
     </div>
   );
-}
+};
+
+export default Login;
