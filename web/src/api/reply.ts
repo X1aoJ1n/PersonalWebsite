@@ -1,23 +1,23 @@
 import axios from 'axios';
-import { BaseResponse, ReplyVO, ReplyDTO, AddReplyDTO, PageQuery } from '@/models';
+import type { BaseResponse, ReplyData, ReplyRequest, AddReplyRequest, PageQuery } from '@/models';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // 获取评论回复
 export const getRepliesByCommentId = async (pageQuery: PageQuery) => {
-  const res = await axios.get<BaseResponse<ReplyVO[]>>(`${BASE_URL}/reply/list/by-comment`, { params: pageQuery });
+  const res = await axios.get<BaseResponse<ReplyData[]>>(`${BASE_URL}/reply/list/by-comment`, { params: pageQuery });
   return res.data;
 };
 
 // 创建回复
-export const createReply = async (params: AddReplyDTO) => {
-  const res = await axios.post<BaseResponse<ReplyVO>>(`${BASE_URL}/reply/create`, params);
+export const createReply = async (params: AddReplyRequest) => {
+  const res = await axios.post<BaseResponse<ReplyData>>(`${BASE_URL}/reply/create`, params);
   return res.data;
 };
 
 // 修改回复
-export const updateReply = async (params: ReplyDTO) => {
-  const res = await axios.put<BaseResponse<ReplyVO>>(`${BASE_URL}/reply/update`, params);
+export const updateReply = async (params: ReplyRequest) => {
+  const res = await axios.put<BaseResponse<ReplyData>>(`${BASE_URL}/reply/update`, params);
   return res.data;
 };
 

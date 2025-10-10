@@ -1,27 +1,28 @@
 import axios from 'axios';
+import type { BaseResponse, LoginData, LoginRequest, RegisterRequest } from '@/models';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export interface LoginPasswordDTO {
-  email: string;
-  password: string;
-}
+// 密码登录
+export const loginByPassword = async (params: LoginRequest) => {
+  const res = await axios.post<BaseResponse<LoginData>>(`${BASE_URL}/auth/login/password`, params);
+  return res.data;
+};
 
-export interface UserLoginVO {
-  id: string;
-  token: string;
-  username: string;
-  email: string;
-  icon: string;
-}
+// 验证码登录
+export const loginByCode = async (params: LoginRequest) => {
+  const res = await axios.post<BaseResponse<LoginData>>(`${BASE_URL}/auth/login/code`, params);
+  return res.data;
+};
 
-export interface ResponseUserLoginVO {
-  code: number;
-  message: string;
-  data: UserLoginVO;
-}
+// 注册
+export const register = async (params: RegisterRequest) => {
+  const res = await axios.post<BaseResponse<LoginData>>(`${BASE_URL}/auth/register`, params);
+  return res.data;
+};
 
-export const loginByPassword = async (params: LoginPasswordDTO) => {
-  const response = await axios.post<ResponseUserLoginVO>(`${BASE_URL}/auth/login/password`, params);
-  return response.data;
+// 获取验证码
+export const getRegisterCode = async (email: string) => {
+  const res = await axios.get<BaseResponse<null>>(`${BASE_URL}/auth/getCode?email=${email}`);
+  return res.data;
 };
