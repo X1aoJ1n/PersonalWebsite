@@ -1,5 +1,6 @@
 package com.bettercallxiaojin.home.mapper;
 
+import com.bettercallxiaojin.home.pojo.VO.OrganizationVO;
 import com.bettercallxiaojin.home.pojo.entity.Organization;
 import org.apache.ibatis.annotations.*;
 
@@ -23,4 +24,7 @@ public interface OrganizationMapper {
 
     @Delete("DELETE FROM organization WHERE id = #{id}")
     int deleteById(@Param("id") String id);
+
+    @Select("SELECT * FROM organization WHERE user_id = #{userId}")
+    List<OrganizationVO> selectVOByUserId(String id);
 }

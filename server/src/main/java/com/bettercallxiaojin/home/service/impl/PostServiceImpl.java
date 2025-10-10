@@ -1,6 +1,7 @@
 package com.bettercallxiaojin.home.service.impl;
 
 import com.bettercallxiaojin.home.common.BaseContext;
+import com.bettercallxiaojin.home.common.Constant.TargetTypeConstant;
 import com.bettercallxiaojin.home.mapper.FollowMapper;
 import com.bettercallxiaojin.home.mapper.PostMapper;
 import com.bettercallxiaojin.home.pojo.VO.PostVO;
@@ -192,7 +193,7 @@ public class PostServiceImpl implements PostService {
         simpleUserVO.setIsFollow(followMapper.existsByUserIdAndFollowId(BaseContext.getUserId(), simpleUserVO.getId()));
 
         postVO.setUserVO(simpleUserVO);
-        postVO.setIsLike(likeService.checkLikeStatus(BaseContext.getUserId(), postVO.getId()));
+        postVO.setIsLike(likeService.checkLikeStatus(TargetTypeConstant.POST, postVO.getId()));
 
         postVO.setIsCreator(post.getUserId().equals(BaseContext.getUserId()));
 

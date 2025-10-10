@@ -2,6 +2,7 @@ package com.bettercallxiaojin.home.service.impl;
 
 import com.bettercallxiaojin.home.common.BaseContext;
 import com.bettercallxiaojin.home.common.Constant.StatusConstant;
+import com.bettercallxiaojin.home.common.Constant.TargetTypeConstant;
 import com.bettercallxiaojin.home.mapper.CommentMapper;
 import com.bettercallxiaojin.home.mapper.FollowMapper;
 import com.bettercallxiaojin.home.mapper.PostMapper;
@@ -152,7 +153,7 @@ public class CommentServiceImpl implements CommentService {
         simpleUserVO.setIsFollow(followMapper.existsByUserIdAndFollowId(BaseContext.getUserId(), simpleUserVO.getId()));
 
         commentVO.setUserVO(simpleUserVO);
-        commentVO.setIsLike(likeService.checkLikeStatus(BaseContext.getUserId(), commentVO.getId()));
+        commentVO.setIsLike(likeService.checkLikeStatus(TargetTypeConstant.COMMENT, commentVO.getId()));
 
         commentVO.setIsCreator(comment.getUserId().equals(BaseContext.getUserId()));
 

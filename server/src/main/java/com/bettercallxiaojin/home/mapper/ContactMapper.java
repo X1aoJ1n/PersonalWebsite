@@ -1,5 +1,6 @@
 package com.bettercallxiaojin.home.mapper;
 
+import com.bettercallxiaojin.home.pojo.VO.ContactVO;
 import com.bettercallxiaojin.home.pojo.entity.Contact;
 import org.apache.ibatis.annotations.*;
 
@@ -10,6 +11,9 @@ public interface ContactMapper {
 
     @Select("SELECT * FROM contact WHERE user_id = #{userId}")
     List<Contact> selectByUserId(@Param("userId") String userId);
+
+    @Select("SELECT * FROM contact WHERE user_id = #{userId}")
+    List<ContactVO> selectVOByUserId(@Param("userId") String userId);
 
     @Select("SELECT * FROM contact WHERE id = #{id}")
     Contact selectById(String id);

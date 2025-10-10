@@ -18,8 +18,8 @@ public class UserLoginVO {
     private String email;
     private String icon;
     private String introduction;
-    private List<Contact> contacts;
-    private List<Organization> organizations;
+    private List<ContactVO> contacts;
+    private List<OrganizationVO> organizations;
     private Integer followerCount;
     private Integer followingCount;
 }

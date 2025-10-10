@@ -2,6 +2,7 @@ package com.bettercallxiaojin.home.service.impl;
 
 import com.bettercallxiaojin.home.common.BaseContext;
 import com.bettercallxiaojin.home.common.Constant.StatusConstant;
+import com.bettercallxiaojin.home.common.Constant.TargetTypeConstant;
 import com.bettercallxiaojin.home.mapper.*;
 import com.bettercallxiaojin.home.pojo.VO.*;
 import com.bettercallxiaojin.home.pojo.entity.Comment;
@@ -23,7 +24,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ReplyServiceImpl implements ReplyService {
 
-    private final CommentService commentService;
     private final UserService userService;
     private final LikeService likeService;
 
@@ -168,7 +168,7 @@ public class ReplyServiceImpl implements ReplyService {
 
 
         replyVO.setUserVO(simpleUserVO);
-        replyVO.setIsLike(likeService.checkLikeStatus(BaseContext.getUserId(), replyVO.getId()));
+        replyVO.setIsLike(likeService.checkLikeStatus(TargetTypeConstant.REPLY, replyVO.getId()));
         replyVO.setIsCreator(reply.getUserId().equals(BaseContext.getUserId()));
 
 

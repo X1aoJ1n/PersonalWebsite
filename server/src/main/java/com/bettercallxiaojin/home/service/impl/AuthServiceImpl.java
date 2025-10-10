@@ -4,6 +4,8 @@ import com.bettercallxiaojin.home.common.BaseContext;
 import com.bettercallxiaojin.home.common.util.CodeGenerator;
 import com.bettercallxiaojin.home.mapper.ContactMapper;
 import com.bettercallxiaojin.home.mapper.OrganizationMapper;
+import com.bettercallxiaojin.home.pojo.VO.ContactVO;
+import com.bettercallxiaojin.home.pojo.VO.OrganizationVO;
 import com.bettercallxiaojin.home.pojo.VO.UserLoginVO;
 import com.bettercallxiaojin.home.common.util.JwtUtil;
 import com.bettercallxiaojin.home.common.util.PasswordEncodeUtil;
@@ -60,8 +62,8 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Password incorrect");
         }
 
-        List<Contact> contacts = contactMapper.selectByUserId(user.getId());
-        List<Organization> organizations = organizationMapper.selectByUserId(user.getId());
+        List<ContactVO> contacts = contactMapper.selectVOByUserId(user.getId());
+        List<OrganizationVO> organizations = organizationMapper.selectVOByUserId(user.getId());
 
 
         UserLoginVO userLoginVO = new UserLoginVO();
@@ -90,8 +92,8 @@ public class AuthServiceImpl implements AuthService {
         }
         redisTemplate.delete(CODE_PREFIX + email);
 
-        List<Contact> contacts = contactMapper.selectByUserId(user.getId());
-        List<Organization> organizations = organizationMapper.selectByUserId(user.getId());
+        List<ContactVO> contacts = contactMapper.selectVOByUserId(user.getId());
+        List<OrganizationVO> organizations = organizationMapper.selectVOByUserId(user.getId());
 
         UserLoginVO userLoginVO = new UserLoginVO();
 

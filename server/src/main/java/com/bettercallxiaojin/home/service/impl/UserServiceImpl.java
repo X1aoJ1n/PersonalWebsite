@@ -4,6 +4,8 @@ import com.bettercallxiaojin.home.common.BaseContext;
 import com.bettercallxiaojin.home.mapper.ContactMapper;
 import com.bettercallxiaojin.home.mapper.OrganizationMapper;
 import com.bettercallxiaojin.home.mapper.UserMapper;
+import com.bettercallxiaojin.home.pojo.VO.ContactVO;
+import com.bettercallxiaojin.home.pojo.VO.OrganizationVO;
 import com.bettercallxiaojin.home.pojo.VO.UserVO;
 import com.bettercallxiaojin.home.pojo.entity.Contact;
 import com.bettercallxiaojin.home.pojo.entity.Organization;
@@ -36,8 +38,8 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("user is null");
         }
 
-        List<Organization> organizations = organizationMapper.selectByUserId(id);
-        List<Contact> contacts = contactMapper.selectByUserId(id);
+        List<OrganizationVO> organizations = organizationMapper.selectVOByUserId(id);
+        List<ContactVO> contacts = contactMapper.selectVOByUserId(id);
 
 
         UserVO userVO = new UserVO();

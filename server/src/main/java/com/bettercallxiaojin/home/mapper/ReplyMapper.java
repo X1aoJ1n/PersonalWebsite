@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Mapper
 public interface ReplyMapper {
 
     @Insert("INSERT INTO reply (id, user_id, comment_id, content, like_count, created_at, updated_at, status, reply_to) " +
@@ -21,6 +22,9 @@ public interface ReplyMapper {
 
     @Update("UPDATE reply SET content = #{content}, updated_at = #{updatedAt} WHERE id = #{id}")
     int update(String content, LocalDateTime updatedAt, String id);
+
+    @Update("UPDATE reply SET like_count = like_count + #{increment} WHERE id = #{id}")
+    int updateLikeCount(@Param("id") String id, @Param("increment") Integer increment);
 
     @Update("UPDATE reply SET status = #{status} WHERE id = #{id}")
     int updateStatus(String id, Integer status);

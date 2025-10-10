@@ -20,15 +20,6 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "鉴权管理", description = "注册登录相关接口")
 public class AuthController {
 
-    @Value("${bettercallxiaojin.jwt.admin-secret-key}")
-    private String secretKey;
-
-    @Value("${bettercallxiaojin.jwt.admin-ttl}")
-    private long ttl;
-
-    @Value("${bettercallxiaojin.jwt.admin-token-name}")
-    private String tokenName;
-
     private final AuthService authService;
 
     @PostMapping("/login/password")

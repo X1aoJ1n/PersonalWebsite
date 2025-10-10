@@ -19,8 +19,8 @@ public interface CommentMapper {
     @Update("UPDATE comment SET content = #{content}, updated_at = #{updatedAt} WHERE id = #{id}")
     int update(Comment comment);
 
-    @Delete("DELETE FROM comment WHERE id = #{id}")
-    int deleteById(String id);
+    @Update("UPDATE comment SET like_count = like_count + #{increment} WHERE id = #{id}")
+    int updateLikeCount(@Param("id") String id, @Param("increment") Integer increment);
 
     @Update("UPDATE comment SET status = #{status} WHERE id = #{commentId}")
     int updateStatus(String commentId, Integer status);
