@@ -35,4 +35,13 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/swagger-ui/**")
                 .excludePathPatterns("/files/**");
     }
+
+    @Override
+    public void addCorsMappings(org.springframework.web.servlet.config.annotation.CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowCredentials(true)
+                .maxAge(3600);
+    }
 }

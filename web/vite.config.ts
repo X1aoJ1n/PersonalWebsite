@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
-import path from 'path';
+import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -9,8 +9,9 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
+    dedupe: ['react', 'react-dom'], // ← 这里加上 dedupe
   },
   server: {
-    port:3001
+    port: 3001,
   },
-});
+})
