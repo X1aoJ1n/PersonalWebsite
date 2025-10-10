@@ -1,11 +1,10 @@
 // src/api/axiosInstance.ts
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // 1. 创建一个新的 axios 实例
 const axiosInstance = axios.create({
-  baseURL: BASE_URL, // 设置统一的请求前缀
+  baseURL: '/api', // 设置统一的请求前缀
   timeout: 10000, // 设置统一的超时时间
 });
 

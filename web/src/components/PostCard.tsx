@@ -1,18 +1,26 @@
 // src/components/PostCard.tsx
-import React from 'react';
+import React, { useState } from 'react'; // 引入 useState
 import { Link } from 'react-router-dom';
 import type { SimplePostData } from '@/models';
 
 interface PostCardProps {
-  post: Partial<SimplePostData>; // 使用 Partial<> 允许传入不完整的 post 对象（用于标题）
-  variant?: 'default' | 'header'; // 新增 variant 属性
+  post: Partial<SimplePostData>;
+  variant?: 'default' | 'header';
 }
 
 const PostCard: React.FC<PostCardProps> = ({ post, variant = 'default' }) => {
-  // 根据 variant 生成动态样式
-  const cardStyle = {
+  // --- 新增：用于追踪鼠标悬浮状态 ---
+  const [isHovered, setIsHovered] = useState(false);
+
+  const baseCardStyle = {
     ...styles.postCard,
     ...(variant === 'header' ? styles.headerCard : {}),
+  };
+
+  // --- 修改：合并基础样式和悬浮样式 ---
+  const cardStyle = {
+    ...baseCardStyle,
+    ...(isHovered ? styles.cardHover : {}), // 如果 isHovered 为 true，则应用悬浮样式
   };
 
   const titleStyle = {
@@ -20,20 +28,12 @@ const PostCard: React.FC<PostCardProps> = ({ post, variant = 'default' }) => {
     ...(variant === 'header' ? styles.headerTitle : {}),
   };
 
-  return (
-    <div style={cardStyle}>
+  const cardContent = (
+    <>
       <h3 style={styles.postTitle}>
-        {/* 如果是 header，则标题不可点击 */}
-        {variant === 'header' || !post.id ? (
-          <span style={titleStyle}>{post.title}</span>
-        ) : (
-          <Link to={`/post/${post.id}`} style={titleStyle}>
-            {post.title}
-          </Link>
-        )}
+        <span style={titleStyle}>{post.title}</span>
       </h3>
       
-      {/* 只有默认样式的卡片才显示预览和元信息 */}
       {variant === 'default' && (
         <>
           <p style={styles.postPreview}>{post.preview || '暂无预览...'}</p>
@@ -47,32 +47,64 @@ const PostCard: React.FC<PostCardProps> = ({ post, variant = 'default' }) => {
           </div>
         </>
       )}
+    </>
+  );
+
+  if (variant === 'default' && post.id) {
+    return (
+      <Link 
+        to={`/post/${post.id}`} 
+        style={styles.cardLink}
+        // --- 新增：鼠标事件处理器 ---
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div style={cardStyle}>
+          {cardContent}
+        </div>
+      </Link>
+    );
+  }
+
+  return (
+    <div style={cardStyle}>
+      {cardContent}
     </div>
   );
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
+  cardLink: {
+    textDecoration: 'none',
+    color: 'inherit',
+    display: 'block',
+    marginBottom: '15px', // --- 修正：在这里加回了 marginBottom ---
+  },
   postCard: {
     backgroundColor: '#fff',
     padding: '20px',
-    marginBottom: '15px',
     borderRadius: '8px',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
     border: '1px solid #e0e0e0',
+    transition: 'transform 0.2s ease-out, box-shadow 0.2s ease-out', // 优化了 transition 效果
   },
-  // --- 新增的样式 ---
+  // --- 新增：鼠标悬浮时的样式 ---
+  cardHover: {
+    transform: 'translateY(-4px)', // 轻微上浮
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)', // 阴影加深
+  },
   headerCard: {
-    backgroundColor: '#4f46e5', // 蓝色背景
-    color: '#fff', // 白色字体
+    backgroundColor: '#4f46e5',
+    color: '#fff',
     border: 'none',
-    padding: '12px 20px', // 减小上下内边距 (之前是20px)，左右保持不变
+    padding: '12px 20px',
+    marginBottom: '15px',
   },
   headerTitle: {
-    color: '#fff', // 标题白色
+    color: '#fff',
   },
-  // --- 结束 ---
   postTitle: {
-    margin: '0', // 移除了 h3 的默认 margin
+    margin: '0',
   },
   postTitleLink: {
     textDecoration: 'none',
@@ -83,7 +115,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   postPreview: {
     color: '#666',
     fontSize: '14px',
-    marginTop: '10px', // 从标题下方增加一点间距
+    marginTop: '10px',
     marginBottom: '15px',
     lineHeight: 1.6,
   },

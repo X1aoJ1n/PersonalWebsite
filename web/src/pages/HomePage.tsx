@@ -18,6 +18,9 @@ const HomePage: React.FC = () => { // 移除了 props
   // 通过 useOutletContext hook 从 RootLayout 获取共享状态
   const { currentUser } = useOutletContext<OutletContextType>();
 
+  // --- 在这里增加一行日志 ---
+  console.log('--- [HomePage] 接收到的 currentUser:', currentUser, '---');
+
   const [posts, setPosts] = useState<SimplePostData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -164,7 +167,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   logoLink: { display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#333' },
   logo: { height: '32px', marginRight: '12px' },
-  siteName: { fontSize: '20px', fontWeight: 'bold',color: '#4f4e5' },
+  siteName: { fontSize: '20px', fontWeight: 'bold',color: '#4f46e5' },
   nav: { marginLeft: '40px' },
   navLink: { margin: '0 15px', textDecoration: 'none', color: '#555', fontSize: '16px', fontWeight: 500 },
 

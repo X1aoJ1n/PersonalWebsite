@@ -1,6 +1,6 @@
 // src/layouts/RootLayout.tsx
 import React, { useState, useEffect } from 'react';
-import { Outlet, useLocation } from 'react-router-dom'; // 引入 useLocation
+import { Outlet, useLocation } from 'react-router-dom';
 
 import { getCurrentUser } from '@/api/user';
 import type { UserData } from '@/models';
@@ -23,7 +23,7 @@ const titleMap: Record<string, string> = {
 const RootLayout: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<UserData | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
-  const location = useLocation(); // 使用 useLocation hook
+  const location = useLocation();
 
   // --- 处理动态标题的 useEffect ---
   useEffect(() => {
@@ -35,21 +35,26 @@ const RootLayout: React.FC = () => {
   useEffect(() => {
     const checkLoginStatus = async () => {
       const token = localStorage.getItem('token');
+      
       if (token) {
         try {
           const res = await getCurrentUser();
+          
           if (res.code === 200 && res.data) {
             setCurrentUser(res.data);
           } else {
+            // 如果接口返回错误码，移除 token
             localStorage.removeItem('token');
           }
         } catch (error) {
-          console.error("Token validation failed", error);
+          // 如果请求直接异常，也移除 token
+          console.error("Token validation failed, removing token.", error);
           localStorage.removeItem('token');
         }
       }
       setIsAuthLoading(false);
     };
+
     checkLoginStatus();
   }, []);
 
