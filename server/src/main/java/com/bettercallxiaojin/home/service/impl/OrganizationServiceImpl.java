@@ -42,21 +42,13 @@ public class OrganizationServiceImpl implements OrganizationService {
             throw new RuntimeException("user is null");
         }
 
-        List<Organization> organizations = organizationMapper.selectByUserId(id);
+        List<OrganizationVO> organizations = organizationMapper.selectVOByUserId(id);
 
-        List<OrganizationVO> organizationVOS = new ArrayList<>();
-
-        for (Organization organization : organizations) {
-            OrganizationVO organizationVO = new OrganizationVO();
-            BeanUtils.copyProperties(organization, organizationVO);
-            organizationVOS.add(organizationVO);
-        }
-
-        return organizationVOS;
+        return organizations;
     }
 
     @Override
-    public List<OrganizationVO> updateOrganization(String id, String name, String type, LocalDate startDate, LocalDate endDate, String position, String description) {
+    public List<OrganizationVO> updateOrganization(String id, String name, String type, LocalDate startDate, LocalDate endDate, String position, String description, String location) {
 
         Organization organization = organizationMapper.selectById(id);
 
@@ -71,6 +63,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         organization.setEndDate(endDate);
         organization.setPosition(position);
         organization.setDescription(description);
+        organization.setLocation(location);
 
         if (organization.getEndDate() != null) {
             if (organization.getStartDate().isAfter(organization.getEndDate())) {
@@ -88,7 +81,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public List<OrganizationVO> addOrganization(String name, String type, LocalDate startDate, LocalDate endDate, String position, String description) {
+    public List<OrganizationVO> addOrganization(String name, String type, LocalDate startDate, LocalDate endDate, String position, String description, String location) {
         Organization organization = new Organization();
         organization.setName(name);
         organization.setType(type);
@@ -96,6 +89,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         organization.setEndDate(endDate);
         organization.setPosition(position);
         organization.setDescription(description);
+        organization.setLocation(location);
         organization.setUserId(BaseContext.getUserId());
 
         String id =  UUID.randomUUID().toString();

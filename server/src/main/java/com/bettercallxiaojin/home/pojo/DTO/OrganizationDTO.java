@@ -26,4 +26,7 @@ public class OrganizationDTO {
     private String position;
 
     private String description;
+
+    private String location;
+
 }

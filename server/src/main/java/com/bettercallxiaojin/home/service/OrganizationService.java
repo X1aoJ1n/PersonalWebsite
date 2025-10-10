@@ -11,9 +11,9 @@ public interface OrganizationService {
 
     List<OrganizationVO> getOrganizationByUserId(String id);
 
-    List<OrganizationVO> updateOrganization(String id, String name, String type, LocalDate startDate, LocalDate endDate, String position, String description);
+    List<OrganizationVO> updateOrganization(String id, String name, String type, LocalDate startDate, LocalDate endDate, String position, String description, String location);
 
-    List<OrganizationVO> addOrganization(String name, String type, LocalDate startDate, LocalDate endDate, String position, String description);
+    List<OrganizationVO> addOrganization(String name, String type, LocalDate startDate, LocalDate endDate, String position, String description, String location);
 
     List<OrganizationVO> deleteOrganization(String id);
 }

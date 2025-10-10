@@ -38,7 +38,8 @@ public class OrganizationController {
                     addOrganizationDTO.getStartDate(),
                     addOrganizationDTO.getEndDate(),
                     addOrganizationDTO.getPosition(),
-                    addOrganizationDTO.getDescription()
+                    addOrganizationDTO.getDescription(),
+                    addOrganizationDTO.getLocation()
             );
             return Response.success(organizations);
         } catch (Exception e) {
@@ -88,7 +89,8 @@ public class OrganizationController {
                     organizationDTO.getStartDate(),
                     organizationDTO.getEndDate(),
                     organizationDTO.getPosition(),
-                    organizationDTO.getDescription()
+                    organizationDTO.getDescription(),
+                    organizationDTO.getLocation()
             );
             return Response.success(organizations);
         } catch (Exception e) {

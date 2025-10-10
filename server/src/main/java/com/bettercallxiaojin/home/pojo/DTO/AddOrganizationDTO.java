@@ -28,4 +28,6 @@ public class AddOrganizationDTO {
     private String position;
 
     private String description;
+
+    private String location;
 }

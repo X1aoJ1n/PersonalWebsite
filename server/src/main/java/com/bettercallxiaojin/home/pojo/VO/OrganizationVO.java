@@ -13,4 +13,5 @@ public class OrganizationVO {
     private LocalDate endDate;
     private String position;
     private String description;
+    private String location;
 }
