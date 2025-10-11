@@ -1,5 +1,11 @@
-import type { BaseResponse, ReplyData, ReplyRequest, AddReplyRequest, PageQuery } from '@/models';
+import type { BaseResponse, ReplyData, ReplyRequest, AddReplyRequest } from '@/models';
 import axiosInstance from './axiosInstance';
+
+export interface PageQuery {
+  id?: string;
+  pageNum?: number;
+  pageSize?: number;
+}
 
 // 获取评论回复
 export const getRepliesByCommentId = async (commentId: string, pageQuery: PageQuery) => {

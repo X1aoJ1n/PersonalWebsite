@@ -1,5 +1,10 @@
-import type { SimpleUserVO } from "./common";
-
+interface SimpleUserVO {
+  id: string;
+  username: string;
+  icon: string;
+  isFollow: boolean;
+  beingFollow: boolean;
+}
 // 请求类型
 export interface PostRequest {
   id: string;

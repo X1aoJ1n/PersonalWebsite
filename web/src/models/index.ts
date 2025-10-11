@@ -11,4 +11,3 @@ export type * from './post';
 export type * from './reply';
 export type * from './user';
 export type * from './file';
-export type * from './common';

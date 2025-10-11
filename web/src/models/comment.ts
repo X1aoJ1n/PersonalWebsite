@@ -1,6 +1,13 @@
-import type { SimpleUserVO } from '@/models/common';
 import type { ReplyData } from './reply';
 
+
+interface SimpleUserVO {
+  id: string;
+  username: string;
+  icon: string;
+  isFollow: boolean;
+  beingFollow: boolean;
+}
 
 // 请求类型
 export interface AddCommentRequest {

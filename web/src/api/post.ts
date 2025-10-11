@@ -1,5 +1,11 @@
-import type { BaseResponse, PostData, AddPostRequest, PostRequest, PageQuery, SimplePostData } from '@/models';
+import type { BaseResponse, PostData, AddPostRequest, PostRequest, SimplePostData } from '@/models';
 import axiosInstance from './axiosInstance';
+
+export interface PageQuery {
+  id?: string;
+  pageNum?: number;
+  pageSize?: number;
+}
 
 // 获取帖子详情
 export const getPostDetail = async (id: string) => {

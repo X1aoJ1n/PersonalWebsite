@@ -1,6 +1,12 @@
 import type { BaseResponse, CommentData, CommentRequest, AddCommentRequest } from '@/models';
-import type { PageQuery } from '@/models/common'; 
 import axiosInstance from './axiosInstance';
+
+
+export interface PageQuery {
+  id?: string;
+  pageNum?: number;
+  pageSize?: number;
+}
 
 // 获取帖子评论
 export const getCommentsByPostId = async (postId: string, pageQuery: PageQuery) => {

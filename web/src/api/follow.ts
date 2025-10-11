@@ -1,6 +1,19 @@
-import type { BaseResponse, SimpleUserVO } from '@/models';
-import type { PageQuery } from '@/models/common';
+import type { BaseResponse } from '@/models';
 import axiosInstance from './axiosInstance';
+
+export interface SimpleUserVO {
+  id: string;
+  username: string;
+  icon: string;
+  isFollow: boolean;
+  beingFollow: boolean;
+}
+
+export interface PageQuery {
+  id?: string;
+  pageNum?: number;
+  pageSize?: number;
+}
 
 // 关注用户
 export const follow = async (followId: string) => {

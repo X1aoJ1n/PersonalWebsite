@@ -1,5 +1,17 @@
-import type { SimpleUserVO } from './common';
-import type { ReplyToVO } from './common';
+
+interface SimpleUserVO {
+  id: string;
+  username: string;
+  icon: string;
+  isFollow: boolean;
+  beingFollow: boolean;
+}
+
+export interface ReplyToVO {
+  replyId: string;
+  userId: string;
+  userName: string;
+}
 
 // 请求类型
 export interface ReplyRequest {
@@ -12,6 +24,8 @@ export interface AddReplyRequest {
   replyTo?: string;
   content: string;
 }
+
+
 
 // 响应数据类型
 export interface ReplyData {
