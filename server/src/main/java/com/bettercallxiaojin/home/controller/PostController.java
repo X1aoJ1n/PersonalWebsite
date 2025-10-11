@@ -106,7 +106,7 @@ public class PostController {
     }
 
 
-    @PostMapping("/list/follow")
+    @GetMapping("/list/follow")
     @Operation(summary = "获取关注帖子", description = "获取收藏用户的公开帖子列表")
     public Response<List<SimplePostVO>> getFollowPost(PageQuery pageQuery) {
         try {
