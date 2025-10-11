@@ -1,40 +1,28 @@
-import axios from 'axios';
-import { BaseResponse, ReplyVO, ReplyDTO, AddReplyDTO, PageQuery } from '@/models';
+import type { SimpleUserVO } from './common';
+import type { ReplyToVO } from './common';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+// 请求类型
+export interface ReplyRequest {
+  id: string;
+  content: string;
+}
 
-// 获取评论回复
-export const getRepliesByCommentId = async (pageQuery: PageQuery) => {
-  const res = await axios.get<BaseResponse<ReplyVO[]>>(`${BASE_URL}/reply/list/by-comment`, { params: pageQuery });
-  return res.data;
-};
+export interface AddReplyRequest {
+  commentId: string;
+  replyTo?: string;
+  content: string;
+}
 
-// 创建回复
-export const createReply = async (params: AddReplyDTO) => {
-  const res = await axios.post<BaseResponse<ReplyVO>>(`${BASE_URL}/reply/create`, params);
-  return res.data;
-};
-
-// 修改回复
-export const updateReply = async (params: ReplyDTO) => {
-  const res = await axios.put<BaseResponse<ReplyVO>>(`${BASE_URL}/reply/update`, params);
-  return res.data;
-};
-
-// 删除回复
-export const deleteReply = async (id: string) => {
-  const res = await axios.put<BaseResponse<boolean>>(`${BASE_URL}/reply/delete?id=${id}`);
-  return res.data;
-};
-
-// 隐藏回复
-export const archiveReply = async (id: string) => {
-  const res = await axios.put<BaseResponse<boolean>>(`${BASE_URL}/reply/archive?id=${id}`);
-  return res.data;
-};
-
-// 删除回复（软删）
-export const unarchiveReply = async (id: string) => {
-  const res = await axios.put<BaseResponse<boolean>>(`${BASE_URL}/reply/unarchive?id=${id}`);
-  return res.data;
-};
+// 响应数据类型
+export interface ReplyData {
+  id: string;
+  userVO: SimpleUserVO;
+  commentId: string;
+  replyToVO?: ReplyToVO; // 回复可能没有目标，所以可选
+  content: string;
+  likeCount: number;
+  isLike: boolean;
+  isCreator: boolean;
+  createdAt: string; // LocalDateTime -> ISO string
+  updatedAt: string;
+}

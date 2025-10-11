@@ -13,7 +13,10 @@
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
-    "noEmit": true,
+    //"noEmit": true,
+    "declaration": true, // ✅ 告诉编译器生成 .d.ts 文件
+    "emitDeclarationOnly": true, // ✅ 确保只生成类型文件，不生成 JS 文件
+    "outDir": "./dist/types", // ✅ 指定 .d.ts 文件的输出目录
     "jsx": "react-jsx",
 
     /* Path aliases */

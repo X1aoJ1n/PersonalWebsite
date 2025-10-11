@@ -1,4 +1,5 @@
-import type { BaseResponse, SimpleUserVO, PageQuery } from '@/models';
+import type { BaseResponse, SimpleUserVO } from '@/models';
+import type { PageQuery } from '@/models/common';
 import axiosInstance from './axiosInstance';
 
 // 关注用户

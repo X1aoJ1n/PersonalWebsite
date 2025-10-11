@@ -7,12 +7,12 @@ import { FaTrash, FaEdit } from 'react-icons/fa';
 import type { OutletContextType } from '@/layouts/RootLayout';
 
 import { getUserById } from '@/api/user';
-import { getContactByUserId, addContact, deleteContactById, updateContactById } from '@/api/contact';
+import { getContactByUserId , deleteContactById ,updateContactById ,addContact } from '@/api/contact';
 // 1. Import deleteOrganizationById
 import { getOrganizationByUserId, deleteOrganizationById } from '@/api/organization';
-import { checkFollowStatus, follow, unfollow } from '@/api/follow';
+import { checkFollowStatus, follow, unfollow ,} from '@/api/follow';
 
-import type { UserData, ContactData, OrganizationData, AddContactRequest, ContactRequest } from '@/models';
+import type { UserData, ContactData, OrganizationData, ContactRequest, AddContactRequest} from '@/models';
 
 
 // --- UserInfo Sub-component (No changes) ---
@@ -32,6 +32,8 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, isOwnProfile, isFollowing, is
         ...(isEditHovered && styles.editButtonHover),
         ...(isEditActive && styles.editButtonActive),
     };
+
+    
     return (
         <div style={styles.card}>
             <img src={user.icon || '/default-avatar.png'} alt={user.username} style={styles.profileAvatar} />
@@ -240,12 +242,84 @@ const ProfilePage: React.FC = () => {
     }, [userIdToFetch, currentUser]);
 
     // Handlers
-    const handleFollowToggle = async () => { /* ... no changes ... */ };
-    const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement>) => { /* ... no changes ... */ };
-    const handleEditContactClick = (contact: ContactData) => { /* ... no changes ... */ };
-    const handleCancelEdit = () => { /* ... no changes ... */ };
-    const handleSaveContact = async () => { /* ... no changes ... */ };
-    const handleDeleteContact = async (contactId: string) => { /* ... no changes ... */ };
+    const handleFollowToggle = async () => {
+        if (isTogglingFollow || isOwnProfile || !userIdToFetch) return;
+        setIsTogglingFollow(true);
+        try {
+        if (isFollowing) {
+            await unfollow(userIdToFetch);
+            setIsFollowing(false);
+        } else {
+            await follow(userIdToFetch);
+            setIsFollowing(true);
+        }
+        } catch (err) {
+        console.error('关注/取关操作失败', err);
+        } finally {
+        setIsTogglingFollow(false);
+        }
+    };
+    const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setEditFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleEditContactClick = (contact: ContactData) => {
+        setEditingContactId(contact.id);
+        setEditFormData({ type: contact.type, data: contact.data });
+        setIsAddingContact(false); // 确保新增表单是关闭的
+    };
+
+
+    const handleCancelEdit = () => {
+        setEditingContactId(null);
+        setIsAddingContact(false);
+        setEditFormData({ type: '', data: '' });
+    };    
+    
+    const handleSaveContact = async () => {
+        setIsSubmitting(true);
+        try {
+            const isEditing = !!editingContactId;
+            const apiCall = isEditing
+                ? updateContactById({ id: editingContactId, ...editFormData } as ContactRequest)
+                : addContact(editFormData as AddContactRequest);
+            
+            const res = await apiCall;
+            if (res.code === 200 && res.data) {
+                setContacts(res.data);
+                handleCancelEdit(); // 保存成功后重置所有状态
+            } else {
+                throw new Error(res.message);
+            }
+        } catch (err: any) {
+            alert(err.message);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleDeleteContact = async (contactId: string) => {
+      // 弹出确认框
+      if (!window.confirm('您确定要删除这个联系方式吗？')) {
+        return;
+      }
+      
+      // 可以复用 isSubmitting 状态来显示加载中
+      setIsSubmitting(true);
+      try {
+        const res = await deleteContactById(contactId);
+        if (res.code === 200 && res.data) {
+          setContacts(res.data); // 后端返回了更新后的列表
+        } else {
+          throw new Error(res.message || '删除失败');
+        }
+      } catch (err: any) {
+        alert(err.message);
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
 
     // 4. Add the delete handler for organizations
     const handleDeleteOrganization = async (orgId: string) => {

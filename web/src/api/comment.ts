@@ -1,4 +1,5 @@
-import type { BaseResponse, CommentData, CommentRequest, AddCommentRequest, PageQuery } from '@/models';
+import type { BaseResponse, CommentData, CommentRequest, AddCommentRequest } from '@/models';
+import type { PageQuery } from '@/models/common'; 
 import axiosInstance from './axiosInstance';
 
 // 获取帖子评论

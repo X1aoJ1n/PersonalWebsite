@@ -14,7 +14,7 @@ import RightSidebar from '@/components/RightSidebar';
 const POSTS_PER_PAGE = 5;
 
 const HomePage: React.FC = () => {
-  const { currentUser, searchTerm } = useOutletContext<OutletContextType>();
+  const { currentUser } = useOutletContext<OutletContextType>();
 
   const [posts, setPosts] = useState<SimplePostData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
