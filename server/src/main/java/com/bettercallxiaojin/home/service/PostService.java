@@ -20,5 +20,7 @@ public interface PostService {
 
     List<SimplePostVO> getVisiblePost(Integer pageNum, Integer pageSize);
 
+    List<SimplePostVO> getFavoritePost(Integer pageNum, Integer pageSize);
+
     List<SimplePostVO> getFollowPost(Integer pageNum, Integer pageSize);
 }

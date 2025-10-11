@@ -95,7 +95,18 @@ public class PostController {
         }
     }
 
-    @PostMapping("/list/favorite")
+    @GetMapping("/list/favorite")
+    @Operation(summary = "获取点赞最多帖子", description = "获取当前用户可见的点赞最多帖子列表")
+    public Response<List<SimplePostVO>> getFavoritePost(PageQuery pageQuery) {
+        try {
+            return Response.success(postService.getFavoritePost(pageQuery.getPageNum(),pageQuery.getPageSize()));
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/list/follow")
     @Operation(summary = "获取关注帖子", description = "获取收藏用户的公开帖子列表")
     public Response<List<SimplePostVO>> getFollowPost(PageQuery pageQuery) {
         try {

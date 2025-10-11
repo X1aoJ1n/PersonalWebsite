@@ -143,7 +143,22 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<SimplePostVO> getVisiblePost(Integer pageNum, Integer pageSize) {
-        List<Post> posts = postMapper.selectAll( pageSize, (pageNum - 1) * pageSize);
+        List<Post> posts = postMapper.selectLatest( pageSize, (pageNum - 1) * pageSize);
+        if (posts == null || posts.isEmpty()) {
+            return List.of();
+        }
+        List<SimplePostVO> simplePostVOs = new ArrayList<>();
+        for  (Post post : posts) {
+            SimplePostVO simplePostVO = convertToSimplePostVO(post);
+            simplePostVOs.add(simplePostVO);
+        }
+
+        return simplePostVOs;
+    }
+
+    @Override
+    public List<SimplePostVO> getFavoritePost(Integer pageNum, Integer pageSize) {
+        List<Post> posts = postMapper.selectFavorite( pageSize, (pageNum - 1) * pageSize);
         if (posts == null || posts.isEmpty()) {
             return List.of();
         }

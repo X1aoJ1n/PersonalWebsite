@@ -32,7 +32,11 @@ public interface PostMapper {
                               @Param("offset") int offset);
 
     @Select("SELECT * FROM post ORDER BY created_at DESC LIMIT #{pageSize} OFFSET #{offset}")
-    List<Post> selectAll(@Param("pageSize") int pageSize,
+    List<Post> selectLatest(@Param("pageSize") int pageSize,
+                         @Param("offset") int offset);
+
+    @Select("SELECT * FROM post ORDER BY like_count DESC LIMIT #{pageSize} OFFSET #{offset}")
+    List<Post> selectFavorite(@Param("pageSize") int pageSize,
                          @Param("offset") int offset);
 
     @Select({
