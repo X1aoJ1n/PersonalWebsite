@@ -175,6 +175,7 @@ public class PostServiceImpl implements PostService {
     public List<SimplePostVO> getFollowPost(Integer pageNum, Integer pageSize) {
         List<String> userIds = followMapper.selectFollowingByUserId(BaseContext.getUserId());
 
+        log.info(userIds.toString());
         if (userIds == null || userIds.isEmpty()) {
             return List.of();
         }

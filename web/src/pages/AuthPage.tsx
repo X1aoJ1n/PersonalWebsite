@@ -1,18 +1,19 @@
 // src/pages/AuthPage.tsx
 import React, { useState } from 'react';
-import { useNavigate, useOutletContext } from 'react-router-dom'; // 确保引入 useOutletContext
-import type { OutletContextType } from '@/layouts/RootLayout'; // 引入共享的 context 类型
+import { useNavigate, useOutletContext } from 'react-router-dom';
+import type { OutletContextType } from '@/layouts/RootLayout';
 
-// 引入API接口和数据类型
-import { loginByPassword, register, getRegisterCode } from '@/api/auth';
+// 引入API接口和数据类型 (注意 getRegisterCode 已重命名为 getVerificationCode)
+import { loginByPassword, loginByCode, register, getVerificationCode } from '@/api/auth';
 import type { LoginData } from '@/models';
 
-// 移除了 AuthPageProps 定义
-const AuthPage: React.FC = () => { // 移除了 props
-  // 通过 useOutletContext hook 从 RootLayout 获取共享状态
+const AuthPage: React.FC = () => {
   const { setCurrentUser } = useOutletContext<OutletContextType>();
 
   const [isLoginView, setIsLoginView] = useState(true);
+  // --- 新增 state: 用于管理登录方式 ---
+  const [loginMethod, setLoginMethod] = useState<'password' | 'code'>('password');
+  
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
@@ -32,7 +33,6 @@ const AuthPage: React.FC = () => { // 移除了 props
 
   const handleAuthSuccess = (data: LoginData) => {
     localStorage.setItem('token', data.token);
-    // 调用从 context 获取的函数，更新全局状态
     setCurrentUser(data);
     navigate('/');
   };
@@ -45,7 +45,7 @@ const AuthPage: React.FC = () => { // 移除了 props
     setIsLoading(true);
     setError(null);
     try {
-      const res = await getRegisterCode(formData.email);
+      const res = await getVerificationCode(formData.email); // 使用新的函数名
       if (res.code === 200) {
         setIsCodeSent(true);
         alert('验证码已发送，请检查您的邮箱！');
@@ -59,24 +59,33 @@ const AuthPage: React.FC = () => { // 移除了 props
     }
   };
 
+  // --- 更新: handleSubmit 以处理不同登录方式 ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
     try {
+      let res;
       if (isLoginView) {
-        const res = await loginByPassword({ email: formData.email, password: formData.password });
+        // --- 登录逻辑 ---
+        if (loginMethod === 'password') {
+          res = await loginByPassword({ email: formData.email, password: formData.password });
+        } else { // 验证码登录
+          // 接口需要 {email, password}，我们将 code 放入 password 字段
+          res = await loginByCode({ email: formData.email, password: formData.code });
+        }
         if (res.code === 200 && res.data) {
           handleAuthSuccess(res.data);
         } else {
           throw new Error(res.message || '登录失败');
         }
       } else {
+        // --- 注册逻辑 (保持不变) ---
         if (formData.password !== formData.confirmPassword) {
           throw new Error('两次输入的密码不一致');
         }
-        const res = await register({
+        res = await register({
           username: formData.username,
           email: formData.email,
           password: formData.password,
@@ -101,84 +110,79 @@ const AuthPage: React.FC = () => { // 移除了 props
     <div style={styles.pageContainer}>
       <div style={styles.formContainer}>
         <h2 style={styles.title}>{isLoginView ? '登录' : '注册'}</h2>
+        
+        {/* --- 新增: 仅在登录视图下显示登录方式切换 --- */}
+        {isLoginView && (
+          <div style={styles.methodSwitcher}>
+            <span
+              style={loginMethod === 'password' ? styles.activeMethod : styles.inactiveMethod}
+              onClick={() => setLoginMethod('password')}
+            >
+              密码登录
+            </span>
+            <span
+              style={loginMethod === 'code' ? styles.activeMethod : styles.inactiveMethod}
+              onClick={() => setLoginMethod('code')}
+            >
+              验证码登录
+            </span>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit}>
           {!isLoginView && (
             <div style={styles.inputGroup}>
-              <input
-                type="text"
-                name="username"
-                placeholder="用户名"
-                style={styles.input}
-                value={formData.username}
-                onChange={handleInputChange}
-                required
-              />
+              <input name="username" placeholder="用户名" style={styles.input} value={formData.username} onChange={handleInputChange} required type="text" />
             </div>
           )}
           <div style={styles.inputGroup}>
-            <input
-              type="email"
-              name="email"
-              placeholder="邮箱"
-              style={styles.input}
-              value={formData.email}
-              onChange={handleInputChange}
-              required
-            />
+            <input name="email" placeholder="邮箱" style={styles.input} value={formData.email} onChange={handleInputChange} required type="email" />
           </div>
-          {!isLoginView && (
-            <div style={styles.inputGroupWithButton}>
-              <input
-                type="text"
-                name="code"
-                placeholder="验证码"
-                style={styles.input}
-                value={formData.code}
-                onChange={handleInputChange}
-                required
-              />
-              <button
-                type="button"
-                style={styles.getCodeButton}
-                onClick={handleGetCode}
-                disabled={isLoading || isCodeSent}
-              >
-                {isCodeSent ? '已发送' : '获取验证码'}
-              </button>
-            </div>
+          
+          {/* --- 更新: 根据视图和登录方式动态显示输入框 --- */}
+          {isLoginView ? (
+            loginMethod === 'password' ? (
+              <div style={styles.inputGroup}>
+                <input name="password" placeholder="密码" style={styles.input} value={formData.password} onChange={handleInputChange} required type="password" />
+              </div>
+            ) : (
+              <div style={styles.inputGroupWithButton}>
+                <input name="code" placeholder="验证码" style={styles.input} value={formData.code} onChange={handleInputChange} required type="text" />
+                <button type="button" style={styles.getCodeButton} onClick={handleGetCode} disabled={isLoading || isCodeSent}>
+                  {isCodeSent ? '已发送' : '获取验证码'}
+                </button>
+              </div>
+            )
+          ) : ( // 注册视图
+            <>
+              <div style={styles.inputGroupWithButton}>
+                <input name="code" placeholder="验证码" style={styles.input} value={formData.code} onChange={handleInputChange} required type="text" />
+                <button type="button" style={styles.getCodeButton} onClick={handleGetCode} disabled={isLoading || isCodeSent}>
+                  {isCodeSent ? '已发送' : '获取验证码'}
+                </button>
+              </div>
+              <div style={styles.inputGroup}>
+                <input name="password" placeholder="密码" style={styles.input} value={formData.password} onChange={handleInputChange} required type="password" />
+              </div>
+              <div style={styles.inputGroup}>
+                <input name="confirmPassword" placeholder="确认密码" style={styles.input} value={formData.confirmPassword} onChange={handleInputChange} required type="password" />
+              </div>
+            </>
           )}
-          <div style={styles.inputGroup}>
-            <input
-              type="password"
-              name="password"
-              placeholder="密码"
-              style={styles.input}
-              value={formData.password}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          {!isLoginView && (
-            <div style={styles.inputGroup}>
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="确认密码"
-                style={styles.input}
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-          )}
+
           {error && <p style={styles.errorText}>{error}</p>}
           <button type="submit" style={styles.submitButton} disabled={isLoading}>
             {isLoading ? '处理中...' : (isLoginView ? '登录' : '注册')}
           </button>
         </form>
+
         <p style={styles.toggleText}>
           {isLoginView ? '还没有账户？' : '已有账户？'}
-          <span style={styles.toggleLink} onClick={() => { setIsLoginView(!isLoginView); setError(null); }}>
+          <span style={styles.toggleLink} onClick={() => {
+            setIsLoginView(!isLoginView);
+            setLoginMethod('password'); // 切换视图时重置登录方式
+            setError(null);
+          }}>
             {isLoginView ? '立即注册' : '立即登录'}
           </span>
         </p>
@@ -187,8 +191,9 @@ const AuthPage: React.FC = () => { // 移除了 props
   );
 };
 
-// ... (styles 对象保持不变)
+// --- 更新: 增加登录方式切换的样式 ---
 const styles: { [key: string]: React.CSSProperties } = {
+  // ... pageContainer, formContainer, title 样式保持不变 ...
   pageContainer: {
     display: 'flex',
     justifyContent: 'center',
@@ -205,11 +210,33 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   title: {
     textAlign: 'center',
-    marginBottom: '30px',
+    marginBottom: '20px', // 稍微减小间距
     fontSize: '24px',
     fontWeight: '600',
     color: '#4f46e5',
   },
+  // --- 新增样式 ---
+  methodSwitcher: {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '20px',
+    marginBottom: '25px',
+    fontSize: '16px',
+  },
+  activeMethod: {
+    color: '#4f46e5',
+    fontWeight: '600',
+    cursor: 'pointer',
+    borderBottom: '2px solid #4f46e5',
+    paddingBottom: '5px',
+  },
+  inactiveMethod: {
+    color: '#666',
+    cursor: 'pointer',
+    paddingBottom: '5px',
+    borderBottom: '2px solid transparent',
+  },
+  // ... 其他样式保持不变 ...
   inputGroup: {
     marginBottom: '20px',
   },

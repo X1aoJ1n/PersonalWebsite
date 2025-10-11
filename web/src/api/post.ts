@@ -13,15 +13,21 @@ export const getUserPost = async (pageQuery: PageQuery) => {
   return res.data;
 };
 
-// 获取所有帖子（可见）
+// 获取所有帖子（最新）
 export const getVisiblePost = async (pageQuery: PageQuery) => {
   const res = await axiosInstance.get<BaseResponse<SimplePostData[]>>('/post/list/all', { params: pageQuery });
   return res.data;
 };
 
+// 获取所有帖子（点赞）
+export const getFavoritePost = async (pageQuery: PageQuery) => {
+  const res = await axiosInstance.get<BaseResponse<SimplePostData[]>>('/post/list/favorite', { params: pageQuery });
+  return res.data;
+};
+
 // 获取收藏帖子
 export const getFollowPost = async (pageQuery: PageQuery) => {
-  const res = await axiosInstance.post<BaseResponse<SimplePostData[]>>('/post/list/favorite', null, { params: pageQuery });
+  const res = await axiosInstance.get<BaseResponse<SimplePostData[]>>('/post/list/follow', { params: pageQuery });
   return res.data;
 };
 

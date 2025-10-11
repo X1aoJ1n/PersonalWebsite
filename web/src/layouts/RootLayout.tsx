@@ -1,60 +1,63 @@
 // src/layouts/RootLayout.tsx
 import React, { useState, useEffect } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'; 
 
 import { getCurrentUser } from '@/api/user';
 import type { UserData } from '@/models';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
-// 定义将要共享给子路由的 context 类型
 export interface OutletContextType {
   currentUser: UserData | null;
   setCurrentUser: React.Dispatch<React.SetStateAction<UserData | null>>;
+  searchTerm: string; 
 }
 
-// --- 动态标题的数据 ---
 const SITE_NAME = 'Better Call XiaoJin';
 const titleMap: Record<string, string> = {
   '/': '首页',
   '/auth': '登录/注册',
   "/profile": '个人主页',
+  '/search': '搜索结果',
 };
-// --- 结束 ---
 
 const RootLayout: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<UserData | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const location = useLocation();
+  const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
 
-  // --- 处理动态标题的 useEffect ---
-  useEffect(() => {
+  const handleSearch = (e?: React.KeyboardEvent<HTMLInputElement>) => {
+  e?.preventDefault(); // 如果有事件，就阻止默认行为
+  if (searchTerm.trim() !== '') {
+    navigate(`/search?q=${searchTerm}`);
+  }
+};
+
+    useEffect(() => {
     const pageTitle = titleMap[location.pathname] || '';
     document.title = pageTitle ? `${pageTitle} - ${SITE_NAME}` : SITE_NAME;
   }, [location.pathname]);
 
-  // --- 处理用户登录状态的 useEffect ---
   useEffect(() => {
     const checkLoginStatus = async () => {
-      const token = localStorage.getItem('token');
-      
+    const token = localStorage.getItem('token');
       if (token) {
         try {
           const res = await getCurrentUser();
-          
           if (res.code === 200 && res.data) {
             setCurrentUser(res.data);
           } else {
-            // 如果接口返回错误码，移除 token
             localStorage.removeItem('token');
           }
         } catch (error) {
-          // 如果请求直接异常，也移除 token
-          console.error("Token validation failed, removing token.", error);
+          console.error("Token validation failed", error);
           localStorage.removeItem('token');
         }
       }
       setIsAuthLoading(false);
     };
-
     checkLoginStatus();
   }, []);
 
@@ -62,7 +65,28 @@ const RootLayout: React.FC = () => {
     return <div>Loading Application...</div>;
   }
 
-  return <Outlet context={{ currentUser, setCurrentUser }} />;
+  return (
+    <div style={styles.pageContainer}><Header
+        currentUser={currentUser}
+        searchTerm={searchTerm}
+        onSearchChange={(e) => setSearchTerm(e.target.value)}
+        onSearchSubmit={handleSearch} // 将新的 handleSearch 函数传递下去
+      /><main style={styles.mainContent}>
+        <Outlet context={{ currentUser, setCurrentUser, searchTerm }} />
+      </main><Footer /></div>
+  );
+};
+
+const styles: { [key: string]: React.CSSProperties } = {
+  pageContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: '100vh',
+    backgroundColor: '#f4f5f5',
+  },
+  mainContent: {
+    flex: '1 0 auto',
+  },
 };
 
 export default RootLayout;

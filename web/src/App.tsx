@@ -1,27 +1,35 @@
 // src/App.tsx
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-
-// 引入布局和页面组件
 import RootLayout from '@/layouts/RootLayout';
 import HomePage from '@/pages/HomePage';
 import AuthPage from '@/pages/AuthPage';
-// import ProfilePage from '@/pages/ProfilePage';
+import ProfilePage from '@/pages/ProfilePage';
+import EditProfilePage from '@/pages/EditProfilePage';
+import OrganizationEditPage from '@/pages/OrganizationEditPage';
+import UnderDevelopmentPage from '@/pages/UnderDevelopmentPage'; // 1. 引入新组件
 
-// 将路由配置定义在组件外部，这是最佳实践
+
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <RootLayout />, // RootLayout 作为根元素
+    element: <RootLayout />,
     children: [
-      {
-        index: true,
-        element: <HomePage />,
-      },
-      {
-        path: 'auth',
-        element: <AuthPage />,
-      },
-      // { path: 'profile', element: <ProfilePage /> },
+      { index: true, element: <HomePage /> },
+      { path: 'auth', element: <AuthPage /> },
+      { path: 'profile', element: <ProfilePage /> },
+      { path: 'profile/:userId', element: <ProfilePage /> },
+      { path: 'profile/edit', element: <EditProfilePage /> },
+      { path: 'organization/add', element: <OrganizationEditPage /> },
+      { path: 'organization/edit/:orgId', element: <OrganizationEditPage /> },
+
+      // --- 2. 将待开发页面指向 UnderDevelopmentPage ---
+      { path: 'settings', element: <UnderDevelopmentPage /> },
+      { path: 'recommend-user', element: <UnderDevelopmentPage /> },
+      { path: 'ai-agents', element: <UnderDevelopmentPage /> },
+      { path: 'notifications', element: <UnderDevelopmentPage /> },
+      { path: 'post/:postId', element: <UnderDevelopmentPage /> },
+    { path: 'search', element: <UnderDevelopmentPage /> },
+
     ],
   },
 ]);
