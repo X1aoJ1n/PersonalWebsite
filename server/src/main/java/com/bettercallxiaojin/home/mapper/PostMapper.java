@@ -23,6 +23,9 @@ public interface PostMapper {
     @Update("UPDATE post SET like_count = like_count + #{increment} WHERE id = #{id}")
     int updateLikeCount(@Param("id") String id, @Param("increment") Integer increment);
 
+    @Update("UPDATE post SET comment_count = comment_count + #{increment} WHERE id = #{id}")
+    int updateCommentCount(@Param("id") String id, @Param("increment") Integer increment);
+
     @Delete("DELETE FROM post WHERE id = #{id}")
     int deleteById(String id);
 

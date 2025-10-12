@@ -55,12 +55,14 @@ public class CommentServiceImpl implements CommentService {
         comment.setId(id);
 
         try {
+            postMapper.updateCommentCount(postId, 1);
             commentMapper.insert(comment);
         } catch (Exception e) {
             throw new RuntimeException("insert failed: " + e.getMessage());
         }
 
         CommentVO commentVO = convertToCommentVO(comment);
+
 
         return commentVO;
     }
@@ -79,6 +81,9 @@ public class CommentServiceImpl implements CommentService {
 
         int rows = 0;
         try {
+            if (!(status == StatusConstant.OK)) {
+                postMapper.updateCommentCount(comment.getPostId(), -1);
+            }
             rows = commentMapper.updateStatus(id, status);
         } catch (Exception e) {
             throw new RuntimeException("change status failed: " + e.getMessage());
