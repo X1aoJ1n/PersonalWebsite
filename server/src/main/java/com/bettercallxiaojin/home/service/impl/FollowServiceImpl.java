@@ -34,6 +34,11 @@ public class FollowServiceImpl implements FollowService {
         if (user == null) {
             throw new RuntimeException("User is null");
         }
+
+        if (followId == userId) {
+            throw new RuntimeException("cannot follow yourself");
+        }
+
         if (followMapper.existsByUserIdAndFollowId(userId, followId)) {
             throw new RuntimeException("Already follow");
         }
