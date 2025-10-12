@@ -2,14 +2,17 @@ package com.bettercallxiaojin.home.service.impl;
 
 import com.bettercallxiaojin.home.common.BaseContext;
 import com.bettercallxiaojin.home.mapper.ContactMapper;
+import com.bettercallxiaojin.home.mapper.FollowMapper;
 import com.bettercallxiaojin.home.mapper.OrganizationMapper;
 import com.bettercallxiaojin.home.mapper.UserMapper;
 import com.bettercallxiaojin.home.pojo.VO.ContactVO;
 import com.bettercallxiaojin.home.pojo.VO.OrganizationVO;
+import com.bettercallxiaojin.home.pojo.VO.UserPreviewVO;
 import com.bettercallxiaojin.home.pojo.VO.UserVO;
 import com.bettercallxiaojin.home.pojo.entity.Contact;
 import com.bettercallxiaojin.home.pojo.entity.Organization;
 import com.bettercallxiaojin.home.pojo.entity.User;
+import com.bettercallxiaojin.home.service.FollowService;
 import com.bettercallxiaojin.home.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +31,8 @@ public class UserServiceImpl implements UserService {
     private final OrganizationMapper organizationMapper;
     private final ContactMapper contactMapper;
     private final StringRedisTemplate redisTemplate;
+
+    private final FollowMapper followMapper;
 
     private static final String CHANGE_PREFIX = "change:code:";
 
@@ -57,6 +62,22 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("user is null");
         }
         return user.getUsername();
+    }
+
+    @Override
+    public UserPreviewVO getUserPreviewById(String id) {
+        User user = userMapper.selectById(id);
+        if (user == null) {
+            throw new RuntimeException("user is null");
+        }
+
+        UserPreviewVO userPreviewVO = new UserPreviewVO();
+
+        BeanUtils.copyProperties(user, userPreviewVO);
+
+        userPreviewVO.setIsFollowed(followMapper.existsByUserIdAndFollowId(BaseContext.getUserId(),id));
+
+        return userPreviewVO;
     }
 
     @Override

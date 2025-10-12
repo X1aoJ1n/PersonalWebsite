@@ -4,6 +4,7 @@ import com.bettercallxiaojin.home.common.BaseContext;
 import com.bettercallxiaojin.home.pojo.DTO.ChangeEmailDTO;
 import com.bettercallxiaojin.home.pojo.DTO.ChangePasswordDTO;
 import com.bettercallxiaojin.home.pojo.DTO.UserUpdateDTO;
+import com.bettercallxiaojin.home.pojo.VO.UserPreviewVO;
 import com.bettercallxiaojin.home.pojo.VO.UserVO;
 import com.bettercallxiaojin.home.pojo.entity.Response;
 import com.bettercallxiaojin.home.service.AuthService;
@@ -31,6 +32,20 @@ public class UserController {
         }
         try {
             UserVO user = userService.getUserById(id);
+            return Response.success(user);
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "根据id获取用户概览")
+    public Response<UserPreviewVO> getUserPreviewById(@PathVariable String id) {
+        if (id == null || id.isEmpty()) {
+            return Response.error("id is empty or null");
+        }
+        try {
+            UserPreviewVO user = userService.getUserPreviewById(id);
             return Response.success(user);
         } catch (Exception e) {
             return Response.error(e.getMessage());
