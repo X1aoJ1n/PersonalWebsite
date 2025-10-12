@@ -69,12 +69,13 @@ public class CommentController {
 
     @GetMapping("/list/by-post")
     @Operation(summary = "获取帖子评论", description = "获取指定帖子下的评论列表")
-    public Response<List<CommentVO>> getCommentsByPostId(@RequestBody @Valid PageQuery pageQuery) {
-        if  (pageQuery.getId() == null) {
-            return Response.error("id cannot be empty");
-        }
+    public Response<List<CommentVO>> getCommentsByPostId(
+            @RequestParam("id") String postId,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize
+    ) {
         try {
-            return Response.success(commentService.getCommentsByPostId(pageQuery.getId(), pageQuery.getPageNum(),pageQuery.getPageSize()));
+            return Response.success(commentService.getCommentsByPostId(postId, pageNum, pageSize));
         } catch (Exception e) {
             return Response.error(e.getMessage());
         }
