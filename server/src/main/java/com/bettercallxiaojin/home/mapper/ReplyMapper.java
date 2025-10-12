@@ -29,7 +29,7 @@ public interface ReplyMapper {
     @Update("UPDATE reply SET status = #{status} WHERE id = #{id}")
     int updateStatus(String id, Integer status);
 
-    @Select("SELECT * FROM reply WHERE comment_id = #{id} ORDER BY create_at DESC LIMIT #{pageSize} OFFSET #{offset}")
+    @Select("SELECT * FROM reply WHERE comment_id = #{id} ORDER BY created_at DESC LIMIT #{pageSize} OFFSET #{offset}")
     List<Reply> selectByCommentId(@Param("commentId") String id,
                                  @Param("pageSize") int pageSize,
                                  @Param("offset") int offset);

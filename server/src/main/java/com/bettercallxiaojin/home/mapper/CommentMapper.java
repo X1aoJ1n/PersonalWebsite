@@ -25,7 +25,7 @@ public interface CommentMapper {
     @Update("UPDATE comment SET status = #{status} WHERE id = #{commentId}")
     int updateStatus(String commentId, Integer status);
 
-    @Select("SELECT * FROM comment WHERE post_id = #{postId} ORDER BY like_count DESC, create_at DESC LIMIT #{pageSize} OFFSET #{offset}")
+    @Select("SELECT * FROM comment WHERE post_id = #{postId} ORDER BY like_count DESC, created_at DESC LIMIT #{pageSize} OFFSET #{offset}")
     List<Comment> selectByPostId(@Param("postId") String id,
                                  @Param("pageSize") int pageSize,
                                  @Param("offset") int offset);
