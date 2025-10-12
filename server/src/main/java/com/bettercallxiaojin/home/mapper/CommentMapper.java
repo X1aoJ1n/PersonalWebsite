@@ -29,4 +29,7 @@ public interface CommentMapper {
     List<Comment> selectByPostId(@Param("postId") String postId,
                                  @Param("pageSize") int pageSize,
                                  @Param("offset") int offset);
+
+    @Update("UPDATE comment SET reply_count = reply_count + #{i} WHERE id = #{id}")
+    void updateReplyCount(String id, int i);
 }

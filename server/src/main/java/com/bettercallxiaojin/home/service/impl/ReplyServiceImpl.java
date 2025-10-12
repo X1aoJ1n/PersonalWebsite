@@ -65,6 +65,7 @@ public class ReplyServiceImpl implements ReplyService {
 
 
         try {
+            commentMapper.updateReplyCount(commentId, 1);
             replyMapper.insert(reply);
         } catch (Exception e) {
             throw new RuntimeException("insert failed: " + e.getMessage());

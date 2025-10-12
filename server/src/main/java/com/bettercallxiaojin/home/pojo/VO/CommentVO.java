@@ -16,8 +16,8 @@ public class CommentVO {
     private SimpleUserVO userVO;
     private String postId;
     private String content;
-    private List<ReplyVO> replies;
     private Integer likeCount;
+    private Integer replyCount;
     private Boolean isLike;
     private Boolean isCreator;
     private LocalDateTime createdAt;

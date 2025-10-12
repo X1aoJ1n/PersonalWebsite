@@ -11,6 +11,7 @@ import com.bettercallxiaojin.home.pojo.entity.Comment;
 import com.bettercallxiaojin.home.pojo.entity.Post;
 import com.bettercallxiaojin.home.service.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CommentServiceImpl implements CommentService {
 
     private final PostMapper postMapper;
@@ -88,6 +90,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<CommentVO> getCommentsByPostId(String postId, Integer pageNum, Integer pageSize) {
 
+        log.info("getCommentsByPostId postId:{} pageNum:{} pageSize:{}", postId, pageNum, pageSize);
         Post post = postMapper.selectById(postId);
         if (post == null) {
             throw new RuntimeException("Post Not Found");
@@ -100,9 +103,10 @@ public class CommentServiceImpl implements CommentService {
         }
         List<CommentVO> commentVOS = new ArrayList<>();
         for  (Comment comment : comments) {
-            CommentVO commentVO = convertToCommentVO(comment);
-            commentVO.setReplies(replyService.getOverviewReplies(commentVO.getId()));
-            commentVOS.add(commentVO);
+            if (comment.getStatus() == StatusConstant.OK) {
+                CommentVO commentVO = convertToCommentVO(comment);
+                commentVOS.add(commentVO);
+            }
         }
 
         return commentVOS;
