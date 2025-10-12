@@ -78,12 +78,13 @@ public class ReplyController {
 
     @GetMapping("/list/by-comment")
     @Operation(summary = "获取评论回复", description = "获取指定评论下的回复列表")
-    public Response<List<ReplyVO>> getRepliesByCommentId(@RequestBody @Valid PageQuery pageQuery) {
-        if (pageQuery.getId() == null) {
-            return Response.error("id cannot be empty");
-        }
+    public Response<List<ReplyVO>> getRepliesByCommentId(
+            @RequestParam("id") String commentId,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize
+    ) {
         try {
-            return Response.success(replyService.getRepliesByCommentId(pageQuery.getId(), pageQuery.getPageNum(), pageQuery.getPageSize()));
+            return Response.success(replyService.getRepliesByCommentId(commentId, pageNum, pageSize));
         } catch (Exception e) {
             return Response.error(e.getMessage());
         }
