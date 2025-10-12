@@ -23,7 +23,7 @@ import java.util.List;
 @Tag(name = "评论管理", description = "评论相关接口")
 public class CommentController {
 
-    private CommentService commentService;
+    private final CommentService commentService;
 
 
     @PostMapping("/create")

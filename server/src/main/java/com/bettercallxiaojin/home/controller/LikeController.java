@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/like")
 @RequiredArgsConstructor
-@Tag(name = "评论管理", description = "评论相关接口")
+@Tag(name = "点赞管理", description = "点赞相关接口")
 public class LikeController {
 
     private final LikeService likeService;
