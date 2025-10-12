@@ -158,9 +158,6 @@ public class CommentServiceImpl implements CommentService {
         simpleUserVO.setId(BaseContext.getUserId());
         simpleUserVO.setUsername(userVO.getUsername());
         simpleUserVO.setIcon(userVO.getIcon());
-        simpleUserVO.setBeingFollow(followMapper.existsByUserIdAndFollowId(simpleUserVO.getId(), BaseContext.getUserId()));
-        simpleUserVO.setIsFollow(followMapper.existsByUserIdAndFollowId(BaseContext.getUserId(), simpleUserVO.getId()));
-
         commentVO.setUserVO(simpleUserVO);
         commentVO.setIsLike(likeService.checkLikeStatus(TargetTypeConstant.COMMENT, commentVO.getId()));
 

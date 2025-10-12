@@ -205,8 +205,6 @@ public class PostServiceImpl implements PostService {
         simpleUserVO.setId(BaseContext.getUserId());
         simpleUserVO.setUsername(userVO.getUsername());
         simpleUserVO.setIcon(userVO.getIcon());
-        simpleUserVO.setBeingFollow(followMapper.existsByUserIdAndFollowId(simpleUserVO.getId(), BaseContext.getUserId()));
-        simpleUserVO.setIsFollow(followMapper.existsByUserIdAndFollowId(BaseContext.getUserId(), simpleUserVO.getId()));
 
         postVO.setUserVO(simpleUserVO);
         postVO.setIsLike(likeService.checkLikeStatus(TargetTypeConstant.POST, postVO.getId()));
@@ -227,9 +225,6 @@ public class PostServiceImpl implements PostService {
         simpleUserVO.setId(userVO.getId());
         simpleUserVO.setUsername(userVO.getUsername());
         simpleUserVO.setIcon(userVO.getIcon());
-        simpleUserVO.setBeingFollow(followMapper.existsByUserIdAndFollowId(simpleUserVO.getId(), BaseContext.getUserId()));
-        simpleUserVO.setIsFollow(followMapper.existsByUserIdAndFollowId(BaseContext.getUserId(), simpleUserVO.getId()));
-
         simplePostVO.setUserVO(simpleUserVO);
 
         return simplePostVO;

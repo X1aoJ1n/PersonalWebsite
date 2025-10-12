@@ -11,6 +11,4 @@ public class SimpleUserVO {
     private String id;
     private String username;
     private String icon;
-    private Boolean isFollow;
-    private Boolean beingFollow;
 }
