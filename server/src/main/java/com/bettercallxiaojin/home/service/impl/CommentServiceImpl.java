@@ -86,14 +86,14 @@ public class CommentServiceImpl implements CommentService {
 
 
     @Override
-    public List<CommentVO> getCommentsByPostId(String id, Integer pageNum, Integer pageSize) {
+    public List<CommentVO> getCommentsByPostId(String postId, Integer pageNum, Integer pageSize) {
 
-        Post post = postMapper.selectById(id);
+        Post post = postMapper.selectById(postId);
         if (post == null) {
             throw new RuntimeException("Post Not Found");
         }
 
-        List<Comment> comments = commentMapper.selectByPostId(id, pageSize, (pageNum - 1) * pageSize);
+        List<Comment> comments = commentMapper.selectByPostId(postId, pageSize, (pageNum - 1) * pageSize);
 
         if (comments == null || comments.isEmpty()) {
             return List.of();
