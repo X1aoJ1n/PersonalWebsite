@@ -38,7 +38,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/preview/{id}")
     @Operation(summary = "根据id获取用户概览")
     public Response<UserPreviewVO> getUserPreviewById(@PathVariable String id) {
         if (id == null || id.isEmpty()) {
