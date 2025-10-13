@@ -14,6 +14,7 @@ public class UserPreviewVO {
     private String username;
     private String icon;
     private String introduction;
+    private String background;
     private Integer followerCount;
     private Integer followingCount;
     private Boolean isFollowed;

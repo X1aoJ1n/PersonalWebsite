@@ -1,10 +1,7 @@
 package com.bettercallxiaojin.home.service.impl;
 
 import com.bettercallxiaojin.home.common.BaseContext;
-import com.bettercallxiaojin.home.mapper.CommentMapper;
-import com.bettercallxiaojin.home.mapper.LikeMapper;
-import com.bettercallxiaojin.home.mapper.PostMapper;
-import com.bettercallxiaojin.home.mapper.ReplyMapper;
+import com.bettercallxiaojin.home.mapper.*;
 import com.bettercallxiaojin.home.service.LikeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

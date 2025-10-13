@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +36,7 @@ public class FollowServiceImpl implements FollowService {
             throw new RuntimeException("User is null");
         }
 
-        if (followId == userId) {
+        if (Objects.equals(followId, userId)) {
             throw new RuntimeException("cannot follow yourself");
         }
 

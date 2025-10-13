@@ -17,6 +17,7 @@ public class UserVO {
     private String email;
     private String icon;
     private String introduction;
+    private String background;
     private List<ContactVO> contacts;
     private List<OrganizationVO> organizations;
     private Integer followerCount;

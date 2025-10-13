@@ -52,4 +52,7 @@ public interface UserMapper {
             "</script>"
     })
     List<SimpleUserVO> selectSimpleUsersByIds(@Param("userIds") List<String> userIds);
+
+    @Update("UPDATE user_db set background = #{backgroundUrl} WHERE id = #{userId}")
+    void updateBackground(String userId, String backgroundUrl);
 }
