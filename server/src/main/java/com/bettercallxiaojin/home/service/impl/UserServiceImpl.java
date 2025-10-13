@@ -122,7 +122,7 @@ public class UserServiceImpl implements UserService {
         return userVO;
     }
 
-    @Override
+    // @Override
     public UserVO updateBackground(String backgroundUrl) {
         String userId = BaseContext.getUserId();
 
