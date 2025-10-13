@@ -115,6 +115,11 @@ public class FollowServiceImpl implements FollowService {
 
         List<SimpleUserVO> followingList = userMapper.selectSimpleUsersByIds(userIds);
 
+        for (SimpleUserVO simpleUserVO : followingList) {
+            simpleUserVO.setIsFollowed(true);
+            simpleUserVO.setBeingFollowed(followMapper.existsByUserIdAndFollowId(simpleUserVO.getId(), BaseContext.getUserId()));
+        }
+
         return PageQueryUtil.paginate(followingList, pageNum, pageSize);
     }
 
@@ -130,6 +135,10 @@ public class FollowServiceImpl implements FollowService {
 
         List<SimpleUserVO> followerList = userMapper.selectSimpleUsersByIds(userIds);
 
+        for (SimpleUserVO simpleUserVO : followerList) {
+            simpleUserVO.setIsFollowed(followMapper.existsByUserIdAndFollowId(BaseContext.getUserId(),simpleUserVO.getId()));
+            simpleUserVO.setBeingFollowed(true);
+        }
 
         return PageQueryUtil.paginate(followerList, pageNum, pageSize);
     }
