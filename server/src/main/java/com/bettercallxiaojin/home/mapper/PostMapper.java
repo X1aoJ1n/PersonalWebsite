@@ -10,8 +10,8 @@ import java.util.List;
 @Mapper
 public interface PostMapper {
 
-    @Insert("INSERT INTO post (id, user_id, title, content, like_count, comment_count, created_at, updated_at) " +
-            "VALUES (#{id}, #{userId}, #{title}, #{content}, #{likeCount}, #{commentCount}, #{createdAt}, #{updatedAt})")
+    @Insert("INSERT INTO post (id, user_id, title, content, like_count, comment_count, created_at, updated_at, preview) " +
+            "VALUES (#{id}, #{userId}, #{title}, #{content}, #{likeCount}, #{commentCount}, #{createdAt}, #{updatedAt}, #{preview})")
     int insert(Post post);
 
     @Select("SELECT * FROM post WHERE id = #{id}")

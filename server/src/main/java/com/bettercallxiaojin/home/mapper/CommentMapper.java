@@ -9,8 +9,8 @@ import java.util.List;
 @Mapper
 public interface CommentMapper {
 
-    @Insert("INSERT INTO comment (id, user_id, post_id, content, like_count, created_at, updated_at, status) " +
-            "VALUES (#{id}, #{userId}, #{postId}, #{content}, #{likeCount}, #{createdAt}, #{updatedAt}, #{status})")
+    @Insert("INSERT INTO comment (id, user_id, post_id, content, like_count, created_at, updated_at, status, reply_count) " +
+            "VALUES (#{id}, #{userId}, #{postId}, #{content}, #{likeCount}, #{createdAt}, #{updatedAt}, #{status}, #{replyCount})")
     int insert(Comment comment);
 
     @Select("SELECT * FROM comment WHERE id = #{id}")
