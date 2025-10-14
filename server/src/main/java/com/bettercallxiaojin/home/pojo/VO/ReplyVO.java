@@ -15,6 +15,7 @@ public class ReplyVO {
     private String commentId;
     private ReplyToVO replyToVO;
     private String content;
+    private Integer status;
     private Integer likeCount;
     private Boolean isLike;
     private Boolean isCreator;
