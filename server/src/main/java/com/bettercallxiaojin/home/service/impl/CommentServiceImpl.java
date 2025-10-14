@@ -108,10 +108,8 @@ public class CommentServiceImpl implements CommentService {
         }
         List<CommentVO> commentVOS = new ArrayList<>();
         for  (Comment comment : comments) {
-            if (comment.getStatus() == StatusConstant.OK) {
-                CommentVO commentVO = convertToCommentVO(comment);
-                commentVOS.add(commentVO);
-            }
+            CommentVO commentVO = convertToCommentVO(comment);
+            commentVOS.add(commentVO);
         }
 
         return commentVOS;

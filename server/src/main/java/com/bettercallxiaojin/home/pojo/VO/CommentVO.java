@@ -18,6 +18,7 @@ public class CommentVO {
     private String content;
     private Integer likeCount;
     private Integer replyCount;
+    private Integer status;
     private Boolean isLike;
     private Boolean isCreator;
     private LocalDateTime createdAt;
