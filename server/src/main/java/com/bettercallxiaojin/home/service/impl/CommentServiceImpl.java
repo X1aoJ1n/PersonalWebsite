@@ -153,13 +153,13 @@ public class CommentServiceImpl implements CommentService {
         UserVO userVO = userService.getUserById(comment.getUserId());
 
         SimpleUserVO simpleUserVO = new SimpleUserVO();
-        simpleUserVO.setId(BaseContext.getUserId());
+        simpleUserVO.setId(userVO.getId());
         simpleUserVO.setUsername(userVO.getUsername());
         simpleUserVO.setIcon(userVO.getIcon());
         commentVO.setUserVO(simpleUserVO);
         commentVO.setIsLike(likeService.checkLikeStatus(TargetTypeConstant.COMMENT, commentVO.getId()));
 
-        commentVO.setIsCreator(comment.getUserId().equals(BaseContext.getUserId()));
+        commentVO.setIsCreator(userVO.getId().equals(BaseContext.getUserId()));
 
         return commentVO;
     }
