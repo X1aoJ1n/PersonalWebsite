@@ -161,13 +161,13 @@ public class ReplyServiceImpl implements ReplyService {
         UserVO userVO = userService.getUserById(reply.getUserId());
 
         SimpleUserVO simpleUserVO = new SimpleUserVO();
-        simpleUserVO.setId(BaseContext.getUserId());
+        simpleUserVO.setId(userVO.getId());
         simpleUserVO.setUsername(userVO.getUsername());
         simpleUserVO.setIcon(userVO.getIcon());
 
         replyVO.setUserVO(simpleUserVO);
         replyVO.setIsLike(likeService.checkLikeStatus(TargetTypeConstant.REPLY, replyVO.getId()));
-        replyVO.setIsCreator(reply.getUserId().equals(BaseContext.getUserId()));
+        replyVO.setIsCreator(userVO.getId().equals(BaseContext.getUserId()));
 
 
         ReplyToVO replyToVO = new ReplyToVO();
