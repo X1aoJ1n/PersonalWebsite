@@ -11,3 +11,17 @@ export type * from './post';
 export type * from './reply';
 export type * from './user';
 export type * from './file';
+
+export interface SimpleUserVO {
+  id: string;
+  username: string;
+  icon: string;
+  isFollowed: boolean;
+  beingFollowed: boolean;
+}
+
+export interface PageQuery {
+  id?: string;
+  pageNum?: number;
+  pageSize?: number;
+}

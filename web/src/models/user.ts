@@ -30,3 +30,13 @@ export interface UserData {
   followerCount: number;
   followingCount: number;
 }
+
+export interface UserPreviewData {
+  id: string;
+  username: string;
+  icon?: string;
+  introduction?: string;
+  followerCount: number;
+  followingCount: number;
+  isFollow: boolean;
+}

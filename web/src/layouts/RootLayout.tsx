@@ -1,48 +1,41 @@
 // src/layouts/RootLayout.tsx
+
 import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'; 
-
 import { getCurrentUser } from '@/api/user';
-import type { UserData } from '@/models';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import type { UserData } from '@/models'; 
+import Header from '@/components/common/Header';
+import Footer from '@/components/common/Footer';
 
+// Updated Context Type
 export interface OutletContextType {
   currentUser: UserData | null;
   setCurrentUser: React.Dispatch<React.SetStateAction<UserData | null>>;
-  searchTerm: string; 
 }
 
-const SITE_NAME = 'Better Call XiaoJin';
-const titleMap: Record<string, string> = {
-  '/': '首页',
-  '/auth': '登录/注册',
-  "/profile": '个人主页',
-  '/search': '搜索结果',
-};
-
 const RootLayout: React.FC = () => {
+  // Corrected state type
   const [currentUser, setCurrentUser] = useState<UserData | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const location = useLocation();
-  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
-  const handleSearch = (e?: React.KeyboardEvent<HTMLInputElement>) => {
-  e?.preventDefault(); // 如果有事件，就阻止默认行为
-  if (searchTerm.trim() !== '') {
-    navigate(`/search?q=${searchTerm}`);
-  }
-};
+  // --- FIX for Error 2: Add back the search state ---
+  const [searchTerm, setSearchTerm] = useState('');
 
-    useEffect(() => {
-    const pageTitle = titleMap[location.pathname] || '';
-    document.title = pageTitle ? `${pageTitle} - ${SITE_NAME}` : SITE_NAME;
-  }, [location.pathname]);
-
+  // --- FIX for Error 2: Add back the search handler ---
+  const handleSearch = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (searchTerm.trim() !== '') {
+      navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
+    }
+  };
+  
+  // Your useEffect for checking login status is good
   useEffect(() => {
     const checkLoginStatus = async () => {
-    const token = localStorage.getItem('token');
+      setIsAuthLoading(true);
+      const token = localStorage.getItem('token');
       if (token) {
         try {
           const res = await getCurrentUser();
@@ -50,30 +43,39 @@ const RootLayout: React.FC = () => {
             setCurrentUser(res.data);
           } else {
             localStorage.removeItem('token');
+            setCurrentUser(null);
           }
         } catch (error) {
           console.error("Token validation failed", error);
           localStorage.removeItem('token');
+          setCurrentUser(null);
         }
+      } else {
+        setCurrentUser(null);
       }
       setIsAuthLoading(false);
     };
     checkLoginStatus();
-  }, []);
+  }, [location.key]);
 
   if (isAuthLoading) {
     return <div>Loading Application...</div>;
   }
 
   return (
-    <div style={styles.pageContainer}><Header
+    <div style={styles.pageContainer}>
+      {/* --- FIX for Error 2: Pass all required props to Header --- */}
+      <Header
         currentUser={currentUser}
         searchTerm={searchTerm}
         onSearchChange={(e) => setSearchTerm(e.target.value)}
-        onSearchSubmit={handleSearch} // 将新的 handleSearch 函数传递下去
-      /><main style={styles.mainContent}>
-        <Outlet context={{ currentUser, setCurrentUser, searchTerm }} />
-      </main><Footer /></div>
+        onSearchSubmit={handleSearch}
+      />
+      <main style={styles.mainContent}>
+        <Outlet context={{ currentUser, setCurrentUser }} />
+      </main>
+      <Footer />
+    </div>
   );
 };
 

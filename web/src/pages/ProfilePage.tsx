@@ -40,8 +40,12 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, isOwnProfile, isFollowing, is
             <h2 style={styles.username}>{user.username}</h2>
             <p style={styles.introduction}>{user.introduction || '这位用户很神秘，什么也没留下...'}</p>
             <div style={styles.stats}>
-                <span><strong>{user.followingCount}</strong> 关注</span>
-                <span><strong>{user.followerCount}</strong> 粉丝</span>
+                <Link to={`/profile/${user.id}/follows?tab=following`} style={styles.statLink}>
+                    <span><strong>{user.followingCount}</strong> 关注</span>
+                </Link>
+                <Link to={`/profile/${user.id}/follows?tab=followers`} style={styles.statLink}>
+                    <span><strong>{user.followerCount}</strong> 粉丝</span>
+                </Link>
             </div>
             {isOwnProfile ? (
                 <Link 
@@ -422,6 +426,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     stats: { display: 'flex', justifyContent: 'center', gap: '20px', marginBottom: '20px' },
     addButton: { border: 'none', backgroundColor: 'transparent', fontSize: '24px', cursor: 'pointer', color: '#4f46e5', textDecoration: 'none' },
     centerMessage: { textAlign: 'center', padding: '50px', fontSize: '18px', color: '#666' },
+    statLink: {
+        textDecoration: 'none',
+        color: 'inherit',
+    },
 };
 
 export default ProfilePage;

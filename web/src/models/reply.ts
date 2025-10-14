@@ -3,8 +3,6 @@ interface SimpleUserVO {
   id: string;
   username: string;
   icon: string;
-  isFollow: boolean;
-  beingFollow: boolean;
 }
 
 export interface ReplyToVO {
@@ -34,6 +32,7 @@ export interface ReplyData {
   commentId: string;
   replyToVO?: ReplyToVO; // 回复可能没有目标，所以可选
   content: string;
+  status: number;
   likeCount: number;
   isLike: boolean;
   isCreator: boolean;

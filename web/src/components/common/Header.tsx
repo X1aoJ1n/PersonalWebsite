@@ -1,26 +1,23 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { UserData } from '@/models';
-import { IoSearchOutline } from 'react-icons/io5';
-
-
-// Removed the problematic import from 'react-icons'
+// 1. 恢复使用 react-icons/io5 库
+import { IoSearchOutline, IoSettingsOutline } from 'react-icons/io5';
 
 interface HeaderProps {
   currentUser: UserData | null;
   searchTerm: string;
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onSearchSubmit: (event?: React.KeyboardEvent<HTMLInputElement>) => void; 
+  onSearchSubmit: (event?: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
-// A new NavLink component to handle its own hover state
+// NavLink 子组件保持不变
 const NavLink: React.FC<{ to: string; children: React.ReactNode }> = ({ to, children }) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  // Dynamically set the background color based on the hover state
   const navLinkStyle: React.CSSProperties = {
     ...styles.navLink,
-    backgroundColor: isHovered ? '#f5f5f5' : 'transparent', // light gray on hover
+    backgroundColor: isHovered ? '#f5f5f5' : 'transparent',
     transition: 'background-color 0.2s ease-in-out',
   };
 
@@ -35,7 +32,6 @@ const NavLink: React.FC<{ to: string; children: React.ReactNode }> = ({ to, chil
     </Link>
   );
 };
-
 
 const Header: React.FC<HeaderProps> = ({ currentUser, searchTerm, onSearchChange, onSearchSubmit }) => {
   const [isSettingsHovered, setIsSettingsHovered] = useState(false);
@@ -52,16 +48,16 @@ const Header: React.FC<HeaderProps> = ({ currentUser, searchTerm, onSearchChange
     <header style={styles.header}>
       <div style={styles.headerContent}>
         <div style={styles.headerLeft}>
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             style={styles.logoLink}
             onMouseEnter={() => setIsLogoHovered(true)}
             onMouseLeave={() => setIsLogoHovered(false)}
           >
-            <img 
-              src={isLogoHovered ? 'https://cdn.cdnstep.com/ysbhEjwXccSJjeVIeBS1/cover.thumb256.webp' : '/logo.png'} 
-              alt="Logo" 
-              style={styles.logo} 
+            <img
+              src={isLogoHovered ? 'https://cdn.cdnstep.com/ysbhEjwXccSJjeVIeBS1/cover.thumb256.webp' : '/logo.png'}
+              alt="Logo"
+              style={styles.logo}
             />
             <span style={styles.siteName}>Better Call XiaoJin</span>
           </Link>
@@ -72,7 +68,7 @@ const Header: React.FC<HeaderProps> = ({ currentUser, searchTerm, onSearchChange
             <NavLink to="/notifications">消息通知</NavLink>
           </nav>
         </div>
-        
+
         <div style={styles.headerSearch}>
           <div style={styles.searchContainer}>
             <input
@@ -83,9 +79,10 @@ const Header: React.FC<HeaderProps> = ({ currentUser, searchTerm, onSearchChange
               onChange={onSearchChange}
               onKeyDown={handleKeyDown}
             />
+            {/* 2. 将图标恢复为 IoSearchOutline 组件 */}
             <IoSearchOutline
               style={{ ...styles.searchIcon, cursor: 'pointer' }}
-              onClick={() => onSearchSubmit(undefined)} // 点击触发搜索
+              onClick={() => onSearchSubmit(undefined)}
             />
           </div>
         </div>
@@ -106,15 +103,15 @@ const Header: React.FC<HeaderProps> = ({ currentUser, searchTerm, onSearchChange
                 onMouseEnter={() => setIsSettingsHovered(true)}
                 onMouseLeave={() => setIsSettingsHovered(false)}
               >
-                {/* svg 图标 */}
+                {/* 3. 将图标恢复为 IoSettingsOutline 组件 */}
+                <IoSettingsOutline size={24} />
               </Link>
 
-              {/* 用户头像 + 名字 */}
               <Link
                 to={`/profile`}
                 style={{
                   ...styles.userProfile,
-                  backgroundColor: isProfileHovered ? '#f5f5f5' : 'transparent', // 👈 hover变灰
+                  backgroundColor: isProfileHovered ? '#f5f5f5' : 'transparent',
                   borderRadius: '8px',
                   padding: '4px 8px',
                   transition: 'background-color 0.2s ease-in-out',
@@ -163,17 +160,17 @@ const styles: { [key: string]: React.CSSProperties } = {
   logoLink: { display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#333' },
   logo: { height: '32px', marginRight: '12px' },
   siteName: { fontSize: '20px', fontWeight: 'bold', color: '#4f46e5' },
-  nav: { 
+  nav: {
     marginLeft: '40px',
     display: 'flex',
-    gap: '10px' // Use gap for spacing between links
+    gap: '10px'
   },
-  navLink: { 
-    padding: '8px 16px', // Add padding for the background
-    borderRadius: '6px', // Add rounded corners
-    textDecoration: 'none', 
-    color: '#555', 
-    fontSize: '16px', 
+  navLink: {
+    padding: '8px 16px',
+    borderRadius: '6px',
+    textDecoration: 'none',
+    color: '#555',
+    fontSize: '16px',
     fontWeight: 500,
   },
   headerSearch: {
@@ -190,7 +187,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   searchInput: {
     width: '100%',
-    padding: '8px 40px 8px 15px', 
+    padding: '8px 40px 8px 15px',
     border: '1px solid #ccc',
     borderRadius: '20px',
     outline: 'none',
@@ -199,8 +196,8 @@ const styles: { [key: string]: React.CSSProperties } = {
   searchIcon: {
     position: 'absolute',
     right: '15px',
-    fill: '#888', // Use fill for SVG color
-    width: '20px',  // Use width/height for SVG size
+    color: '#888', // Changed from fill to color for react-icons
+    width: '20px',
     height: '20px',
   },
   headerRight: {
@@ -228,4 +225,3 @@ const styles: { [key: string]: React.CSSProperties } = {
 };
 
 export default Header;
-

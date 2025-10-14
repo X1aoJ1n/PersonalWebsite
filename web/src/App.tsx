@@ -6,8 +6,11 @@ import AuthPage from '@/pages/AuthPage';
 import ProfilePage from '@/pages/ProfilePage';
 import EditProfilePage from '@/pages/EditProfilePage';
 import OrganizationEditPage from '@/pages/OrganizationEditPage';
-import UnderDevelopmentPage from '@/pages/UnderDevelopmentPage'; // 1. 引入新组件
-
+import UnderDevelopmentPage from '@/pages/UnderDevelopmentPage'; 
+import PostDetailPage from '@/pages/PostDetailPage';
+import PostEditPage from '@/pages/PostEditPage';
+import PostCreatePage from '@/pages/PostCreatePage';
+import FollowListPage from '@/pages/FollowListPage';
 
 const router = createBrowserRouter([
   {
@@ -21,14 +24,18 @@ const router = createBrowserRouter([
       { path: 'profile/edit', element: <EditProfilePage /> },
       { path: 'organization/add', element: <OrganizationEditPage /> },
       { path: 'organization/edit/:orgId', element: <OrganizationEditPage /> },
+      { path: 'post/:postId', element: <PostDetailPage /> },
+      { path: 'post/edit/:postId', element: <PostEditPage /> },
+      { path: 'post/create', element: <PostCreatePage /> },
+      { path: 'profile/:userId/follows', element: <FollowListPage /> },
+
 
       // --- 2. 将待开发页面指向 UnderDevelopmentPage ---
       { path: 'settings', element: <UnderDevelopmentPage /> },
       { path: 'recommend-user', element: <UnderDevelopmentPage /> },
       { path: 'ai-agents', element: <UnderDevelopmentPage /> },
       { path: 'notifications', element: <UnderDevelopmentPage /> },
-      { path: 'post/:postId', element: <UnderDevelopmentPage /> },
-    { path: 'search', element: <UnderDevelopmentPage /> },
+      { path: 'search', element: <UnderDevelopmentPage /> },
 
     ],
   },

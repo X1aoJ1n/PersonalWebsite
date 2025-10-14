@@ -1,4 +1,4 @@
-import type { BaseResponse, UserData, UserUpdateRequest, ChangeEmailRequest, ChangePasswordRequest } from '@/models';
+import type { BaseResponse, UserData, UserPreviewData, UserUpdateRequest, ChangeEmailRequest, ChangePasswordRequest } from '@/models';
 import axiosInstance from './axiosInstance';
 
 // 获取当前用户
@@ -10,6 +10,12 @@ export const getCurrentUser = async () => {
 // 根据id获取用户
 export const getUserById = async (id: string) => {
   const res = await axiosInstance.get<BaseResponse<UserData>>(`/user/${id}`);
+  return res.data;
+};
+
+// 根据id获取用户预览
+export const getUserPreviewById = async (id: string) => {
+  const res = await axiosInstance.get<BaseResponse<UserPreviewData>>(`/user/preview/${id}`);
   return res.data;
 };
 

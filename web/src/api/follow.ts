@@ -5,8 +5,8 @@ export interface SimpleUserVO {
   id: string;
   username: string;
   icon: string;
-  isFollow: boolean;
-  beingFollow: boolean;
+  isFollowed: boolean;
+  beingFollowed: boolean;
 }
 
 export interface PageQuery {
@@ -28,14 +28,24 @@ export const unfollow = async (followId: string) => {
 };
 
 // 获取关注列表
-export const getFollowingList = async (pageQuery: PageQuery) => {
-  const res = await axiosInstance.get<BaseResponse<SimpleUserVO[]>>('/follow/list-following', { params: pageQuery });
+export const getFollowingList = async (userId: string, pageQuery: PageQuery) => {
+  const res = await axiosInstance.get<BaseResponse<SimpleUserVO[]>>('/follow/list-following', { 
+    params: {
+      userId,          // Include the userId
+      ...pageQuery     // Spread the rest of the pagination params
+    } 
+  });
   return res.data;
 };
 
 // 获取粉丝列表
-export const getFollowerList = async (pageQuery: PageQuery) => {
-  const res = await axiosInstance.get<BaseResponse<SimpleUserVO[]>>('/follow/list-follower', { params: pageQuery });
+export const getFollowerList = async (userId: string, pageQuery: PageQuery) => {
+  const res = await axiosInstance.get<BaseResponse<SimpleUserVO[]>>('/follow/list-follower', {
+    params: {
+      userId,          // Include the userId
+      ...pageQuery     // Spread the rest of the pagination params
+    } 
+  });
   return res.data;
 };
 

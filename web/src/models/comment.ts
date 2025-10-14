@@ -1,12 +1,7 @@
-import type { ReplyData } from './reply';
-
-
 interface SimpleUserVO {
   id: string;
   username: string;
   icon: string;
-  isFollow: boolean;
-  beingFollow: boolean;
 }
 
 // 请求类型
@@ -26,8 +21,9 @@ export interface CommentData {
   userVO: SimpleUserVO;
   postId: string;
   content: string;
-  replies: ReplyData[];
+  status: number;
   likeCount: number;
+  replyCount: number;
   isLike: boolean;
   isCreator: boolean;
   createdAt: string;

@@ -7,9 +7,9 @@ import type { OutletContextType } from '@/layouts/RootLayout';
 import { getVisiblePost, getFollowPost, getFavoritePost } from '@/api/post';
 import type { SimplePostData } from '@/models';
 
-import LeftSidebar from '@/components/LeftSidebar';
-import PostCard from '@/components/PostCard';
-import RightSidebar from '@/components/RightSidebar';
+import LeftSidebar from '@/components/home/LeftSidebar';
+import PostCard from '@/components/home/PostCard';
+import RightSidebar from '@/components/home/RightSidebar';
 
 const POSTS_PER_PAGE = 5;
 
@@ -21,7 +21,7 @@ const HomePage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   
   // 2. 更新 activeFeed 的类型和初始值
-  const [activeFeed, setActiveFeed] = useState<'latest' | 'favorite' | 'following'>('latest');
+  const [activeFeed, setActiveFeed] = useState<'favorite' | 'latest' | 'following'>('favorite');
   
   const [currentPageNum, setCurrentPageNum] = useState(1);
   const [hasMore, setHasMore] = useState(true);

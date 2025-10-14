@@ -10,7 +10,13 @@ export interface PageQuery {
 
 // 获取帖子评论
 export const getCommentsByPostId = async (postId: string, pageQuery: PageQuery) => {
-  const res = await axiosInstance.get<BaseResponse<CommentData[]>>(`/comment/list/by-post?postId=${postId}`, { params: pageQuery });
+  const res = await axiosInstance.get<BaseResponse<CommentData[]>>('/comment/list/by-post', {
+    params: {
+      id: postId,
+      pageNum: pageQuery.pageNum,
+      pageSize: pageQuery.pageSize,
+    }
+  });
   return res.data;
 };
 
@@ -28,7 +34,7 @@ export const createComment = async (params: AddCommentRequest) => {
 
 // 删除评论
 export const deleteComment = async (id: string) => {
-  const res = await axiosInstance.delete<BaseResponse<boolean>>(`/comment/delete?id=${id}`);
+  const res = await axiosInstance.put<BaseResponse<boolean>>(`/comment/delete?id=${id}`);
   return res.data;
 };
 

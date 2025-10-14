@@ -9,8 +9,14 @@ export interface PageQuery {
 
 // 获取评论回复
 export const getRepliesByCommentId = async (commentId: string, pageQuery: PageQuery) => {
-  const res = await axiosInstance.get<BaseResponse<ReplyData[]>>(`/reply/list/by-comment?commentId=${commentId}`, { params: pageQuery });
-  return res.data;
+  const res = await axiosInstance.get<BaseResponse<ReplyData[]>>(`/reply/list/by-comment?commentId=${commentId}`, {
+    params: {
+      id: commentId,
+      pageNum: pageQuery.pageNum,
+      pageSize: pageQuery.pageSize,
+    }
+  });
+  return res.data;
 };
 
 // 创建回复
@@ -27,7 +33,7 @@ export const updateReply = async (params: ReplyRequest) => {
 
 // 删除回复
 export const deleteReply = async (id: string) => {
-  const res = await axiosInstance.delete<BaseResponse<boolean>>(`/reply/delete?id=${id}`);
+  const res = await axiosInstance.put<BaseResponse<boolean>>(`/reply/delete?id=${id}`);
   return res.data;
 };
 
