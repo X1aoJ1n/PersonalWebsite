@@ -202,14 +202,14 @@ public class PostServiceImpl implements PostService {
         UserVO userVO = userService.getUserById(post.getUserId());
 
         SimpleUserVO simpleUserVO = new SimpleUserVO();
-        simpleUserVO.setId(BaseContext.getUserId());
+        simpleUserVO.setId(userVO.getId());
         simpleUserVO.setUsername(userVO.getUsername());
         simpleUserVO.setIcon(userVO.getIcon());
 
         postVO.setUserVO(simpleUserVO);
         postVO.setIsLike(likeService.checkLikeStatus(TargetTypeConstant.POST, postVO.getId()));
 
-        postVO.setIsCreator(post.getUserId().equals(BaseContext.getUserId()));
+        postVO.setIsCreator(userVO.getId().equals(BaseContext.getUserId()));
 
         return postVO;
     }
