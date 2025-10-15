@@ -8,7 +8,7 @@ const PostEditPage: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState<Partial<PostRequest>>({ title: '', content: '' });
+  const [formData, setFormData] = useState<Partial<PostRequest>>({ title: '', preview: '', content: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +21,13 @@ const PostEditPage: React.FC = () => {
     getPostDetail(postId)
       .then(res => {
         if (res.code === 200 && res.data) {
-          setFormData({ id: res.data.id, title: res.data.title, content: res.data.content });
+          // 1. 在加载数据时，一并设置 preview 字段
+          setFormData({ 
+            id: res.data.id, 
+            title: res.data.title, 
+            preview: res.data.preview || '', 
+            content: res.data.content 
+          });
         } else {
           throw new Error(res.message || '加载帖子失败');
         }
@@ -46,7 +52,7 @@ const PostEditPage: React.FC = () => {
       const res = await updatePost(formData as PostRequest);
       if (res.code === 200) {
         alert('修改成功！');
-        navigate(`/post/${formData.id}`); // 修改成功后，返回帖子详情页
+        navigate(`/post/${formData.id}`);
       } else {
         throw new Error(res.message);
       }
@@ -67,6 +73,20 @@ const PostEditPage: React.FC = () => {
           <label>标题</label>
           <input name="title" value={formData.title || ''} onChange={handleChange} style={styles.input} />
         </div>
+
+        {/* 2. 添加帖子预览的编辑框 */}
+        <div style={styles.inputGroup}>
+          <label>预览内容 (可选)</label>
+          <textarea 
+            name="preview" 
+            value={formData.preview || ''} 
+            onChange={handleChange} 
+            style={styles.previewTextarea} 
+            rows={3}
+            placeholder="如果不填，会自动截取内容前100个字符作为预览"
+          />
+        </div>
+
         <div style={styles.inputGroup}>
           <label>内容 (支持 Markdown)</label>
           <textarea name="content" value={formData.content || ''} onChange={handleChange} style={styles.textarea} rows={50} />
@@ -85,6 +105,7 @@ const PostEditPage: React.FC = () => {
   );
 };
 
+// 3. 为新的预览输入框添加样式
 const styles: { [key: string]: React.CSSProperties } = {
   pageContainer: { maxWidth: '800px', margin: '40px auto' },
   formContainer: { backgroundColor: '#fff', padding: '30px', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)' },
@@ -92,6 +113,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   title: { textAlign: 'center', fontSize: '24px', fontWeight: 600, marginBottom: '30px' },
   inputGroup: { marginBottom: '20px' },
   input: { width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '6px', marginTop: '5px', fontSize: '16px', boxSizing: 'border-box' },
+  previewTextarea: { width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '6px', marginTop: '5px', resize: 'vertical', fontFamily: 'inherit', fontSize: '14px', boxSizing: 'border-box', lineHeight: 1.6 },
   textarea: { width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '6px', marginTop: '5px', resize: 'vertical', fontFamily: 'inherit', fontSize: '16px', boxSizing: 'border-box' },
   buttonGroup: { display: 'flex', justifyContent: 'flex-end', gap: '15px', marginTop: '30px' },
   saveButton: { border: 'none', backgroundColor: '#4f46e5', color: '#fff', padding: '10px 20px', borderRadius: '6px', cursor: 'pointer' },

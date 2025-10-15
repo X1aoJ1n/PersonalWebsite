@@ -23,9 +23,10 @@ interface ReplyItemProps extends ReplyPreviewHandlers {
   onReplyClick: () => void;
   onUpdate: (replyId: string, newContent: string) => Promise<void>;
   onDelete: (replyId: string) => Promise<void>;
+  isLoggedIn: boolean; 
 }
 
-const ReplyItem: React.FC<ReplyItemProps> = ({ reply, onReplyClick, onReplyAuthorMouseEnter, onUserMouseLeave, onUpdate, onDelete }) => {
+const ReplyItem: React.FC<ReplyItemProps> = ({ reply, onReplyClick, onReplyAuthorMouseEnter, onUserMouseLeave, onUpdate, onDelete, isLoggedIn }) => {
   const [isLiked, setIsLiked] = useState(reply.isLike);
   const [likeCount, setLikeCount] = useState(reply.likeCount);
   const [isLiking, setIsLiking] = useState(false);
@@ -84,20 +85,20 @@ const ReplyItem: React.FC<ReplyItemProps> = ({ reply, onReplyClick, onReplyAutho
     <div style={styles.replyItem}>
       <Link
         to={`/profile/${reply.userVO.id}`}
-        onMouseEnter={(e: React.MouseEvent) => onReplyAuthorMouseEnter(e, reply.userVO.id, replyAuthorNameRef.current)}
+        onMouseEnter={(e: React.MouseEvent) => isLoggedIn && onReplyAuthorMouseEnter(e, reply.userVO.id, replyAuthorNameRef.current)}
         onMouseLeave={onUserMouseLeave}
       >
         <img src={reply.userVO.icon || '/default-avatar.png'} alt={reply.userVO.username} style={styles.avatarSmall} />
       </Link>
       <div style={styles.commentContent}>
         <div>
-          <Link ref={replyAuthorNameRef} to={`/profile/${reply.userVO.id}`} style={styles.authorName} onMouseEnter={(e: React.MouseEvent) => onReplyAuthorMouseEnter(e, reply.userVO.id, replyAuthorNameRef.current)} onMouseLeave={onUserMouseLeave}>
+          <Link ref={replyAuthorNameRef} to={`/profile/${reply.userVO.id}`} style={styles.authorName} onMouseEnter={(e: React.MouseEvent) => isLoggedIn && onReplyAuthorMouseEnter(e, reply.userVO.id, replyAuthorNameRef.current)} onMouseLeave={onUserMouseLeave}>
             {reply.userVO.username}
           </Link>
           {reply.replyToVO?.userId && (
             <span style={styles.replyTo}>
               {' 回复 '}
-              <Link to={`/profile/${reply.replyToVO.userId}`} style={{...styles.authorName, fontSize: '14px'}} onMouseEnter={(e: React.MouseEvent) => onReplyAuthorMouseEnter(e, reply.replyToVO!.userId, e.currentTarget as HTMLElement)} onMouseLeave={onUserMouseLeave}>
+              <Link to={`/profile/${reply.replyToVO.userId}`} style={{...styles.authorName, fontSize: '14px'}} onMouseEnter={(e: React.MouseEvent) => isLoggedIn && onReplyAuthorMouseEnter(e, reply.replyToVO!.userId, e.currentTarget as HTMLElement)} onMouseLeave={onUserMouseLeave}>
                 @{reply.replyToVO.userName}
               </Link>
             </span>
@@ -118,11 +119,16 @@ const ReplyItem: React.FC<ReplyItemProps> = ({ reply, onReplyClick, onReplyAutho
         
         <div style={styles.commentActions}>
           <span>{new Date(reply.createdAt).toLocaleString()}</span>
-          <button onClick={onReplyClick} style={styles.buttonSmall}>回复</button>
-          <button onClick={handleLikeToggle} disabled={isLiking} style={styles.likeButtonSmall}>
-            {isLiked ? <FaHeart style={{ color: '#ef4444' }}/> : <FaRegHeart />}
-            {likeCount > 0 && <span>{likeCount}</span>}
-          </button>
+          {isLoggedIn && (
+            <button onClick={onReplyClick} style={styles.buttonSmall}>回复</button>
+          )}
+           {isLoggedIn && (
+            <button onClick={handleLikeToggle} disabled={isLiking} style={styles.likeButtonSmall}>
+              {isLiked ? <FaHeart style={{ color: '#ef4444' }}/> : <FaRegHeart />}
+              {likeCount > 0 && <span>{likeCount}</span>}
+            </button>
+          )}
+
           {reply.isCreator && !isEditing && (
             <>
               <button onClick={() => setIsEditing(true)} style={styles.actionButton}><FaEdit /></button>
@@ -142,6 +148,7 @@ interface CommentItemProps extends CommentPreviewHandlers {
   onCommentDeleted: (commentId: string) => Promise<void>;
   onCommentUpdated: (commentId: string, newContent: string) => Promise<void>;
   onReplyDeleted: (commentId: string) => void;
+  isLoggedIn: boolean;
 }
 
 const CommentItem: React.FC<CommentItemProps> = ({ 
@@ -152,6 +159,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   onUserMouseLeave,
   onCommentDeleted,
   onCommentUpdated,
+  isLoggedIn 
 }) => {
   const [replies, setReplies] = useState<ReplyData[]>([]);
   const [showReplies, setShowReplies] = useState(false);
@@ -277,12 +285,12 @@ const CommentItem: React.FC<CommentItemProps> = ({
 
   return (
     <div style={styles.commentItem}>
-      <Link to={`/profile/${comment.userVO.id}`} onMouseEnter={(e: React.MouseEvent) => onCommentAuthorMouseEnter(e, comment.userVO.id, commentAuthorNameRef.current)} onMouseLeave={onUserMouseLeave}>
+      <Link to={`/profile/${comment.userVO.id}`} onMouseEnter={(e: React.MouseEvent) => isLoggedIn && onCommentAuthorMouseEnter(e, comment.userVO.id, commentAuthorNameRef.current)} onMouseLeave={onUserMouseLeave}>
         <img src={comment.userVO.icon || '/default-avatar.png'} alt={comment.userVO.username} style={comment.status === 1 ? {...styles.avatar, filter: 'grayscale(100%)'} : styles.avatar} />
       </Link>
 
       <div style={styles.commentContent}>
-        <Link ref={commentAuthorNameRef} to={`/profile/${comment.userVO.id}`} style={styles.authorName} onMouseEnter={(e: React.MouseEvent) => onCommentAuthorMouseEnter(e, comment.userVO.id, commentAuthorNameRef.current)} onMouseLeave={onUserMouseLeave}>
+        <Link ref={commentAuthorNameRef} to={`/profile/${comment.userVO.id}`} style={styles.authorName} onMouseEnter={(e: React.MouseEvent) => isLoggedIn && onCommentAuthorMouseEnter(e, comment.userVO.id, commentAuthorNameRef.current)} onMouseLeave={onUserMouseLeave}>
           {comment.userVO.username}
         </Link>
         
@@ -302,48 +310,54 @@ const CommentItem: React.FC<CommentItemProps> = ({
         )}
 
         <div style={styles.commentActions}>
-          <span>{new Date(comment.createdAt).toLocaleString()}</span>
-          {/* Hide actions if comment is deleted */}
-          {comment.status !== 1 && (
-            <>
+        <span>{new Date(comment.createdAt).toLocaleString()}</span>
+        {comment.status !== 1 && (
+          <>
+            {/* 6. Conditionally render the comment's like button */}
+            {isLoggedIn && (
               <button onClick={handleLikeToggle} disabled={isLiking} style={styles.likeButtonSmall}>
                 {isLiked ? <FaHeart style={{ color: '#ef4444' }}/> : <FaRegHeart />}
                 {likeCount > 0 && <span>{likeCount}</span>}
               </button>
+            )}
+
+            {isLoggedIn && (
               <button onClick={handleReplyToComment} style={styles.buttonLarge}>
-                {showReplyForm && !replyTarget ? '取消回复' : '回复'}
+              {showReplyForm && !replyTarget ? '取消回复' : '回复'}
               </button>
-              {comment.isCreator && !isEditing && (
-                <>
-                  <button onClick={() => setIsEditing(true)} style={styles.actionButton}><FaEdit /> 编辑</button>
-                  <button onClick={handleDeleteComment} style={{...styles.actionButton, color: '#ef4444'}}><FaTrash /> 删除</button>
-                </>
-              )}
-            </>
-          )}
-          {/* Always show "view replies" button, regardless of comment status */}
-          {comment.replyCount > 0 && (
-            <button onClick={handleToggleReplies} style={styles.actionButton}>
-              {isLoadingReplies ? '加载中...' : (showReplies ? '收起回复' : `查看 ${comment.replyCount} 条回复`)}
-            </button>
-          )}
-        </div>
+            )}
+            {comment.isCreator && !isEditing && (
+              <>
+                <button onClick={() => setIsEditing(true)} style={styles.actionButton}><FaEdit /> 编辑</button>
+                <button onClick={handleDeleteComment} style={{...styles.actionButton, color: '#ef4444'}}><FaTrash /> 删除</button>
+              </>
+            )}
+          </>
+        )}
+        {comment.replyCount > 0 && (
+          <button onClick={handleToggleReplies} style={styles.actionButton}>
+            {isLoadingReplies ? '加载中...' : (showReplies ? '收起回复' : `查看 ${comment.replyCount} 条回复`)}
+          </button>
+        )}
+      </div>
         
         {showReplies && (
-          <div style={styles.repliesContainer}>
-            {replies.map(reply => 
-              <ReplyItem
-                key={reply.id}
-                reply={reply}
-                onReplyClick={() => handleReplyToReply(reply)}
-                onReplyAuthorMouseEnter={onReplyAuthorMouseEnter}
-                onUserMouseLeave={onUserMouseLeave}
-                onUpdate={handleUpdateReply}
-                onDelete={handleDeleteReply}
-              />
-            )}
-          </div>
-        )}
+        <div style={styles.repliesContainer}>
+          {replies.map(reply => 
+            <ReplyItem
+              key={reply.id}
+              reply={reply}
+              onReplyClick={() => handleReplyToReply(reply)}
+              onReplyAuthorMouseEnter={onReplyAuthorMouseEnter}
+              onUserMouseLeave={onUserMouseLeave}
+              onUpdate={handleUpdateReply}
+              onDelete={handleDeleteReply}
+              isLoggedIn={isLoggedIn} // 7. Pass `isLoggedIn` down to ReplyItem
+            />
+          )}
+        </div>
+      )}
+
 
         {showReplyForm && comment.status !== 1 && (
           <CommentForm 

@@ -1,3 +1,5 @@
+// src/components/post/PostContent.tsx
+
 import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
@@ -7,26 +9,25 @@ import { deletePost } from '@/api/post';
 import { like, unlike } from '@/api/like';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 
-// 1. Define the props interface to accept the required event handlers from the parent
 interface UserPreviewHandlers {
   onUserMouseEnter: (e: React.MouseEvent, userId: string, anchor: HTMLElement | null) => void;
   onUserMouseLeave: () => void;
 }
 
+// 1. Add `isLoggedIn` to the props interface
 interface PostContentProps extends UserPreviewHandlers {
   post: PostData;
+  isLoggedIn: boolean; // This prop will tell us if the user is logged in
 }
 
-const PostContent: React.FC<PostContentProps> = ({ post, onUserMouseEnter, onUserMouseLeave }) => {
+// 2. Destructure the new `isLoggedIn` prop
+const PostContent: React.FC<PostContentProps> = ({ post, onUserMouseEnter, onUserMouseLeave, isLoggedIn }) => {
   const navigate = useNavigate();
-
-  // 2. The useUserPreview() hook has been REMOVED from this component.
   
   const [isLiked, setIsLiked] = useState(post.isLike);
   const [likeCount, setLikeCount] = useState(post.likeCount);
   const [isLiking, setIsLiking] = useState(false);
 
-  // 3. Keep the ref to provide a stable anchor element for positioning.
   const authorAnchorRef = useRef<HTMLAnchorElement>(null);
 
   const handleDelete = async () => {
@@ -79,7 +80,7 @@ const PostContent: React.FC<PostContentProps> = ({ post, onUserMouseEnter, onUse
           ref={authorAnchorRef}
           to={`/profile/${post.userVO.id}`}
           // 5. Call the functions passed down via props.
-          onMouseEnter={(e: React.MouseEvent) => onUserMouseEnter(e, post.userVO.id, authorAnchorRef.current)}
+          onMouseEnter={(e: React.MouseEvent) => isLoggedIn && onUserMouseEnter(e, post.userVO.id, authorAnchorRef.current)}
           onMouseLeave={onUserMouseLeave}
         >
           <img src={post.userVO.icon || '/default-avatar.png'} alt={post.userVO.username} style={styles.avatar} />
@@ -89,7 +90,7 @@ const PostContent: React.FC<PostContentProps> = ({ post, onUserMouseEnter, onUse
             to={`/profile/${post.userVO.id}`} 
             style={styles.authorName}
             // 5. Call the functions passed down via props.
-            onMouseEnter={(e: React.MouseEvent) => onUserMouseEnter(e, post.userVO.id, authorAnchorRef.current)}
+            onMouseEnter={(e: React.MouseEvent) => isLoggedIn && onUserMouseEnter(e, post.userVO.id, authorAnchorRef.current)}
             onMouseLeave={onUserMouseLeave}
           >
             {post.userVO.username}
@@ -104,14 +105,17 @@ const PostContent: React.FC<PostContentProps> = ({ post, onUserMouseEnter, onUse
       </div>
 
       <div style={styles.actionsBar}>
-        <button onClick={handleLikeToggle} disabled={isLiking} style={styles.likeButton}>
-          {isLiked ? (
-            <FaHeart style={{ color: '#ef4444' }} />
-          ) : (
-            <FaRegHeart />
-          )}
-          <span style={styles.actionText}>{likeCount > 0 ? likeCount : '点赞'}</span>
-        </button>
+        {/* 3. Conditionally render the like button based on `isLoggedIn` */}
+        {isLoggedIn && (
+          <button onClick={handleLikeToggle} disabled={isLiking} style={styles.likeButton}>
+            {isLiked ? (
+              <FaHeart style={{ color: '#ef4444' }} />
+            ) : (
+              <FaRegHeart />
+            )}
+            <span style={styles.actionText}>{likeCount > 0 ? likeCount : '点赞'}</span>
+          </button>
+        )}
 
         {post.isCreator && (
           <div style={styles.creatorActions}>
@@ -124,7 +128,7 @@ const PostContent: React.FC<PostContentProps> = ({ post, onUserMouseEnter, onUse
   );
 };
 
-// The styles object remains unchanged.
+// 4. Update styles to ensure layout works when the like button is hidden
 const styles: { [key: string]: React.CSSProperties } = {
   card: { backgroundColor: '#fff', borderRadius: '8px', padding: '30px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)' },
   postTitle: { fontSize: '32px', margin: '0 0 20px 0' },
@@ -132,11 +136,17 @@ const styles: { [key: string]: React.CSSProperties } = {
   avatar: { width: '48px', height: '48px', borderRadius: '50%', marginRight: '15px' },
   authorName: { textDecoration: 'none', color: '#333', fontWeight: '600', fontSize: '16px' },
   postMeta: { fontSize: '14px', color: '#999', margin: '4px 0 0 0' },
-  markdownContent: { fontSize: '16px', lineHeight: 1.7, margin: '25px 0' },
+  markdownContent: { 
+    fontSize: '16px', 
+    lineHeight: 1.7, 
+    margin: '25px 0',
+    overflowWrap: 'break-word',
+  },
   actionsBar: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    // Remove justifyContent to prevent creator actions from moving left
+    // justifyContent: 'space-between', 
     paddingTop: '15px',
     borderTop: '1px solid #f0f0f0',
     marginTop: '20px',
@@ -160,6 +170,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   creatorActions: { 
     display: 'flex', 
     gap: '15px',
+    marginLeft: 'auto', // This pushes the creator actions to the right
   },
   actionButton: { 
     background: 'none', 

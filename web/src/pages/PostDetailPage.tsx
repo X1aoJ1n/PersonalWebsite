@@ -19,6 +19,10 @@ const PostDetailPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const { currentUser } = useOutletContext<OutletContextType>();
 
+  const isLoggedIn = !!currentUser;
+
+
+
   const { 
     isCardVisible, 
     previewData, 
@@ -157,10 +161,11 @@ const PostDetailPage: React.FC = () => {
     <>
       <main style={styles.mainContent}>
         <PostContent 
-          post={post} 
-          onUserMouseEnter={handleMouseEnterForPost}
-          onUserMouseLeave={handleMouseLeave}
-        />
+        post={post}
+        isLoggedIn={isLoggedIn} // 3. Pass the prop down
+        onUserMouseEnter={handleMouseEnterForPost}
+        onUserMouseLeave={handleMouseLeave}
+      />
         {/* Pass the new props down to the CommentSection */}
         <CommentSection 
           postId={post.id}

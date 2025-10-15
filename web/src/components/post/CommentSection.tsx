@@ -19,7 +19,6 @@ interface CommentSectionProps extends UserPreviewHandlers {
   totalCommentCount: number;
   onNewCommentAdded: (newComment: CommentData) => void;
   onReplyAdded: (targetCommentId: string) => void;
-  // Add new props for user context and actions
   currentUser: UserData | null;
   onCommentDeleted: (commentId: string) => Promise<void>;
   onCommentUpdated: (commentId: string, newContent: string) => Promise<void>;
@@ -35,12 +34,14 @@ const CommentSection: React.FC<CommentSectionProps> = ({
   onCommentAuthorMouseEnter,
   onReplyAuthorMouseEnter,
   onUserMouseLeave,
-  // ========= 3. Destructure the new props =========
   currentUser,
   onCommentDeleted,
   onCommentUpdated,
   onReplyDeleted,
 }) => {
+
+  // 更改: Derive a boolean for login status
+  const isLoggedIn = !!currentUser;
 
   const handleCommentSubmit = async (text: string) => {
     const payload: AddCommentRequest = { postId, content: text };
@@ -60,11 +61,20 @@ const CommentSection: React.FC<CommentSectionProps> = ({
   return (
     <div style={styles.card}>
       <h3 style={styles.sectionTitle}>评论 ({totalCommentCount})</h3>
-      <CommentForm 
-        onSubmit={handleCommentSubmit}
-        placeholder="留下你的精彩评论吧..."
-        cta="发表评论"
-      />
+
+      {/* 更改: Conditionally render the comment form */}
+      {isLoggedIn ? (
+        <CommentForm 
+          onSubmit={handleCommentSubmit}
+          placeholder="留下你的精彩评论吧..."
+          cta="发表评论"
+        />
+      ) : (
+        <div style={styles.loginPrompt}>
+          请<a href="/auth" style={styles.loginLink}>登录</a>后发表评论
+        </div>
+      )}
+
       <div style={styles.commentList}>
         {comments.map(comment => (
           <CommentItem 
@@ -74,11 +84,12 @@ const CommentSection: React.FC<CommentSectionProps> = ({
             onCommentAuthorMouseEnter={onCommentAuthorMouseEnter}
             onReplyAuthorMouseEnter={onReplyAuthorMouseEnter}
             onUserMouseLeave={onUserMouseLeave}
-            // ========= 4. Pass the new props down to each CommentItem =========
             currentUser={currentUser}
             onCommentDeleted={onCommentDeleted}
             onCommentUpdated={onCommentUpdated}
             onReplyDeleted={onReplyDeleted}
+            // 更改: Pass the isLoggedIn boolean down to CommentItem
+            isLoggedIn={isLoggedIn}
           />
         ))}
       </div>
@@ -88,8 +99,23 @@ const CommentSection: React.FC<CommentSectionProps> = ({
 
 const styles: { [key: string]: React.CSSProperties } = {
   card: { backgroundColor: '#fff', borderRadius: '8px', padding: '25px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)', marginTop: '20px' },
-  sectionTitle: { margin: '0 0 10px 0' },
-  commentList: { display: 'flex', flexDirection: 'column', gap: '30px', marginTop: '20px' },
+  sectionTitle: { margin: '0 0 20px 0', paddingBottom: '15px', borderBottom: '1px solid #f0f0f0' },
+  commentList: { display: 'flex', flexDirection: 'column', gap: '30px', marginTop: '30px' },
+  // 更改: Add styles for the login prompt
+  loginPrompt: {
+    textAlign: 'center',
+    padding: '20px',
+    backgroundColor: '#f9f9f9',
+    borderRadius: '8px',
+    margin: '20px 0',
+    color: '#666',
+  },
+  loginLink: {
+    color: '#4f46e5',
+    fontWeight: '600',
+    textDecoration: 'none',
+    margin: '0 4px',
+  },
 };
 
 export default CommentSection;

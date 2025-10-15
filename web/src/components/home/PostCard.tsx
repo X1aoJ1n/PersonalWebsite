@@ -78,7 +78,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     textDecoration: 'none',
     color: 'inherit',
     display: 'block',
-    marginBottom: '15px', // --- 修正：在这里加回了 marginBottom ---
+    marginBottom: '15px',
   },
   postCard: {
     backgroundColor: '#fff',
@@ -86,12 +86,11 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: '8px',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
     border: '1px solid #e0e0e0',
-    transition: 'transform 0.2s ease-out, box-shadow 0.2s ease-out', // 优化了 transition 效果
+    transition: 'transform 0.2s ease-out, box-shadow 0.2s ease-out',
   },
-  // --- 新增：鼠标悬浮时的样式 ---
   cardHover: {
-    transform: 'translateY(-4px)', // 轻微上浮
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)', // 阴影加深
+    transform: 'translateY(-4px)',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
   },
   headerCard: {
     backgroundColor: '#4f46e5',
@@ -118,6 +117,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginTop: '10px',
     marginBottom: '15px',
     lineHeight: 1.6,
+    // --- 新增：强制长单词或URL换行 ---
+    overflowWrap: 'break-word',
   },
   postMeta: {
     display: 'flex',
