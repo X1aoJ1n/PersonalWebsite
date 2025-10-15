@@ -52,6 +52,10 @@ public class RecentViewServiceImpl implements RecentViewService {
     public void insertPost(String targetId) {
         String userId = BaseContext.getUserId();
 
+        if (userId == null) {
+            return;
+        }
+
         String id = UUID.randomUUID().toString();
 
         recentViewMapper.insertOrUpdatePost(id, userId, targetId);
