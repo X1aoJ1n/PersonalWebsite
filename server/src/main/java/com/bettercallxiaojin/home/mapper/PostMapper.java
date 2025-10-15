@@ -17,6 +17,9 @@ public interface PostMapper {
     @Select("SELECT * FROM post WHERE id = #{id}")
     Post selectById(String id);
 
+    @Select("SELECT user_id FROM post WHERE id = #{id}")
+    String selectUserId(String id);
+
     @Update("UPDATE post SET title = #{title}, content = #{content}, preview = #{preview}, updated_at = #{updatedAt} WHERE id = #{id}")
     int update(Post post);
 

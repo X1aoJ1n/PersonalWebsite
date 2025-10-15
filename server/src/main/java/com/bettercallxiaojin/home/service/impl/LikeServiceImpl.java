@@ -2,6 +2,7 @@ package com.bettercallxiaojin.home.service.impl;
 
 import com.bettercallxiaojin.home.common.BaseContext;
 import com.bettercallxiaojin.home.mapper.*;
+import com.bettercallxiaojin.home.pojo.entity.Post;
 import com.bettercallxiaojin.home.service.LikeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ public class LikeServiceImpl implements LikeService {
     private final PostMapper postMapper;
     private final CommentMapper commentMapper;
     private final ReplyMapper replyMapper;
+    private final UserMapper userMapper;
 
     @Override
     public Boolean like(Integer targetType, String targetId) {
@@ -27,6 +29,8 @@ public class LikeServiceImpl implements LikeService {
 
         try {
             if (targetType == 1) {
+                String postUserId = postMapper.selectUserId(targetId);
+                userMapper.updateLikeCount(1, postUserId);
                 postMapper.updateLikeCount(targetId, 1);
             } else if (targetType == 2) {
                 commentMapper.updateLikeCount(targetId, 1);
@@ -56,6 +60,8 @@ public class LikeServiceImpl implements LikeService {
 
         try {
             if (targetType == 1) {
+                String postUserId = postMapper.selectUserId(targetId);
+                userMapper.updateLikeCount(-1, postUserId);
                 postMapper.updateLikeCount(targetId, -1);
             } else if (targetType == 2) {
                 commentMapper.updateLikeCount(targetId, -1);

@@ -152,6 +152,7 @@ public class AuthServiceImpl implements AuthService {
         user.setUpdateTime(LocalDateTime.now());
         user.setFollowerCount(0);
         user.setFollowingCount(0);
+        user.setLikeCount(0);
 
         userMapper.insert(user);
 

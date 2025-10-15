@@ -35,6 +35,8 @@ public class RecentViewServiceImpl implements RecentViewService {
                 pageSize,
                 (pageNum - 1) * pageSize);
 
+        log.info("postIds:"+postIds);
+
         return postService.getBatchPost(postIds);
     }
 

@@ -17,8 +17,8 @@ public interface UserMapper {
     @Select("SELECT username FROM user_db WHERE id = #{id}")
     String selectNameById(String id);
 
-    @Insert("INSERT INTO user_db (id, email, password, username, create_time, update_time, follower_count, following_count) " +
-            "VALUES(#{id}, #{email}, #{password}, #{username}, #{createTime}, #{updateTime}, #{followerCount}, #{followingCount})")
+    @Insert("INSERT INTO user_db (id, email, password, username, create_time, update_time, follower_count, following_count, like_count) " +
+            "VALUES(#{id}, #{email}, #{password}, #{username}, #{createTime}, #{updateTime}, #{followerCount}, #{followingCount}, #{likeCount})")
     int insert(User user);
 
     @Select("SELECT * FROM user_db WHERE id = #{id}")
@@ -35,6 +35,9 @@ public interface UserMapper {
 
     @Update("UPDATE user_db set following_count = #{followingCount} WHERE id = #{userId}")
     void updateFollowing(Integer followingCount, String userId);
+
+    @Update("UPDATE user_db set like_count = like_count + #{i} WHERE id = #{userId}")
+    void updateLikeCount(Integer i, String userId);
 
     @Update("UPDATE user_db set email = #{email} WHERE id = #{userId}")
     void updateEmail(String userId, String email);

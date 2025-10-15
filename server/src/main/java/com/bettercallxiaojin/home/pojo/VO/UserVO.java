@@ -22,4 +22,5 @@ public class UserVO {
     private List<OrganizationVO> organizations;
     private Integer followerCount;
     private Integer followingCount;
+    private Integer likeCount;
 }

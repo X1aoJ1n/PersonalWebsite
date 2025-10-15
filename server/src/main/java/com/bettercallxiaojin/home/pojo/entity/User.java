@@ -21,4 +21,5 @@ public class User {
     private String introduction;
     private Integer followerCount;
     private Integer followingCount;
+    private Integer likeCount;
 }

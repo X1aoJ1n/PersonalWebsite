@@ -18,4 +18,5 @@ public class UserPreviewVO {
     private Integer followerCount;
     private Integer followingCount;
     private Boolean isFollowed;
+    private Integer likeCount;
 }
