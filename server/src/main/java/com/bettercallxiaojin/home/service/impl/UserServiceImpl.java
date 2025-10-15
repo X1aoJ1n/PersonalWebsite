@@ -5,10 +5,7 @@ import com.bettercallxiaojin.home.mapper.ContactMapper;
 import com.bettercallxiaojin.home.mapper.FollowMapper;
 import com.bettercallxiaojin.home.mapper.OrganizationMapper;
 import com.bettercallxiaojin.home.mapper.UserMapper;
-import com.bettercallxiaojin.home.pojo.VO.ContactVO;
-import com.bettercallxiaojin.home.pojo.VO.OrganizationVO;
-import com.bettercallxiaojin.home.pojo.VO.UserPreviewVO;
-import com.bettercallxiaojin.home.pojo.VO.UserVO;
+import com.bettercallxiaojin.home.pojo.VO.*;
 import com.bettercallxiaojin.home.pojo.entity.User;
 import com.bettercallxiaojin.home.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -79,17 +76,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserPreviewVO> getBatchUser(List<String> userIds) {
+    public List<SimpleUserVO> getBatchUser(List<String> userIds) {
         if (userIds == null || userIds.isEmpty()) {
             return List.of();
         }
-        List<UserPreviewVO> userPreviewVOs = userMapper.selectUserPreviewsByIds(userIds);
-        for (UserPreviewVO userPreviewVO : userPreviewVOs) {
-            userPreviewVO.setIsFollowed(followMapper.existsByUserIdAndFollowId(
-                    BaseContext.getUserId(),
-                    userPreviewVO.getId()));
-        }
-        return userPreviewVOs;
+
+        return userMapper.selectSimpleUsersByIds(userIds);
     }
 
     @Override

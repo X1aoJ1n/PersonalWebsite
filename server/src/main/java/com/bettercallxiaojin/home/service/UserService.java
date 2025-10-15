@@ -1,5 +1,6 @@
 package com.bettercallxiaojin.home.service;
 
+import com.bettercallxiaojin.home.pojo.VO.SimpleUserVO;
 import com.bettercallxiaojin.home.pojo.VO.UserPreviewVO;
 import com.bettercallxiaojin.home.pojo.VO.UserVO;
 import jakarta.validation.Valid;
@@ -20,5 +21,5 @@ public interface UserService {
 
     UserPreviewVO getUserPreviewById(String id);
 
-    List<UserPreviewVO> getBatchUser(List<String> userIds);
+    List<SimpleUserVO> getBatchUser(List<String> userIds);
 }

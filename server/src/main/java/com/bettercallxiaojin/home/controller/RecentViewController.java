@@ -1,6 +1,7 @@
 package com.bettercallxiaojin.home.controller;
 
 import com.bettercallxiaojin.home.pojo.VO.SimplePostVO;
+import com.bettercallxiaojin.home.pojo.VO.SimpleUserVO;
 import com.bettercallxiaojin.home.pojo.VO.UserPreviewVO;
 import com.bettercallxiaojin.home.pojo.entity.PageQuery;
 import com.bettercallxiaojin.home.pojo.entity.Response;
@@ -34,7 +35,7 @@ public class RecentViewController {
 
     @GetMapping("/user")
     @Operation(summary = "获取用户发布的帖子列表", description = "获取指定用户发布的帖子列表，支持分页")
-    public Response<List<UserPreviewVO>> getRecentViewUser(PageQuery pageQuery) {
+    public Response<List<SimpleUserVO>> getRecentViewUser(PageQuery pageQuery) {
         try {
             return Response.success(recentViewService.getRecentViewUser(pageQuery.getPageNum(),pageQuery.getPageSize()));
         } catch (Exception e) {

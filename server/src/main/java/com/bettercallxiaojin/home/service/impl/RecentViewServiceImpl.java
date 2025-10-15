@@ -4,6 +4,7 @@ import com.bettercallxiaojin.home.common.BaseContext;
 import com.bettercallxiaojin.home.common.Constant.RecentViewConstant;
 import com.bettercallxiaojin.home.mapper.RecentViewMapper;
 import com.bettercallxiaojin.home.pojo.VO.SimplePostVO;
+import com.bettercallxiaojin.home.pojo.VO.SimpleUserVO;
 import com.bettercallxiaojin.home.pojo.VO.UserPreviewVO;
 import com.bettercallxiaojin.home.service.PostService;
 import com.bettercallxiaojin.home.service.RecentViewService;
@@ -38,7 +39,7 @@ public class RecentViewServiceImpl implements RecentViewService {
     }
 
     @Override
-    public List<UserPreviewVO> getRecentViewUser(Integer pageNum, Integer pageSize) {
+    public List<SimpleUserVO> getRecentViewUser(Integer pageNum, Integer pageSize) {
         List<String> userIds = recentViewMapper.selectByUserId(
                 BaseContext.getUserId(),
                 RecentViewConstant.USER,
