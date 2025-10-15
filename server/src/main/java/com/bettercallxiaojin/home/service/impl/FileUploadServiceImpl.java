@@ -33,6 +33,12 @@ public class FileUploadServiceImpl implements FileUploadService {
 
     @Override
     public UploadedFile uploadFile(MultipartFile file, String category) throws IOException {
+
+        long maxSize = 30 * 1024 * 1024; // 30 MB
+        if (file.getSize() > maxSize) {
+            throw new IOException("文件大小不能超过30MB");
+        }
+
         String originalFileName = file.getOriginalFilename();
         String fileName = originalFileName; // 临时变量用于动态修改
         Path filePath = Paths.get(uploadDir, fileName);
