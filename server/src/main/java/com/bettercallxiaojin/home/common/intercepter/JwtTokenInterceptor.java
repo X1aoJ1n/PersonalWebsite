@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Component
 @Slf4j
 public class JwtTokenInterceptor implements HandlerInterceptor {
@@ -20,16 +23,31 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
     @Value("${bettercallxiaojin.jwt.admin-token-name}")
     private String tokenName;
 
-    private static final String TEST_ADMIN_TOKEN = "test-admin-token-123";
+    private static final List<String> OPTIONAL_TOKEN_PATHS = Arrays.asList(
+            "/comment/list/by-post",
+            "/reply/list/by-comment",
+            "/post/list/byUser",
+            "/post/list/all",
+            "/post/list/favorite"
+    );
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        log.info("Interceptor preHandle called for URL: {}", request.getRequestURI());
+        String uri = request.getRequestURI();
+        log.debug("Interceptor preHandle for URL: {}", uri);
 
         String token = request.getHeader(tokenName);
+        boolean optional = isOptionalPath(uri) || isUserOrPostDetail(uri);
 
+        // 没有 token 且路径是白名单：放行
+        if ((token == null || token.isEmpty()) && optional) {
+            log.debug("No token provided for optional path: {}", uri);
+            return true;
+        }
+
+        // 没 token 且不是白名单路径：拦截
         if (token == null || token.isEmpty()) {
-            log.warn("Token is missing in header: {}", tokenName);
+            log.warn("Missing token for protected path: {}", uri);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Token is missing");
             return false;
@@ -37,50 +55,36 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
 
         if (token.startsWith("Bearer ")) {
             token = token.substring(7);
-        } else {
-            log.warn("Token format error: {}", token);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Token must start with 'Bearer '");
-            return false;
-        }
-
-        // 特殊测试 token，直接放行
-        if (TEST_ADMIN_TOKEN.equals(token)) {
-            log.info("Using TEST_ADMIN_TOKEN for admin access");
-            request.setAttribute("username", "admin");
-            BaseContext.setUserId("1"); // admin 用户 ID
-            return true;
         }
 
         try {
             Claims claims = JwtUtil.parseToken(token, secretKey);
-
-            // 优先取 userId，没有就用 subject
             String userId = claims.get("userId", String.class);
             if (userId == null || userId.isEmpty()) {
                 userId = claims.getSubject();
-                log.info("Token没有 userId，使用 subject 作为用户ID: {}", userId);
-            } else {
-                log.info("从 token 中解析到 userId: {}", userId);
             }
 
-            if (userId == null || userId.isEmpty()) {
-                log.error("Token 解析失败，未能获取 userId");
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Token invalid: no userId found");
-                return false;
+            if (userId != null && !userId.isEmpty()) {
+                BaseContext.setUserId(userId);
+                request.setAttribute("username", claims.getSubject());
+                log.debug("解析到 userId: {}", userId);
             }
-
-            // 保存上下文
-            request.setAttribute("username", claims.getSubject());
-            BaseContext.setUserId(userId);
 
             return true;
         } catch (Exception e) {
-            log.error("Token parsing error: {}", e.getMessage(), e);
+            // 🚫 token 无效或过期，一律拦截（包括白名单接口）
+            log.error("Invalid token for path: {} -> {}", uri, e.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Token invalid or expired");
             return false;
         }
+    }
+
+    private boolean isOptionalPath(String uri) {
+        return OPTIONAL_TOKEN_PATHS.stream().anyMatch(uri::startsWith);
+    }
+
+    private boolean isUserOrPostDetail(String uri) {
+        return uri.matches("^/user/[^/]+$") || uri.matches("^/post/[^/]+$");
     }
 }
