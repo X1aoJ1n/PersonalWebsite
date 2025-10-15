@@ -63,8 +63,8 @@ public class ReplyServiceImpl implements ReplyService {
         String id =  UUID.randomUUID().toString();
         reply.setId(id);
 
-
         try {
+            postMapper.updateCommentCount(comment.getPostId(), 1);
             commentMapper.updateReplyCount(commentId, 1);
             replyMapper.insert(reply);
         } catch (Exception e) {
@@ -90,6 +90,13 @@ public class ReplyServiceImpl implements ReplyService {
 
         int rows = 0;
         try {
+            if (status == StatusConstant.DELETED) {
+                String commentId = reply.getCommentId();
+                Comment comment = commentMapper.selectById(commentId);
+
+                postMapper.updateCommentCount(comment.getPostId(), -1);
+                commentMapper.updateReplyCount(commentId, -1);
+            }
             rows = replyMapper.updateStatus(id, status);
         } catch (Exception e) {
             throw new RuntimeException("change status failed: " + e.getMessage());
