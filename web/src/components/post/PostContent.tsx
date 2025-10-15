@@ -2,8 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import DOMPurify from 'dompurify';
 import type { PostData, LikeDTO } from '@/models';
 import { deletePost } from '@/api/post';
 import { like, unlike } from '@/api/like';
@@ -14,13 +13,11 @@ interface UserPreviewHandlers {
   onUserMouseLeave: () => void;
 }
 
-// 1. Add `isLoggedIn` to the props interface
 interface PostContentProps extends UserPreviewHandlers {
   post: PostData;
-  isLoggedIn: boolean; // This prop will tell us if the user is logged in
+  isLoggedIn: boolean;
 }
 
-// 2. Destructure the new `isLoggedIn` prop
 const PostContent: React.FC<PostContentProps> = ({ post, onUserMouseEnter, onUserMouseLeave, isLoggedIn }) => {
   const navigate = useNavigate();
   
@@ -100,9 +97,11 @@ const PostContent: React.FC<PostContentProps> = ({ post, onUserMouseEnter, onUse
           </p>
         </div>
       </div>
-      <div style={styles.markdownContent}>
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
-      </div>
+      <div 
+        className="post-content" // <--- 在这里添加类名
+        style={styles.markdownContent}
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
+      />
 
       <div style={styles.actionsBar}>
         {/* 3. Conditionally render the like button based on `isLoggedIn` */}

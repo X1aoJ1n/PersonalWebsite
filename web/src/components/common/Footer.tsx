@@ -1,4 +1,3 @@
-// src/components/Footer.tsx
 import React from 'react';
 
 const Footer: React.FC = () => {
@@ -15,7 +14,22 @@ const Footer: React.FC = () => {
           </div>
         </div>
         <div style={styles.copyright}>
-          © {new Date().getFullYear()} Better Call XiaoJin. All Rights Reserved.
+          <div>© {new Date().getFullYear()} Better Call XiaoJin. All Rights Reserved.</div>
+          
+          {/* --- ★★★ 新增备案号信息 ★★★ --- */}
+          <div style={styles.beianContainer}>
+            <a 
+              href="http://beian.miit.gov.cn/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              style={styles.beianLink}
+            >
+              {/* ▼▼▼ 请将这里替换成您自己的备案号 ▼▼▼ */}
+              冀ICP备2025131629号-1
+            </a>
+          </div>
+          {/* --- ★★★ 新增结束 ★★★ --- */}
+
         </div>
       </div>
     </footer>
@@ -26,7 +40,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   footer: {
     backgroundColor: '#202020',
     color: '#a0a0a0',
-    padding: '20px 20px', // 保持我们之前减小的内边距
+    padding: '20px 20px',
     marginTop: 'auto',
     fontSize: '14px',
   },
@@ -38,15 +52,13 @@ const styles: { [key: string]: React.CSSProperties } = {
   contactSection: {
     marginBottom: '20px',
   },
-  // --- 新增的样式，用于重置 h4 的默认 margin ---
   contactTitle: {
-    marginTop: 0, // 关键：将上外边距设置为 0
-    marginBottom: '10px', // 保留一个小的下外边距，与下面的 p 标签分隔
-    color: '#f4f5f5', // 标题颜色也可以亮一些
-    fontSize: '16px', // 调整字体大小
+    marginTop: 0,
+    marginBottom: '10px',
+    color: '#f4f5f5',
+    fontSize: '16px',
     fontWeight: '600',
   },
-  // --- 结束 ---
   links: {
     display: 'flex',
     justifyContent: 'center',
@@ -63,6 +75,15 @@ const styles: { [key: string]: React.CSSProperties } = {
     paddingTop: '15px',
     fontSize: '13px',
   },
+  // --- ★★★ 新增的样式 ★★★ ---
+  beianContainer: {
+    marginTop: '8px', // 与版权信息拉开一点距离
+  },
+  beianLink: {
+    color: '#a0a0a0', // 与周围文字颜色保持一致
+    textDecoration: 'none', // 去掉下划线
+  },
+  // --- ★★★ 新增结束 ★★★ ---
 };
 
 export default Footer;

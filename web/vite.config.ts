@@ -9,20 +9,15 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
-    dedupe: ['react', 'react-dom'], 
+    dedupe: ['react', 'react-dom'],
   },
     server: {
     port: 3001,
-    // --- ADDED THIS SECTION ---
     proxy: {
-      // This sets up a proxy for any request starting with /api
+      // 代理所有以 /api 开头的请求
       '/api': {
-        // This is your backend server address
-        target: 'http://47.113.186.81:8081',
-        // Necessary for virtual hosted sites
+        target: 'https://www.bettercallxiaojin.com', // 你的后端地址
         changeOrigin: true,
-        // Removes the /api prefix before sending to the backend
-        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },
