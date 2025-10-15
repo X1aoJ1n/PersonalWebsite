@@ -85,6 +85,11 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
     }
 
     private boolean isUserOrPostDetail(String uri) {
-        return uri.matches("^/user/[^/]+$") || uri.matches("^/post/[^/]+$");
+        return (
+                uri.matches("^/user/[^/]+$")
+                || uri.matches("^/post/[^/]+$")
+                || uri.matches("^/organization/[^/]+$")
+                || uri.matches("^/contact/[^/]+$")
+        );
     }
 }
