@@ -65,6 +65,10 @@ public class RecentViewServiceImpl implements RecentViewService {
     public void insertUser(String targetId) {
         String userId = BaseContext.getUserId();
 
+        if (userId == null) {
+            return;
+        }
+
         if (userId.equals(targetId)) {
             return;
         }
