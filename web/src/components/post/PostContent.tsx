@@ -96,7 +96,7 @@ const PostContent: React.FC<PostContentProps> = ({ post, onUserMouseEnter, onUse
             {post.userVO.username}
           </Link>
           <p style={styles.postMeta}>
-            {new Date(post.createdAt).toLocaleString()} · {likeCount} ❤️ · {post.commentCount} 💬
+            {new Date(post.createdAt).toLocaleString()} · {likeCount} 点赞 · {post.commentCount} 评论
           </p>
         </div>
       </div>

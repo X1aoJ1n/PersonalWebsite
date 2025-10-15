@@ -40,9 +40,9 @@ const PostCard: React.FC<PostCardProps> = ({ post, variant = 'default' }) => {
           <div style={styles.postMeta}>
             <span>{post.userVO?.username}</span>
             <span> · </span>
-            <span>{post.likeCount} 点赞</span>
+            <span>{post.likeCount} ❤️ </span>
             <span> · </span>
-            <span>{post.commentCount} 评论</span>
+            <span>{post.commentCount} 💬 </span>
             <span style={styles.postDate}>{post.createdAt ? new Date(post.createdAt).toLocaleDateString() : ''}</span>
           </div>
         </>
