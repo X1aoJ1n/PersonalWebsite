@@ -20,8 +20,8 @@ public class JwtUtil {
         Date exp = new Date(nowMillis + ttlMillis);
 
         return Jwts.builder()
-                .setSubject(userId)             // subject 兜底
-                .claim("userId", userId)        // 显式存 userId
+                .setSubject(userId)
+                .claim("userId", userId)
                 .setIssuedAt(now)
                 .setExpiration(exp)
                 .signWith(SignatureAlgorithm.HS256, secretKey)
