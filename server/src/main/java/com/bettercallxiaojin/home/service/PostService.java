@@ -23,4 +23,6 @@ public interface PostService {
     List<SimplePostVO> getFavoritePost(Integer pageNum, Integer pageSize);
 
     List<SimplePostVO> getFollowPost(Integer pageNum, Integer pageSize);
+
+    List<SimplePostVO> getBatchPost(List<String> postIds);
 }

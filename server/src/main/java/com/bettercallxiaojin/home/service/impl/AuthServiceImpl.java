@@ -2,17 +2,13 @@ package com.bettercallxiaojin.home.service.impl;
 
 import com.bettercallxiaojin.home.common.BaseContext;
 import com.bettercallxiaojin.home.common.util.CodeGenerator;
-import com.bettercallxiaojin.home.mapper.ContactMapper;
-import com.bettercallxiaojin.home.mapper.OrganizationMapper;
+import com.bettercallxiaojin.home.mapper.*;
 import com.bettercallxiaojin.home.pojo.VO.ContactVO;
 import com.bettercallxiaojin.home.pojo.VO.OrganizationVO;
 import com.bettercallxiaojin.home.pojo.VO.UserLoginVO;
 import com.bettercallxiaojin.home.common.util.JwtUtil;
 import com.bettercallxiaojin.home.common.util.PasswordEncodeUtil;
-import com.bettercallxiaojin.home.pojo.entity.Contact;
-import com.bettercallxiaojin.home.pojo.entity.Organization;
 import com.bettercallxiaojin.home.pojo.entity.User;
-import com.bettercallxiaojin.home.mapper.UserMapper;
 import com.bettercallxiaojin.home.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +19,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import javax.management.Notification;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -42,6 +39,9 @@ public class AuthServiceImpl implements AuthService {
     private final UserMapper userMapper;
     private final ContactMapper contactMapper;
     private final OrganizationMapper organizationMapper;
+    private final NotificationMapper notificationMapper;
+    private final SettingMapper settingMapper;
+
     private final JavaMailSender mailSender;
     private final StringRedisTemplate redisTemplate;
 
@@ -154,6 +154,9 @@ public class AuthServiceImpl implements AuthService {
         user.setFollowingCount(0);
 
         userMapper.insert(user);
+
+        notificationMapper.initByUserId(user.getId());
+        settingMapper.initByUserId(user.getId());
 
         redisTemplate.delete(CODE_PREFIX + email);
 

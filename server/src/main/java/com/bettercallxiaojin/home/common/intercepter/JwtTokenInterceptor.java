@@ -28,18 +28,6 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
 
         String token = request.getHeader(tokenName);
 
-        if ("GET".equalsIgnoreCase(request.getMethod()) && request.getRequestURI().startsWith("/post/")) {
-            return true;
-        }
-
-        if ("GET".equalsIgnoreCase(request.getMethod()) && request.getRequestURI().startsWith("/comment/")) {
-            return true;
-        }
-
-        if ("GET".equalsIgnoreCase(request.getMethod()) && request.getRequestURI().startsWith("/reply/")) {
-            return true;
-        }
-
         if (token == null || token.isEmpty()) {
             log.warn("Token is missing in header: {}", tokenName);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

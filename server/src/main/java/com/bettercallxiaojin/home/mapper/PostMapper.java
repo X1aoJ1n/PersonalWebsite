@@ -57,4 +57,17 @@ public interface PostMapper {
     List<Post> selectByUserIds(@Param("userIds") List<String> userIds,
                               @Param("pageSize") int pageSize,
                               @Param("offset") int offset);
+
+
+    @Select({
+            "<script>",
+            "SELECT id, user_id AS userId, title, content, like_count AS likeCount, comment_count AS commentCount, created_at AS createdAt",
+            "FROM post",
+            "WHERE id IN",
+            "<foreach collection='postIds' item='id' open='(' separator=',' close=')'>",
+            "#{id}",
+            "</foreach>",
+            "</script>"
+    })
+    List<Post> selectPostsByIds(@Param("postIds") List<String> postIds);
 }

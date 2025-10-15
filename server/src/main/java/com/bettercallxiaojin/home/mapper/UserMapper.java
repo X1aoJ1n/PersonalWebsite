@@ -1,6 +1,8 @@
 package com.bettercallxiaojin.home.mapper;
 
 import com.bettercallxiaojin.home.pojo.VO.SimpleUserVO;
+import com.bettercallxiaojin.home.pojo.VO.UserPreviewVO;
+import com.bettercallxiaojin.home.pojo.entity.Post;
 import com.bettercallxiaojin.home.pojo.entity.User;
 import org.apache.ibatis.annotations.*;
 
@@ -55,4 +57,17 @@ public interface UserMapper {
 
     @Update("UPDATE user_db set background = #{backgroundUrl} WHERE id = #{userId}")
     void updateBackground(String userId, String backgroundUrl);
+
+    @Select({
+            "<script>",
+            "SELECT * FROM user_db",
+            "<if test='userIds != null and userIds.size() > 0'>",
+            "WHERE id IN",
+            "<foreach item='id' collection='userIds' open='(' separator=',' close=')'>",
+            "#{id}",
+            "</foreach>",
+            "</if>",
+            "</script>"
+    })
+    List<UserPreviewVO> selectUserPreviewsByIds(@Param("userIds") List<String> userIds);
 }

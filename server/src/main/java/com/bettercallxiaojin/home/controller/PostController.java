@@ -8,6 +8,7 @@ import com.bettercallxiaojin.home.pojo.VO.SimpleUserVO;
 import com.bettercallxiaojin.home.pojo.entity.PageQuery;
 import com.bettercallxiaojin.home.pojo.entity.Response;
 import com.bettercallxiaojin.home.service.PostService;
+import com.bettercallxiaojin.home.service.RecentViewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -23,6 +24,7 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
+    private final RecentViewService recentViewService;
 
 
     @PostMapping("/create")
@@ -65,6 +67,7 @@ public class PostController {
     @Operation(summary = "获取帖子详情", description = "根据帖子ID获取帖子详细信息")
     public Response<PostVO> getPostDetail(@PathVariable String id) {
         try {
+            recentViewService.insertPost(id);
             return Response.success(postService.getPostById(id));
         } catch (Exception e) {
             return Response.error(e.getMessage());

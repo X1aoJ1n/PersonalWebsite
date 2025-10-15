@@ -9,10 +9,7 @@ import com.bettercallxiaojin.home.pojo.VO.SimplePostVO;
 import com.bettercallxiaojin.home.pojo.VO.SimpleUserVO;
 import com.bettercallxiaojin.home.pojo.VO.UserVO;
 import com.bettercallxiaojin.home.pojo.entity.Post;
-import com.bettercallxiaojin.home.service.FollowService;
-import com.bettercallxiaojin.home.service.LikeService;
-import com.bettercallxiaojin.home.service.PostService;
-import com.bettercallxiaojin.home.service.UserService;
+import com.bettercallxiaojin.home.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -29,9 +26,10 @@ import java.util.UUID;
 public class PostServiceImpl implements PostService {
 
     private final PostMapper postMapper;
+    private final FollowMapper followMapper;
+
     private final UserService userService;
     private final LikeService likeService;
-    private final FollowMapper followMapper;
 
     @Override
     public PostVO createPost(String title, String preview, String content) {
@@ -185,6 +183,23 @@ public class PostServiceImpl implements PostService {
         if (posts == null || posts.isEmpty()) {
             return List.of();
         }
+        List<SimplePostVO> simplePostVOs = new ArrayList<>();
+        for  (Post post : posts) {
+            SimplePostVO simplePostVO = convertToSimplePostVO(post);
+            simplePostVOs.add(simplePostVO);
+        }
+
+        return simplePostVOs;
+    }
+
+    @Override
+    public List<SimplePostVO> getBatchPost(List<String> postIds) {
+        if (postIds == null || postIds.isEmpty()) {
+            return List.of();
+        }
+
+        List<Post> posts = postMapper.selectPostsByIds(postIds);
+
         List<SimplePostVO> simplePostVOs = new ArrayList<>();
         for  (Post post : posts) {
             SimplePostVO simplePostVO = convertToSimplePostVO(post);

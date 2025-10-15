@@ -8,6 +8,7 @@ import com.bettercallxiaojin.home.pojo.VO.UserPreviewVO;
 import com.bettercallxiaojin.home.pojo.VO.UserVO;
 import com.bettercallxiaojin.home.pojo.entity.Response;
 import com.bettercallxiaojin.home.service.AuthService;
+import com.bettercallxiaojin.home.service.RecentViewService;
 import com.bettercallxiaojin.home.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,6 +24,7 @@ public class UserController {
 
     private final UserService userService;
     private final AuthService authService;
+    private final RecentViewService recentViewService;
 
     @GetMapping("/{id}")
     @Operation(summary = "根据id获取用户")
@@ -31,8 +33,8 @@ public class UserController {
             return Response.error("id is empty or null");
         }
         try {
-            UserVO user = userService.getUserById(id);
-            return Response.success(user);
+            recentViewService.insertUser(id);
+            return Response.success(userService.getUserById(id));
         } catch (Exception e) {
             return Response.error(e.getMessage());
         }

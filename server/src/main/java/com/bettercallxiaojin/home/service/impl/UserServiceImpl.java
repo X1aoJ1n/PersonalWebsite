@@ -17,6 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -75,6 +76,20 @@ public class UserServiceImpl implements UserService {
         userPreviewVO.setIsFollowed(followMapper.existsByUserIdAndFollowId(BaseContext.getUserId(),id));
 
         return userPreviewVO;
+    }
+
+    @Override
+    public List<UserPreviewVO> getBatchUser(List<String> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            return List.of();
+        }
+        List<UserPreviewVO> userPreviewVOs = userMapper.selectUserPreviewsByIds(userIds);
+        for (UserPreviewVO userPreviewVO : userPreviewVOs) {
+            userPreviewVO.setIsFollowed(followMapper.existsByUserIdAndFollowId(
+                    BaseContext.getUserId(),
+                    userPreviewVO.getId()));
+        }
+        return userPreviewVOs;
     }
 
     @Override
