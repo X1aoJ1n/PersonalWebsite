@@ -57,7 +57,7 @@ public class NotificationController {
         }
     }
 
-    @GetMapping("/count-follow-unread")
+    @GetMapping("/count-comment-unread")
     @Operation(summary = "获得未读评论回复的数字", description = "获得未读评论回复的数字")
     public Response<Integer> countCommentUnread() {
         try {

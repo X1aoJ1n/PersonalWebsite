@@ -6,8 +6,6 @@ import java.util.List;
 
 public interface NotificationService {
 
-    Integer countUnread(Integer type);
-
     Boolean read(String id);
 
     Boolean readBatch(Integer type);
@@ -30,7 +28,7 @@ public interface NotificationService {
 
     List<NotificationVO> getCommentNotification();
 
-    Integer countUnread(int type);
+    Integer countUnread(Integer type);
 
     Integer countAllUnread();
 }
