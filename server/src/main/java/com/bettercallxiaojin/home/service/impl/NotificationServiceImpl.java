@@ -44,11 +44,16 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public Boolean updateLike(String targetId, Integer targetType) {
+
+        log.info("updateLike");
+
         Notification notification = new Notification();
         String currentUserId = BaseContext.getUserId();
 
         if (targetType.equals(TargetTypeConstant.POST)) {
             Post post = postMapper.selectById(targetId);
+            log.info("post id is " + post.getId() + " and currentUserId is " + currentUserId);
+
             // 自己给自己的帖子点赞，不通知
             if (post.getUserId().equals(currentUserId)) return false;
 
@@ -56,6 +61,9 @@ public class NotificationServiceImpl implements NotificationService {
             notification.setTargetContent(post.getTitle());
         } else if (targetType.equals(TargetTypeConstant.COMMENT)) {
             Comment comment = commentMapper.selectById(targetId);
+
+            log.info("comment id is " + comment.getId() + " and currentUserId is " + currentUserId);
+
             // 自己给自己的评论点赞，不通知
             if (comment.getUserId().equals(currentUserId)) return false;
 
