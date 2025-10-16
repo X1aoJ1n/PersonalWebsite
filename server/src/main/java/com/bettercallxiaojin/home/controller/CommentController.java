@@ -8,6 +8,7 @@ import com.bettercallxiaojin.home.pojo.VO.CommentVO;
 import com.bettercallxiaojin.home.pojo.entity.PageQuery;
 import com.bettercallxiaojin.home.pojo.entity.Response;
 import com.bettercallxiaojin.home.service.CommentService;
+import com.bettercallxiaojin.home.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,12 +25,13 @@ import java.util.List;
 public class CommentController {
 
     private final CommentService commentService;
-
+    private final NotificationService notificationService;
 
     @PostMapping("/create")
     @Operation(summary = "创建评论", description = "对帖子发表评论或回复其他评论")
     public Response<CommentVO> createComment(@RequestBody @Valid AddCommentDTO addCommentDTO) {
         try {
+            notificationService.updateComment(addCommentDTO.getContent(), addCommentDTO.getPostId());
             return Response.success(commentService.createComment(addCommentDTO.getPostId(), addCommentDTO.getContent()));
         } catch (Exception e) {
             return Response.error(e.getMessage());

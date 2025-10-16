@@ -5,6 +5,7 @@ import com.bettercallxiaojin.home.pojo.VO.UserVO;
 import com.bettercallxiaojin.home.pojo.entity.PageQuery;
 import com.bettercallxiaojin.home.pojo.entity.Response;
 import com.bettercallxiaojin.home.service.FollowService;
+import com.bettercallxiaojin.home.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -19,6 +20,7 @@ import java.util.List;
 @Tag(name = "关注管理", description = "关注以及粉丝相关接口")
 public class FollowController {
     private final FollowService followService;
+    private final NotificationService notificationService;
 
     @PostMapping("")
     @Operation(summary = "关注", description = "关注用户")
@@ -27,6 +29,7 @@ public class FollowController {
             return Response.error("id is empty or null");
         }
         try {
+            notificationService.updateFollow(followId);
             followService.follow(followId);
             return Response.success();
         } catch (Exception e) {
@@ -42,6 +45,7 @@ public class FollowController {
             return Response.error("id is empty or null");
         }
         try {
+            notificationService.deleteFollow(followId);
             followService.unfollow(followId);
             return Response.success();
         } catch (Exception e) {

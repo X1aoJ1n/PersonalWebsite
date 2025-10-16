@@ -156,7 +156,6 @@ public class AuthServiceImpl implements AuthService {
 
         userMapper.insert(user);
 
-        notificationMapper.initByUserId(user.getId());
         settingMapper.initByUserId(user.getId());
 
         redisTemplate.delete(CODE_PREFIX + email);

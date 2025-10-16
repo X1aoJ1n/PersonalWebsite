@@ -5,6 +5,7 @@ import com.bettercallxiaojin.home.common.BaseContext;
 import com.bettercallxiaojin.home.pojo.DTO.LikeDTO;
 import com.bettercallxiaojin.home.pojo.entity.Response;
 import com.bettercallxiaojin.home.service.LikeService;
+import com.bettercallxiaojin.home.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -19,11 +20,13 @@ import org.springframework.web.bind.annotation.*;
 public class LikeController {
 
     private final LikeService likeService;
+    private final NotificationService notificationService;
 
     @PostMapping("")
     @Operation(summary = "点赞", description = "对帖子或评论进行点赞")
     public Response<Boolean> like(@RequestBody @Valid LikeDTO likeDTO) {
         try {
+            notificationService.updateLike(likeDTO.getTargetId(), likeDTO.getTargetType());
             return Response.success(likeService.like(likeDTO.getTargetType(), likeDTO.getTargetId()));
         } catch (Exception e) {
             return Response.error(e.getMessage());
@@ -35,6 +38,7 @@ public class LikeController {
     @Operation(summary = "取消点赞", description = "取消对帖子或评论的点赞")
     public Response<Boolean> unlike(@RequestBody @Valid LikeDTO likeDTO) {
         try {
+            notificationService.deleteLike(likeDTO.getTargetId(), likeDTO.getTargetType());
             return Response.success(likeService.unlike(likeDTO.getTargetType(), likeDTO.getTargetId()));
         } catch (Exception e) {
             return Response.error(e.getMessage());

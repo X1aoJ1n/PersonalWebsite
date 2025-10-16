@@ -2,11 +2,13 @@ package com.bettercallxiaojin.home.controller;
 
 
 import com.bettercallxiaojin.home.common.Constant.StatusConstant;
+import com.bettercallxiaojin.home.common.Constant.TargetTypeConstant;
 import com.bettercallxiaojin.home.pojo.DTO.AddReplyDTO;
 import com.bettercallxiaojin.home.pojo.DTO.ReplyDTO;
 import com.bettercallxiaojin.home.pojo.VO.ReplyVO;
 import com.bettercallxiaojin.home.pojo.entity.PageQuery;
 import com.bettercallxiaojin.home.pojo.entity.Response;
+import com.bettercallxiaojin.home.service.NotificationService;
 import com.bettercallxiaojin.home.service.ReplyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,11 +26,17 @@ import java.util.List;
 public class ReplyController {
 
     private final ReplyService replyService;
+    private final NotificationService notificationService;
 
     @PostMapping("/create")
     @Operation(summary = "创建回复", description = "对帖子发表回复或回复其他评论")
     public Response<ReplyVO> createReply(@RequestBody @Valid AddReplyDTO addReplyDTO) {
         try {
+            if (addReplyDTO.getReplyTo() != null) {
+                notificationService.updateReply(addReplyDTO.getContent(), addReplyDTO.getReplyTo(), TargetTypeConstant.REPLY);
+            } else {
+                notificationService.updateReply(addReplyDTO.getContent(), addReplyDTO.getCommentId(), TargetTypeConstant.COMMENT);
+            }
             return Response.success(replyService.createReply(addReplyDTO.getCommentId(), addReplyDTO.getReplyTo(), addReplyDTO.getContent()));
         } catch (Exception e) {
             return Response.error(e.getMessage());

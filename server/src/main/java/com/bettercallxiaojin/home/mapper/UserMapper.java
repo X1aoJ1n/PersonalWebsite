@@ -58,6 +58,9 @@ public interface UserMapper {
     })
     List<SimpleUserVO> selectSimpleUsersByIds(@Param("userIds") List<String> userIds);
 
+    @Select("SELECT id, username, icon FROM user_db WHERE id = #{id}")
+    SimpleUserVO getSimpleUserVO(String id);
+
     @Update("UPDATE user_db set background = #{backgroundUrl} WHERE id = #{userId}")
     void updateBackground(String userId, String backgroundUrl);
 }
