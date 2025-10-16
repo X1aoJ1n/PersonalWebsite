@@ -9,14 +9,14 @@ import java.util.List;
 @Mapper
 public interface NotificationMapper {
 
-    @Insert("INSERT INTO notification (id, user_id, `read`, type, created_at, target_user_id, target_id, target_type, target_content, content) " +
+    @Insert("INSERT INTO notification (id, user_id, \"read\", type, created_at, target_user_id, target_id, target_type, target_content, content) " +
             "VALUES (#{id}, #{userId}, #{read}, #{type}, #{createdAt}, #{targetUserId}, #{targetId}, #{targetType}, #{targetContent}, #{content})")
     int insert(Notification notification);
 
-    @Update("UPDATE notification SET `read` = TRUE WHERE id =#{id}")
+    @Update("UPDATE notification SET \"read\" = TRUE WHERE id =#{id}")
     int updateRead(String id);
 
-    @Update("UPDATE notification SET `read` = TRUE WHERE user_id = #{userId} AND type = #{type}")
+    @Update("UPDATE notification SET  \"read\" = TRUE WHERE user_id = #{userId} AND type = #{type}")
     int updateReadBatch(String userId, Integer type);
 
     @Delete("DELETE FROM notification WHERE target_user_id = #{targetUserId} AND target_id = #{targetId} AND target_type = #{targetType} AND type = #{type}")
