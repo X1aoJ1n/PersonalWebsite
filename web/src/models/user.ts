@@ -39,4 +39,5 @@ export interface UserPreviewData {
   followerCount: number;
   followingCount: number;
   isFollow: boolean;
+  likeCount: number;
 }

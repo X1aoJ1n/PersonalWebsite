@@ -125,8 +125,8 @@ const UserPreviewCard: React.FC<UserPreviewCardProps> = ({
           </Link>
           <div style={styles.stats}>
             <span><span style={styles.statNumber}>{data.followingCount}</span> 关注</span>
-            {/* 6. 渲染 state 中的粉丝数，而不是 props 中的 */}
             <span><span style={styles.statNumber}>{followerCount}</span> 粉丝</span>
+            <span><span style={styles.statNumber}>{data.likeCount}</span> 获赞</span>
           </div>
         </div>
       </div>

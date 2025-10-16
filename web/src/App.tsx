@@ -12,6 +12,7 @@ import PostEditPage from '@/pages/PostEditPage';
 import PostCreatePage from '@/pages/PostCreatePage';
 import FollowListPage from '@/pages/FollowListPage';
 import SettingPage from '@/pages/SettingPage';
+import NotificationPage from '@/pages/NotificationPage';
 
 const router = createBrowserRouter([
   {
@@ -30,11 +31,11 @@ const router = createBrowserRouter([
       { path: 'post/create', element: <PostCreatePage /> },
       { path: 'profile/:userId/follows', element: <FollowListPage /> },
       { path: 'settings', element: <SettingPage /> },
+      { path: 'notifications', element: <NotificationPage /> },
 
       // --- 2. 将待开发页面指向 UnderDevelopmentPage ---
       { path: 'recommend-user', element: <UnderDevelopmentPage /> },
       { path: 'ai-agents', element: <UnderDevelopmentPage /> },
-      { path: 'notifications', element: <UnderDevelopmentPage /> },
       { path: 'search', element: <UnderDevelopmentPage /> },
 
     ],
