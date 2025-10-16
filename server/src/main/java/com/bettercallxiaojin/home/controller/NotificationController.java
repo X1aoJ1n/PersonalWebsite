@@ -1,5 +1,6 @@
 package com.bettercallxiaojin.home.controller;
 
+import com.bettercallxiaojin.home.common.Constant.NotificationConstant;
 import com.bettercallxiaojin.home.pojo.VO.NotificationVO;
 import com.bettercallxiaojin.home.pojo.VO.SimplePostVO;
 import com.bettercallxiaojin.home.pojo.VO.SimpleUserVO;
@@ -25,6 +26,48 @@ import java.util.List;
 public class NotificationController {
 
     private final NotificationService notificationService;
+
+    @GetMapping("/count-all-unread")
+    @Operation(summary = "获得未读消息的数字", description = "获得未读消息的数字")
+    public Response<Integer> countAllUnread() {
+        try {
+            return Response.success(notificationService.countAllUnread());
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
+    @GetMapping("/count-like-unread")
+    @Operation(summary = "获得未读点赞的数字", description = "获得未读点赞的数字")
+    public Response<Integer> countLikeUnread() {
+        try {
+            return Response.success(notificationService.countUnread(NotificationConstant.LIKE));
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
+    @GetMapping("/count-follow-unread")
+    @Operation(summary = "获得未读关注的数字", description = "获得未读关注的数字")
+    public Response<Integer> countFollowUnread() {
+        try {
+            return Response.success(notificationService.countUnread(NotificationConstant.FOLLOW));
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
+    @GetMapping("/count-follow-unread")
+    @Operation(summary = "获得未读评论回复的数字", description = "获得未读评论回复的数字")
+    public Response<Integer> countCommentUnread() {
+        try {
+            return Response.success(
+                    notificationService.countUnread(NotificationConstant.COMMENT) + notificationService.countUnread(NotificationConstant.REPLY)
+            );
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
 
     @PostMapping("/read")
     @Operation(summary = "设为已读", description = "把某个通知设为已读")

@@ -32,4 +32,10 @@ public interface NotificationMapper {
     List<Notification> selectByUserAndTypes(@Param("userId") String userId,
                                             @Param("type1") Integer type1,
                                             @Param("type2") Integer type2);
+
+    @Select("SELECT COUNT(*) FROM notification WHERE read = false AND user_id = #{userId}")
+    Integer countAllUnread(@Param("userId") String userId);
+
+    @Select("SELECT COUNT(*) FROM notification WHERE read = false AND type = #{type} AND user_id = #{userId}")
+    Integer countUnreadByType(@Param("userId") String userId, @Param("type") Integer type);
 }

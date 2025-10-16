@@ -32,6 +32,19 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationMapper notificationMapper;
     private final UserMapper userMapper;
 
+
+    @Override
+    public Integer countUnread(Integer type) {
+        String userId = BaseContext.getUserId();
+        return notificationMapper.countUnreadByType(userId, type);
+    }
+
+    @Override
+    public Integer countAllUnread() {
+        String userId = BaseContext.getUserId();
+        return notificationMapper.countAllUnread(userId);
+    }
+
     @Override
     public Boolean read(String id) {
         return notificationMapper.updateRead(id) > 0;
@@ -271,6 +284,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         return convertToNotificationVOList(notifications);
     }
+
 
 
     private List<NotificationVO> convertToNotificationVOList(List<Notification> list) {
