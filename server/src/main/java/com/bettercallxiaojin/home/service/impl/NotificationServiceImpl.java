@@ -52,23 +52,23 @@ public class NotificationServiceImpl implements NotificationService {
 
         if (targetType.equals(TargetTypeConstant.POST)) {
             Post post = postMapper.selectById(targetId);
-            log.info("post id is " + post.getId() + " and currentUserId is " + currentUserId);
 
             // 自己给自己的帖子点赞，不通知
             if (post.getUserId().equals(currentUserId)) return false;
 
             notification.setUserId(post.getUserId());
             notification.setTargetContent(post.getTitle());
+            notification.setPostId(post.getId());
         } else if (targetType.equals(TargetTypeConstant.COMMENT)) {
             Comment comment = commentMapper.selectById(targetId);
 
-            log.info("comment id is " + comment.getId() + " and currentUserId is " + currentUserId);
 
             // 自己给自己的评论点赞，不通知
             if (comment.getUserId().equals(currentUserId)) return false;
 
             notification.setUserId(comment.getUserId());
             notification.setTargetContent(comment.getContent());
+            notification.setPostId(comment.getPostId());
         } else if (targetType.equals(TargetTypeConstant.REPLY)) {
             Reply reply = replyMapper.selectById(targetId);
             // 自己给自己的回复点赞，不通知
@@ -76,6 +76,10 @@ public class NotificationServiceImpl implements NotificationService {
 
             notification.setUserId(reply.getUserId());
             notification.setTargetContent(reply.getContent());
+
+            Comment comment = commentMapper.selectById(reply.getCommentId());
+
+            notification.setPostId(comment.getPostId());
         } else {
             throw new RuntimeException("targetType error");
         }
@@ -117,6 +121,7 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setUserId(post.getUserId());
         notification.setTargetContent(post.getTitle());
         notification.setContent(content);
+        notification.setPostId(post.getId());
 
         int rows = 0;
         try {
@@ -129,7 +134,7 @@ public class NotificationServiceImpl implements NotificationService {
 
 
     @Override
-    public Boolean updateReply(String Conetent, String targetId, Integer targetType) {
+    public Boolean updateReply(String content, String targetId, Integer targetType) {
         Notification notification = new Notification();
 
         notification.setId(UUID.randomUUID().toString());
@@ -139,15 +144,20 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setTargetUserId(BaseContext.getUserId());
         notification.setTargetId(targetId);
         notification.setTargetType(targetType);
+        notification.setContent(content);
 
         if (targetType.equals(TargetTypeConstant.COMMENT)) {
             Comment comment = commentMapper.selectById(targetId);
             notification.setUserId(comment.getUserId());
             notification.setTargetContent(comment.getContent());
+            notification.setPostId(comment.getPostId());
         } else if (targetType.equals(TargetTypeConstant.REPLY)) {
             Reply reply = replyMapper.selectById(targetId);
             notification.setUserId(reply.getUserId());
             notification.setTargetContent(reply.getContent());
+            Comment comment = commentMapper.selectById(reply.getCommentId());
+
+            notification.setPostId(comment.getPostId());
         } else {
             throw new RuntimeException("targetType error");
         }

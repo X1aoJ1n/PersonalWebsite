@@ -20,4 +20,5 @@ public class NotificationVO {
     private Integer targetType;
     private String targetContent;
     private String content;
+    private String postId;
 }

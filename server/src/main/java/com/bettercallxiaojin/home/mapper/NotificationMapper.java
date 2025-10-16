@@ -9,8 +9,8 @@ import java.util.List;
 @Mapper
 public interface NotificationMapper {
 
-    @Insert("INSERT INTO notification (id, user_id, \"read\", type, created_at, target_user_id, target_id, target_type, target_content, content) " +
-            "VALUES (#{id}, #{userId}, #{read}, #{type}, #{createdAt}, #{targetUserId}, #{targetId}, #{targetType}, #{targetContent}, #{content})")
+    @Insert("INSERT INTO notification (id, user_id, \"read\", type, created_at, target_user_id, target_id, target_type, target_content, content, post_id) " +
+            "VALUES (#{id}, #{userId}, #{read}, #{type}, #{createdAt}, #{targetUserId}, #{targetId}, #{targetType}, #{targetContent}, #{content}, #{postId})")
     int insert(Notification notification);
 
     @Update("UPDATE notification SET \"read\" = TRUE WHERE id =#{id}")
