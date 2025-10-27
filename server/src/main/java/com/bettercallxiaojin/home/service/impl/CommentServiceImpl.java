@@ -149,7 +149,6 @@ public class CommentServiceImpl implements CommentService {
         CommentVO commentVO = new CommentVO();
 
         BeanUtils.copyProperties(comment, commentVO);
-
         UserVO userVO = userService.getUserById(comment.getUserId());
 
         SimpleUserVO simpleUserVO = new SimpleUserVO();
@@ -159,7 +158,11 @@ public class CommentServiceImpl implements CommentService {
         commentVO.setUserVO(simpleUserVO);
         commentVO.setIsLike(likeService.checkLikeStatus(TargetTypeConstant.COMMENT, commentVO.getId()));
 
+        log.info(userVO.getId().toString());
+        log.info(BaseContext.getUserId());
+
         commentVO.setIsCreator(userVO.getId().equals(BaseContext.getUserId()));
+
 
         return commentVO;
     }
