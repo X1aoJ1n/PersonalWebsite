@@ -17,4 +17,6 @@ public interface AuthService {
     void getChangePasswordCode();
 
     void changePassword(String code, String password);
+
+    void getChangeEmailCode(String email);
 }

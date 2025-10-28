@@ -47,7 +47,8 @@ public class AuthServiceImpl implements AuthService {
 
     private static final String CODE_PREFIX = "email:code:";
     private static final String LOCK_PREFIX = "email:lock:";
-    private static final String CHANGE_PREFIX = "change:code:";
+    private static final String CHANGE_PASSWORD_PREFIX = "changepw:code:";
+    private static final String CHANGE_EMAIL_PREFIX = "changeem:code:";
 
     public UserLoginVO loginByPassword(String email, String password) {
 
@@ -197,11 +198,47 @@ public class AuthServiceImpl implements AuthService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("bihuijin427@gmail.com");
         message.setTo(email);
-        message.setSubject("BetterCallXiaoJin邮箱验证码: " + code);
-        message.setText("感谢您注册本网站，您本次的验证码是: " + code + "，有效期5分钟，请尽快使用。");
+        message.setSubject("BetterCallXiaoJin更改密码验证码: " + code);
+        message.setText("您本次的验证码是: " + code + "，有效期5分钟，请尽快使用。");
         mailSender.send(message);
 
-        redisTemplate.opsForValue().set(CHANGE_PREFIX + email, code, 5, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(CHANGE_PASSWORD_PREFIX + email, code, 5, TimeUnit.MINUTES);
+
+        redisTemplate.opsForValue().set(lockKey, "1", 1, TimeUnit.MINUTES);
+    }
+
+    @Override
+    public void getChangeEmailCode(String email) {
+
+        String userId = BaseContext.getUserId();
+        User user = userMapper.selectById(userId);
+
+
+        String oldEmail = user.getEmail();
+
+        if (oldEmail.equals(email)) {
+            throw  new RuntimeException("email not changed");
+        }
+
+        if (userMapper.selectByEmail(email) != null) {
+            throw  new RuntimeException("email already exist");
+        }
+
+        String lockKey = LOCK_PREFIX + email;
+        if (redisTemplate.hasKey(lockKey)) {
+            throw new RuntimeException("请求过于频繁，请稍后再试");
+        }
+
+        String code = CodeGenerator.generateCode(6);
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("bihuijin427@gmail.com");
+        message.setTo(email);
+        message.setSubject("BetterCallXiaoJin更改邮箱验证码: " + code);
+        message.setText("您本次的验证码是: " + code + "，有效期5分钟，请尽快使用。");
+        mailSender.send(message);
+
+        redisTemplate.opsForValue().set(CHANGE_EMAIL_PREFIX + email, code, 5, TimeUnit.MINUTES);
 
         redisTemplate.opsForValue().set(lockKey, "1", 1, TimeUnit.MINUTES);
     }
@@ -218,11 +255,11 @@ public class AuthServiceImpl implements AuthService {
 
         String email =  user.getEmail();
 
-        String realCode = redisTemplate.opsForValue().get(CHANGE_PREFIX + email);
+        String realCode = redisTemplate.opsForValue().get(CHANGE_PASSWORD_PREFIX + email);
         if (realCode == null || !realCode.equals(code)) {
             throw new RuntimeException("code not match");
         }
-        redisTemplate.delete(CHANGE_PREFIX + email);
+        redisTemplate.delete(CHANGE_PASSWORD_PREFIX + email);
 
         userMapper.updatePassword(userId, PasswordEncodeUtil.encode(password));
     }

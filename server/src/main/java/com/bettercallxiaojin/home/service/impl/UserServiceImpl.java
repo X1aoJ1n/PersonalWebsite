@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
 
     private final FollowMapper followMapper;
 
-    private static final String CHANGE_PREFIX = "change:code:";
+    private static final String CHANGE_EMAIL_PREFIX = "changeem:code:";
 
     @Override
     public UserVO getUserById(String id) {
@@ -163,11 +163,11 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("User not found");
         }
 
-        String realCode = redisTemplate.opsForValue().get(CHANGE_PREFIX + email);
+        String realCode = redisTemplate.opsForValue().get(CHANGE_EMAIL_PREFIX + email);
         if (realCode == null || !realCode.equals(code)) {
             throw new RuntimeException("code not match");
         }
-        redisTemplate.delete(CHANGE_PREFIX + email);
+        redisTemplate.delete(CHANGE_EMAIL_PREFIX + email);
 
         userMapper.updateEmail(userId, email);
     }

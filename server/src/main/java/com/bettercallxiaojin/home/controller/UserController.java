@@ -104,6 +104,17 @@ public class UserController {
         }
     }
 
+    @GetMapping("/getChangeEmailCode")
+    @Operation(summary = "获取改密码验证码")
+    public Response<Object> getChangeEmailCode(@RequestParam String email) {
+        try {
+            authService.getChangeEmailCode(email);
+            return Response.success();
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
 
     @PutMapping("/change-password")
     @Operation(summary = "用户更改密码")
