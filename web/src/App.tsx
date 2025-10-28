@@ -1,5 +1,6 @@
 // src/App.tsx
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+// 1. 导入 Navigate
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import RootLayout from '@/layouts/RootLayout';
 import HomePage from '@/pages/HomePage';
 import AuthPage from '@/pages/AuthPage';
@@ -37,11 +38,15 @@ const router = createBrowserRouter([
       { path: 'settings', element: <SettingPage /> },
       { path: 'notifications', element: <NotificationPage /> },
 
-      // --- 2. 将待开发页面指向 UnderDevelopmentPage ---
       { path: 'recommend-user', element: <UnderDevelopmentPage /> },
       { path: 'search', element: <UnderDevelopmentPage /> },
 
+      { 
+        path: 'xiaojin', 
+        element: <Navigate to="/profile/a9294cb6-dacd-43a6-aeaf-1b321bbc4f2e" replace /> 
+      },
 
+      // 3. 404 页面必须在最后
       { path: '*', element: <NotFoundPage /> },
     ],
   },
