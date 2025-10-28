@@ -1,5 +1,5 @@
 // src/components/LeftSidebar.tsx
-import React, { useState } from 'react'; // 1. 引入 useState
+import React, { useState } from 'react';
 
 type FeedType = 'latest' | 'favorite' | 'following';
 
@@ -9,21 +9,18 @@ interface LeftSidebarProps {
   isLoggedIn: boolean;
 }
 
-const LeftSidebar: React.FC<LeftSidebarProps> = ({ activeFeed, onFeedChange, isLoggedIn }) => {
+const LeftSidebar: React.FC<LeftSidebarProps> = ({ activeFeed, onFeedChange }) => {
   
-  // 2. 新增一个 state 来追踪当前悬浮的 Tab
   const [hoveredTab, setHoveredTab] = useState<FeedType | null>(null);
 
   const handleFollowingClick = () => {
-    if (isLoggedIn) {
-      onFeedChange('following');
-    } else {
-      alert('请先登录后查看关注内容！');
-    }
+    onFeedChange('following');
   };
 
   return (
-    <div style={styles.container}><div
+    <div style={styles.container}>
+      {/* 热门帖子 Tab (不变) */}
+      <div
         style={{ 
           ...styles.tab, 
           ...(hoveredTab === 'favorite' ? styles.tabHover : {}),
@@ -34,11 +31,14 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ activeFeed, onFeedChange, isL
         onMouseLeave={() => setHoveredTab(null)}
       >
         热门帖子
-      </div><div
+      </div>
+      
+      {/* 最新帖子 Tab (不变) */}
+      <div
         style={{ 
           ...styles.tab, 
-          ...(hoveredTab === 'latest' ? styles.tabHover : {}), // 应用悬浮样式
-          ...(activeFeed === 'latest' ? styles.activeTab : {})  // 激活样式会覆盖悬浮样式
+          ...(hoveredTab === 'latest' ? styles.tabHover : {}),
+          ...(activeFeed === 'latest' ? styles.activeTab : {})
         }}
         onClick={() => onFeedChange('latest')}
         onMouseEnter={() => setHoveredTab('latest')}
@@ -47,22 +47,24 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ activeFeed, onFeedChange, isL
         最新帖子
       </div>
     
+      {/* 我的关注 Tab (onClick 已更新) */}
       <div
         style={{ 
           ...styles.tab, 
           ...(hoveredTab === 'following' ? styles.tabHover : {}),
           ...(activeFeed === 'following' ? styles.activeTab : {}) 
         }}
-        onClick={handleFollowingClick}
+        onClick={handleFollowingClick} // ★ 修正 ★：使用新的 handler
         onMouseEnter={() => setHoveredTab('following')}
         onMouseLeave={() => setHoveredTab(null)}
       >
         我的关注
-      </div></div>
+      </div>
+    </div>
   );
 };
 
-// 4. 在 styles 对象中新增 tabHover 样式
+// ... 样式 (styles) 对象保持不变 ...
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
     width: '180px',
@@ -84,12 +86,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontWeight: '500',
     transition: 'background-color 0.2s, color 0.2s',
   },
-  // --- 新增样式 ---
   tabHover: {
-    backgroundColor: '#eef2ff', // 一个漂亮的浅靛蓝色
-    color: '#4338ca', // 搭配的深靛蓝色字体
+    backgroundColor: '#eef2ff',
+    color: '#4338ca',
   },
-  // --- 结束 ---
   activeTab: {
     backgroundColor: '#4f46e5',
     color: '#ffffffff',

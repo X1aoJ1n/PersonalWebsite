@@ -65,9 +65,6 @@ const UserPreviewCard: React.FC<UserPreviewCardProps> = ({
         await follow(data.id);
       }
     } catch (error) {
-      console.error("关注/取关失败:", error);
-      alert('操作失败');
-      // 4. 如果失败，则回滚状态
       setIsFollowing(originalIsFollowing);
       setFollowerCount(prevCount => originalIsFollowing ? prevCount + 1 : prevCount - 1);
     } finally {

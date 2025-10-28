@@ -1,11 +1,12 @@
 import React from 'react';
-// ========= 1. Import UserData type =========
-import type { CommentData, AddCommentRequest, UserData } from '@/models';
+import { useOutletContext } from 'react-router-dom';
+import type { OutletContextType } from '@/layouts/RootLayout';
+
+import type { CommentData, AddCommentRequest } from '@/models';
 import { createComment } from '@/api/comment';
 import CommentForm from './CommentForm';
 import CommentItem from './CommentItem';
 
-// User preview handlers remain the same
 interface UserPreviewHandlers {
   onCommentAuthorMouseEnter: (e: React.MouseEvent, userId: string, anchor: HTMLElement | null) => void;
   onReplyAuthorMouseEnter: (e: React.MouseEvent, userId: string, anchor: HTMLElement | null) => void;
@@ -19,7 +20,6 @@ interface CommentSectionProps extends UserPreviewHandlers {
   totalCommentCount: number;
   onNewCommentAdded: (newComment: CommentData) => void;
   onReplyAdded: (targetCommentId: string) => void;
-  currentUser: UserData | null;
   onCommentDeleted: (commentId: string) => Promise<void>;
   onCommentUpdated: (commentId: string, newContent: string) => Promise<void>;
   onReplyDeleted: (commentId: string) => void;
@@ -34,13 +34,12 @@ const CommentSection: React.FC<CommentSectionProps> = ({
   onCommentAuthorMouseEnter,
   onReplyAuthorMouseEnter,
   onUserMouseLeave,
-  currentUser,
   onCommentDeleted,
   onCommentUpdated,
   onReplyDeleted,
 }) => {
 
-  // 更改: Derive a boolean for login status
+  const { currentUser, showToast } = useOutletContext<OutletContextType>();
   const isLoggedIn = !!currentUser;
 
   const handleCommentSubmit = async (text: string) => {
@@ -52,9 +51,9 @@ const CommentSection: React.FC<CommentSectionProps> = ({
       } else {
         throw new Error(res.message || '评论失败');
       }
-    } catch (error) {
+    } catch (error: any) {
        console.error("Comment submission failed:", error);
-       alert('评论失败，请稍后重试。');
+       showToast(error.message || '评论失败，请稍后重试。', 'error'); // 替换 alert
     }
   };
 
@@ -62,7 +61,6 @@ const CommentSection: React.FC<CommentSectionProps> = ({
     <div style={styles.card}>
       <h3 style={styles.sectionTitle}>评论 ({totalCommentCount})</h3>
 
-      {/* 更改: Conditionally render the comment form */}
       {isLoggedIn ? (
         <CommentForm 
           onSubmit={handleCommentSubmit}
@@ -84,12 +82,11 @@ const CommentSection: React.FC<CommentSectionProps> = ({
             onCommentAuthorMouseEnter={onCommentAuthorMouseEnter}
             onReplyAuthorMouseEnter={onReplyAuthorMouseEnter}
             onUserMouseLeave={onUserMouseLeave}
-            currentUser={currentUser}
             onCommentDeleted={onCommentDeleted}
             onCommentUpdated={onCommentUpdated}
             onReplyDeleted={onReplyDeleted}
-            // 更改: Pass the isLoggedIn boolean down to CommentItem
-            isLoggedIn={isLoggedIn}
+            // ★ 9. 不再需要传递 currentUser, isLoggedIn, showToast, setConfirm ★
+            // CommentItem 自己会从 Context 获取它们
           />
         ))}
       </div>

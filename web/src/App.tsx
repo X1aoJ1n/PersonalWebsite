@@ -14,10 +14,14 @@ import FollowListPage from '@/pages/FollowListPage';
 import SettingPage from '@/pages/SettingPage';
 import NotificationPage from '@/pages/NotificationPage';
 
+import ErrorPage from '@/pages/ErrorPage';
+import NotFoundPage from '@/pages/NotFoundPage';
+
 const router = createBrowserRouter([
   {
     path: '/',
     element: <RootLayout />,
+    errorElement: <ErrorPage />,
     children: [
       { index: true, element: <HomePage /> },
       { path: 'auth', element: <AuthPage /> },
@@ -35,9 +39,10 @@ const router = createBrowserRouter([
 
       // --- 2. 将待开发页面指向 UnderDevelopmentPage ---
       { path: 'recommend-user', element: <UnderDevelopmentPage /> },
-      { path: 'ai-agents', element: <UnderDevelopmentPage /> },
       { path: 'search', element: <UnderDevelopmentPage /> },
 
+
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
 ]);

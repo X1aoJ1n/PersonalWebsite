@@ -1,27 +1,37 @@
+// src/pages/PostDetailPage.tsx
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useOutletContext } from 'react-router-dom';
 import { getPostDetail } from '@/api/post';
 import { getCommentsByPostId, deleteComment as apiDeleteComment, updateComment as apiUpdateComment } from '@/api/comment';
-// ========= 1. Added missing API and type imports =========
 import type { PostData, CommentData } from '@/models';
 import type { OutletContextType } from '@/layouts/RootLayout';
 import PostContent from '@/components/post/PostContent';
 import CommentSection from '@/components/post/CommentSection';
 import { useUserPreview } from '@/hooks/useUserPreview';
 import UserPreviewCard from '@/components/common/UserPreviewCard';
+import Alert from '@/components/common/Alert';
+import { PostPageProvider, type ConfirmSetter } from '@/contexts/PostPageContext';
 
 const PostDetailPage: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
-  
   const [post, setPost] = useState<PostData | null>(null);
   const [comments, setComments] = useState<CommentData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { currentUser } = useOutletContext<OutletContextType>();
-
+  const { currentUser, showToast } = useOutletContext<OutletContextType>();
   const isLoggedIn = !!currentUser;
 
-
+  // ★ 2. 修正 state：使用 'children' 而不是 'message'
+  const [confirm, setConfirm] = useState({
+    isOpen: false,
+    title: '请确认',
+    children: '', // 之前是 message
+    onConfirm: () => {},
+    confirmText: '确认',
+    confirmColor: 'primary' as 'primary' | 'danger',
+  });
+  const closeConfirm = () => setConfirm(s => ({ ...s, isOpen: false }));
 
   const { 
     isCardVisible, 
@@ -69,7 +79,6 @@ const PostDetailPage: React.FC = () => {
     fetchData();
   }, [postId]);
   
-  // ========= Logic for adding new comments and replies =========
   const handleNewCommentAdded = (newComment: CommentData) => {
     setComments(prevComments => [newComment, ...prevComments]);
     if (post) {
@@ -91,38 +100,43 @@ const PostDetailPage: React.FC = () => {
     }
   };
 
-  // ========= Handlers for Deleting and Updating Comments/Replies =========
-  const handleCommentDeleted = async (commentId: string) => {
-    if (window.confirm('确定要删除这条评论吗？')) {
-      try {
-        // 1. API 调用保持不变，后端负责将数据库中的 status 设为 1
-        await apiDeleteComment(commentId); 
+  const performDeleteComment = async (commentId: string) => {
+    closeConfirm();
+    try {
+      await apiDeleteComment(commentId); 
 
-        // 2. 前端状态更新：使用 map 找到对应评论并更新其 status
-        setComments(prevComments =>
-          prevComments.map(comment => {
-            if (comment.id === commentId) {
-              // 返回一个更新了 status 的新评论对象
-              return { ...comment, status: 1 };
-            }
-            return comment; // 其他评论保持不变
-          })
-        );
+      setComments(prevComments =>
+        prevComments.map(comment => {
+          if (comment.id === commentId) {
+            return { ...comment, status: 1 };
+          }
+          return comment;
+        })
+      );
 
-        // 3. (可选) 更新帖子总评论数。
-        // 如果软删除也意味着总数减少，保留这部分逻辑。
-        // 如果不减少，可以注释掉这部分。
-        const commentToDelete = comments.find(c => c.id === commentId);
-        if (post && commentToDelete) {
-          // 注意：软删除后，回复依然存在，所以这里只减 1
-          setPost({ ...post, commentCount: post.commentCount - 1 });
-        }
-
-      } catch (error: any) {
-        console.error("删除评论失败:", error);
-        alert(error.message || '删除评论失败');
+      const commentToDelete = comments.find(c => c.id === commentId);
+      if (post && commentToDelete) {
+        setPost({ ...post, commentCount: post.commentCount - 1 });
       }
+      
+      showToast('评论已删除', 'success'); 
+
+    } catch (error: any) {
+      console.error("删除评论失败:", error);
+      // 3. 替换 alert
+      showToast(error.message || '删除评论失败', 'error');
     }
+  };
+
+  const handleCommentDeleted = async (commentId: string) => {
+    setConfirm({
+      isOpen: true,
+      title: '删除评论',
+      children: '您确定要删除这条评论吗？',
+      onConfirm: () => performDeleteComment(commentId),
+      confirmText: '删除',
+      confirmColor: 'danger',
+    });
   };
 
   const handleCommentUpdated = async (commentId: string, content: string) => {
@@ -133,12 +147,12 @@ const PostDetailPage: React.FC = () => {
       );
     } catch (error: any) {
       console.error("更新评论失败:", error);
-      alert(error.message || '更新评论失败');
+      // 替换 alert
+      showToast(error.message || '更新评论失败', 'error');
     }
   };
 
-  // This handler only updates counts. The actual API call and UI update
-  // for the replies list happens in the CommentItem component.
+  
   const handleReplyDeleted = (commentId: string) => {
     setComments(prev => 
       prev.map(c => 
@@ -158,30 +172,30 @@ const PostDetailPage: React.FC = () => {
   if (!post) return <div style={styles.centerMessage}>帖子不存在或已被删除</div>;
 
   return (
-    <>
-      <main style={styles.mainContent}>
-        <PostContent 
-        post={post}
-        isLoggedIn={isLoggedIn} // 3. Pass the prop down
-        onUserMouseEnter={handleMouseEnterForPost}
-        onUserMouseLeave={handleMouseLeave}
-      />
-        {/* Pass the new props down to the CommentSection */}
-        <CommentSection 
-          postId={post.id}
-          comments={comments} 
-          totalCommentCount={post.commentCount} 
-          currentUser={currentUser}
-          onNewCommentAdded={handleNewCommentAdded}
-          onReplyAdded={handleReplyAdded}
-          onCommentAuthorMouseEnter={handleMouseEnterForComment}
-          onReplyAuthorMouseEnter={handleMouseEnterForReply}
-          onUserMouseLeave={handleMouseLeave}
-          onCommentDeleted={handleCommentDeleted}
-          onCommentUpdated={handleCommentUpdated}
-          onReplyDeleted={handleReplyDeleted}
-        />
-      </main>
+    <PostPageProvider value={{ setConfirm: setConfirm as ConfirmSetter }}>
+      <>
+        <main style={styles.mainContent}>
+          <PostContent 
+            post={post}
+            isLoggedIn={isLoggedIn}
+            onUserMouseEnter={handleMouseEnterForPost}
+            onUserMouseLeave={handleMouseLeave}
+          />
+          <CommentSection 
+            postId={post.id}
+            comments={comments} 
+            totalCommentCount={post.commentCount} 
+            onNewCommentAdded={handleNewCommentAdded}
+            onReplyAdded={handleReplyAdded}
+            onCommentAuthorMouseEnter={handleMouseEnterForComment}
+            onReplyAuthorMouseEnter={handleMouseEnterForReply}
+            onUserMouseLeave={handleMouseLeave}
+            onCommentDeleted={handleCommentDeleted}
+            onCommentUpdated={handleCommentUpdated}
+            onReplyDeleted={handleReplyDeleted}
+            // ★ 5. 不再需要传递 currentUser, showToast 和 setConfirm ★
+          />
+        </main>
 
       {isCardVisible && (
         <UserPreviewCard
@@ -193,7 +207,19 @@ const PostDetailPage: React.FC = () => {
           currentUserId={currentUser?.id} 
         />
       )}
+      <Alert
+        isOpen={confirm.isOpen}
+        title={confirm.title}
+        onClose={closeConfirm}
+        onConfirm={confirm.onConfirm}
+        confirmText={confirm.confirmText}
+        cancelText="取消"
+        confirmColor={confirm.confirmColor}
+      >
+        {confirm.children}
+      </Alert>
     </>
+  </PostPageProvider>
   );
 };
 

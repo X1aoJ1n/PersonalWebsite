@@ -1,12 +1,14 @@
 // src/components/post/PostContent.tsx
 
 import React, { useState, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate , useOutletContext } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import type { PostData, LikeDTO } from '@/models';
 import { deletePost } from '@/api/post';
 import { like, unlike } from '@/api/like';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import type { OutletContextType } from '@/layouts/RootLayout';
+import { usePostPage } from '@/contexts/PostPageContext';
 
 interface UserPreviewHandlers {
   onUserMouseEnter: (e: React.MouseEvent, userId: string, anchor: HTMLElement | null) => void;
@@ -18,29 +20,45 @@ interface PostContentProps extends UserPreviewHandlers {
   isLoggedIn: boolean;
 }
 
-const PostContent: React.FC<PostContentProps> = ({ post, onUserMouseEnter, onUserMouseLeave, isLoggedIn }) => {
+const PostContent: React.FC<PostContentProps> = ({ 
+  post, 
+  onUserMouseEnter, 
+  onUserMouseLeave, 
+  isLoggedIn,
+}) => {
   const navigate = useNavigate();
   
   const [isLiked, setIsLiked] = useState(post.isLike);
   const [likeCount, setLikeCount] = useState(post.likeCount);
   const [isLiking, setIsLiking] = useState(false);
 
+  const { showToast } = useOutletContext<OutletContextType>();
+  const { setConfirm } = usePostPage();
+  
   const authorAnchorRef = useRef<HTMLAnchorElement>(null);
 
   const handleDelete = async () => {
-    if (window.confirm('您确定要删除这篇帖子吗？此操作不可撤销。')) {
-      try {
-        const res = await deletePost(post.id);
-        if (res.code === 200) {
-          alert('删除成功！');
-          navigate('/');
-        } else {
-          throw new Error(res.message);
+    // 使用 setConfirm 替换 window.confirm
+    setConfirm({
+      isOpen: true,
+      title: '删除帖子',
+      children: '您确定要删除这篇帖子吗？此操作不可撤销。',
+      confirmColor: 'danger',
+      confirmText: '删除',
+      onConfirm: async () => { // 确认后的回调
+        try {
+          const res = await deletePost(post.id);
+          if (res.code === 200) {
+            showToast('删除成功！', 'success'); // 替换 alert
+            navigate('/');
+          } else {
+            throw new Error(res.message);
+          }
+        } catch (err: any) {
+          showToast(`删除失败: ${err.message}`, 'error'); // 替换 alert
         }
-      } catch (err: any) {
-        alert(`删除失败: ${err.message}`);
       }
-    }
+    });
   };
   
   const handleLikeToggle = async () => {

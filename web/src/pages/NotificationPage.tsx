@@ -111,7 +111,7 @@ const NotificationPage: React.FC = () => {
     }
   };
 
-    if (!currentUser) { return <div style={{...styles.container, padding: '20px'}}><p style={styles.centerMessage}>请先 <Link to="/login">登录</Link> 查看通知。</p></div>; }
+    if (!currentUser) { return <div style={{...styles.container, padding: '20px'}}><p style={styles.centerMessage}>请先 <Link to="/auth">登录</Link> 查看通知。</p></div>; }
 
   const currentNotifications = notifications[activeTab];
 
@@ -200,4 +200,3 @@ const styles: { [key: string]: React.CSSProperties } = {
 };
 
 export default NotificationPage;
-

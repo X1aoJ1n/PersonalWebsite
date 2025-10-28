@@ -59,7 +59,6 @@ const OrganizationEditPage: React.FC = () => {
       
       const res = await apiCall;
       if (res.code === 200) {
-        alert(isEditMode ? '修改成功！' : '添加成功！');
         navigate('/profile');
       } else {
         throw new Error(res.message);

@@ -1,25 +1,24 @@
 // src/pages/PostCreatePage.tsx
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { createPost } from '@/api/post';
 import { uploadFile } from '@/api/file'; // 确保引入上传函数
 import type { AddPostRequest } from '@/models';
 import WysiwygEditor from '@/components/WysiwygEditor';
+import type { OutletContextType } from '@/layouts/RootLayout';
 
 const PostCreatePage: React.FC = () => {
   const navigate = useNavigate();
   
+  const { showToast } = useOutletContext<OutletContextType>();
+
   const [content, setContent] = useState('');
   const [title, setTitle] = useState('');
   const [preview, setPreview] = useState('');
-  
-  // 1. 新增 State，用于存储待上传的文件 Map<blobUrl, File>
   const [localFiles, setLocalFiles] = useState<Map<string, File>>(new Map());
-
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 2. 实现 onFileAdded 回调，用于接收编辑器传来的新文件
   const handleFileAdded = (file: File, url: string) => {
     setLocalFiles(prev => new Map(prev).set(url, file));
   };
@@ -82,8 +81,7 @@ const PostCreatePage: React.FC = () => {
       // f. 提交帖子
       const res = await createPost(formData);
       if (res.code === 200 && res.data) {
-        alert('发布成功！');
-        // 清理本地文件映射
+        showToast('发布成功！', 'success');
         localFiles.forEach((_, url) => URL.revokeObjectURL(url));
         setLocalFiles(new Map());
         navigate(`/post/${res.data.id}`);

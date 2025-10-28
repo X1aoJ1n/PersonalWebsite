@@ -48,3 +48,8 @@ export const getChangePasswordCode = async () => {
   const res = await axiosInstance.get<BaseResponse<null>>('/user/getChangePasswordCode');
   return res.data;
 };
+
+export const getChangeEmailCode = async (params: { email: string }) => {
+  const res = await axiosInstance.get<BaseResponse<null>>('/user/getChangeEmailCode', { params });
+  return res.data;
+};

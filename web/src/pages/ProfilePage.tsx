@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useOutletContext } from 'react-router-dom';
-import type { OutletContextType } from '@/layouts/RootLayout';
+import type { OutletContextType } from '@/layouts/RootLayout'; // 1. 已有正确的 ContextType 导入
 
 // API Imports
 import { getUserById } from '@/api/user';
@@ -18,15 +18,27 @@ import UserInfo from '@/components/profile/UserInfo';
 import Contacts from '@/components/profile/Contacts';
 import Organizations from '@/components/profile/Organizations';
 import Posts from '@/components/profile/posts';
-import RecentViews from '@/components/profile/RecentViews'; // 1. 引入新组件
+import RecentViews from '@/components/profile/RecentViews';
+import Alert from '@/components/common/Alert'; 
+// 2. ★ 移除 ★：不再需要单独导入 toast
+// import { toast } from '@/utils/toast'; 
 
 const POSTS_PER_PAGE = 10;
 
+interface AlertConfig {
+    isOpen: boolean;
+    title: string;
+    children: React.ReactNode;
+    onConfirm: () => void;
+    confirmColor?: 'primary' | 'danger';
+}
+
 const ProfilePage: React.FC = () => {
     const { userId: paramId } = useParams<{ userId: string }>();
-    const { currentUser } = useOutletContext<OutletContextType>();
+    // 3. ★ 修正 ★：从 context 中解构出 showToast
+    const { currentUser, showToast } = useOutletContext<OutletContextType>();
     
-    // --- 所有 State 保持不变，由主组件管理 ---
+    // --- States (保持不变) ---
     const [profileUser, setProfileUser] = useState<UserData | null>(null);
     const [contacts, setContacts] = useState<ContactData[]>([]);
     const [organizations, setOrganizations] = useState<OrganizationData[]>([]);
@@ -47,10 +59,19 @@ const ProfilePage: React.FC = () => {
     const [editingContactId, setEditingContactId] = useState<string | null>(null);
     const [editFormData, setEditFormData] = useState<Partial<ContactRequest>>({ type: '', data: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
-    
+    const [alertConfig, setAlertConfig] = useState<AlertConfig>({
+        isOpen: false,
+        title: '',
+        children: null,
+        onConfirm: () => {},
+        confirmColor: 'primary',
+    });
+
     const userIdToFetch = paramId || currentUser?.id;
     const isOwnProfile = !!currentUser && currentUser.id === userIdToFetch;
 
+    // --- Effects (保持不变) ---
+    
     // 主数据获取 Effect
     useEffect(() => {
         if (!userIdToFetch) {
@@ -61,8 +82,9 @@ const ProfilePage: React.FC = () => {
         const fetchProfileData = async () => {
             setIsLoading(true);
             setError(null);
-            setHasMore(true); // Reset on full refresh
+            setHasMore(true);
             try {
+                // ... (Promise.all 逻辑保持不变)
                 const [userRes, contactRes, orgRes, postRes] = await Promise.all([
                     getUserById(userIdToFetch),
                     getContactByUserId(userIdToFetch),
@@ -80,9 +102,7 @@ const ProfilePage: React.FC = () => {
                 if (postRes.code === 200 && postRes.data) {
                     setPosts(postRes.data);
                     setCurrentPageNum(2);
-                    if (postRes.data.length < POSTS_PER_PAGE) {
-                        setHasMore(false);
-                    }
+                    if (postRes.data.length < POSTS_PER_PAGE) setHasMore(false);
                 } else {
                     throw new Error('获取帖子列表失败');
                 }
@@ -100,29 +120,22 @@ const ProfilePage: React.FC = () => {
         fetchProfileData();
     }, [userIdToFetch, currentUser]);
 
-    // 5. 新增 Effect，用于在首次点击“最近浏览”选项卡时延迟加载数据
+    // “最近浏览” 延迟加载 Effect
     useEffect(() => {
-        // 仅当选项卡被激活、数据尚未获取且用户ID有效时才执行
         if (activeTab === 'recent' && !recentViewFetched && userIdToFetch) {
             const fetchRecentData = async () => {
                 setIsRecentViewLoading(true);
                 try {
-                    // 注意：这里用的是 getRecentViewPost/User，而不是 getUserPost
+                    // ... (Promise.all 逻辑保持不变)
                     const [postRes, userRes] = await Promise.all([
-                        getRecentViewPost({ pageNum: 1, pageSize: 5 }), // 假设每个模块最多显示5条
+                        getRecentViewPost({ pageNum: 1, pageSize: 5 }), 
                         getRecentViewUser({ pageNum: 1, pageSize: 5 })
                     ]);
-
-                    if (postRes.code === 200 && postRes.data) {
-                        setRecentViewPosts(postRes.data);
-                    }
-                    if (userRes.code === 200 && userRes.data) {
-                        setRecentViewUsers(userRes.data);
-                    }
-                    setRecentViewFetched(true); // 标记数据已成功获取
+                    if (postRes.code === 200 && postRes.data) setRecentViewPosts(postRes.data);
+                    if (userRes.code === 200 && userRes.data) setRecentViewUsers(userRes.data);
+                    setRecentViewFetched(true);
                 } catch (err) {
                     console.error("获取最近浏览数据失败:", err);
-                    // 可以在这里设置一个特定的错误状态
                 } finally {
                     setIsRecentViewLoading(false);
                 }
@@ -131,111 +144,29 @@ const ProfilePage: React.FC = () => {
         }
     }, [activeTab, recentViewFetched, userIdToFetch]);
 
-    useEffect(() => {
-        // 仅当选项卡被激活、数据尚未获取且用户ID有效时才执行
-        if (activeTab === 'recent' && !recentViewFetched && userIdToFetch) {
-            const fetchRecentData = async () => {
-                setIsRecentViewLoading(true);
-                try {
-                    const [postRes, userRes] = await Promise.all([
-                        getRecentViewPost({ id: userIdToFetch, pageNum: 1, pageSize: 5 }),
-                        getRecentViewUser({ id: userIdToFetch, pageNum: 1, pageSize: 5 })
-                    ]);
-
-                    if (postRes.code === 200 && postRes.data) {
-                        setRecentViewPosts(postRes.data);
-                    }
-                    if (userRes.code === 200 && userRes.data) {
-                        setRecentViewUsers(userRes.data);
-                    }
-                    setRecentViewFetched(true); // 标记数据已成功获取
-                } catch (err) {
-                    console.error("获取最近浏览数据失败:", err);
-                    // 可以在这里设置一个特定的错误状态
-                } finally {
-                    setIsRecentViewLoading(false);
-                }
-            };
-            fetchRecentData();
-        }
-    }, [activeTab, recentViewFetched, userIdToFetch]);
     
-    useEffect(() => {
-        if (!userIdToFetch) {
-            setError('无法确定要加载的用户。');
-            setIsLoading(false);
-            return;
-        }
-        const fetchProfileData = async () => {
-            setIsLoading(true);
-            setError(null);
-            setHasMore(true); // Reset on full refresh
-            try {
-                const [userRes, contactRes, orgRes, postRes] = await Promise.all([
-                    getUserById(userIdToFetch),
-                    getContactByUserId(userIdToFetch),
-                    getOrganizationByUserId(userIdToFetch),
-                    // 3. Fetch the first page with the correct page size
-                    getUserPost({ id: userIdToFetch, pageNum: 1, pageSize: POSTS_PER_PAGE })
-                ]);
-
-                if (userRes.code === 200 && userRes.data) setProfileUser(userRes.data);
-                else throw new Error('获取用户信息失败');
-                if (contactRes.code === 200 && contactRes.data) setContacts(contactRes.data);
-                else throw new Error('获取联系方式失败');
-                if (orgRes.code === 200 && orgRes.data) setOrganizations(orgRes.data);
-                else throw new Error('获取组织信息失败');
-                
-                if (postRes.code === 200 && postRes.data) {
-                    setPosts(postRes.data);
-                    // 4. Set up for the next page load
-                    setCurrentPageNum(2);
-                    if (postRes.data.length < POSTS_PER_PAGE) {
-                        setHasMore(false);
-                    }
-                } else {
-                    throw new Error('获取帖子列表失败');
-                }
-
-                if (currentUser && userIdToFetch !== currentUser.id) {
-                    const followStatusRes = await checkFollowStatus(userIdToFetch);
-                    if (followStatusRes.code === 200) setIsFollowing(followStatusRes.data);
-                }
-            } catch (err: any) {
-                setError(err.message || '加载页面时出错');
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchProfileData();
-    }, [userIdToFetch, currentUser]);
-
-    // 5. Create the handler to load more posts
     const handleLoadMorePosts = async () => {
         if (isLoadMoreLoading || !hasMore || !userIdToFetch) return;
         setIsLoadMoreLoading(true);
-
-        const pageQuery = { id: userIdToFetch, pageNum: currentPageNum, pageSize: POSTS_PER_PAGE };
+        // ... (省略 API 调用, 保持不变) ...
         try {
-            const res = await getUserPost(pageQuery);
+            const res = await getUserPost({ id: userIdToFetch, pageNum: currentPageNum, pageSize: POSTS_PER_PAGE });
             if (res.code === 200 && res.data) {
                 setPosts(prevPosts => [...prevPosts, ...res.data]);
                 setCurrentPageNum(prevPage => prevPage + 1);
-                if (res.data.length < POSTS_PER_PAGE) {
-                    setHasMore(false);
-                }
+                if (res.data.length < POSTS_PER_PAGE) setHasMore(false);
             } else {
                 throw new Error(res.message || '获取更多帖子失败');
             }
         } catch (err: any) {
-            // You might want to show this error in the UI
             console.error(err);
+            showToast(err.message || '加载失败', 'error');
         } finally {
             setIsLoadMoreLoading(false);
         }
     };
 
-    // Handlers (All remain here)
+    // 关注/取关
     const handleFollowToggle = async () => {
         if (isTogglingFollow || isOwnProfile || !userIdToFetch) return;
         setIsTogglingFollow(true);
@@ -249,28 +180,27 @@ const ProfilePage: React.FC = () => {
             }
         } catch (err) {
             console.error('关注/取关操作失败', err);
+            showToast('操作失败，请稍后重试', 'error');
         } finally {
             setIsTogglingFollow(false);
         }
     };
 
+    // --- Contact Handlers ---
     const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setEditFormData(prev => ({ ...prev, [name]: value }));
     };
-
     const handleEditContactClick = (contact: ContactData) => {
         setEditingContactId(contact.id);
         setEditFormData({ type: contact.type, data: contact.data });
         setIsAddingContact(false);
     };
-
     const handleCancelEdit = () => {
         setEditingContactId(null);
         setIsAddingContact(false);
         setEditFormData({ type: '', data: '' });
     }; 
-    
     const handleSaveContact = async () => {
         setIsSubmitting(true);
         try {
@@ -283,56 +213,92 @@ const ProfilePage: React.FC = () => {
             if (res.code === 200 && res.data) {
                 setContacts(res.data);
                 handleCancelEdit();
+                showToast(isEditing ? '更新成功' : '添加成功', 'success');
             } else {
                 throw new Error(res.message);
             }
         } catch (err: any) {
-            alert(err.message);
+            showToast(err.message || '保存失败', 'error');
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const handleDeleteContact = async (contactId: string) => {
-        if (!window.confirm('您确定要删除这个联系方式吗？')) return;
+    // 执行删除联系人的函数
+    const performDeleteContact = async (contactId: string) => {
+        closeAlert();
         setIsSubmitting(true);
         try {
             const res = await deleteContactById(contactId);
             if (res.code === 200 && res.data) {
                 setContacts(res.data);
+                showToast('删除成功', 'success');
             } else {
                 throw new Error(res.message || '删除失败');
             }
         } catch (err: any) {
-            alert(err.message);
+            showToast(err.message || '删除失败', 'error');
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const handleDeleteOrganization = async (orgId: string) => {
-        if (!window.confirm('您确定要删除这条经历吗？此操作不可撤销。')) return;
+    // 3. ★ 修正 ★：点击删除联系人时，设置 children 和 confirmColor
+    const handleDeleteContact = (contactId: string) => {
+        setAlertConfig({
+            isOpen: true,
+            title: '删除联系方式',
+            children: '您确定要删除这个联系方式吗？', // 之前是 'message'
+            onConfirm: () => performDeleteContact(contactId),
+            confirmColor: 'danger', // 设置为危险色
+        });
+    };
+
+    // --- Organization Handlers ---
+
+    // 执行删除组织的函数
+    const performDeleteOrganization = async (orgId: string) => {
+        closeAlert();
         setIsSubmitting(true); 
         try {
             const res = await deleteOrganizationById(orgId);
             if (res.code === 200 && res.data) {
                 setOrganizations(res.data);
+                showToast('删除成功', 'success');
             } else {
                 throw new Error(res.message || '删除失败');
             }
         } catch (err: any) {
-            alert(err.message);
+            showToast(err.message || '删除失败', 'error');
         } finally {
             setIsSubmitting(false);
         }
     };
+    
+    // 4. ★ 修正 ★：点击删除组织时，设置 children 和 confirmColor
+    const handleDeleteOrganization = (orgId: string) => {
+        setAlertConfig({
+            isOpen: true,
+            title: '删除经历',
+            children: '您确定要删除这条经历吗？此操作不可撤销。', // 之前是 'message'
+            onConfirm: () => performDeleteOrganization(orgId),
+            confirmColor: 'danger', // 设置为危险色
+        });
+    };
 
+    // 关闭 Alert 的辅助函数
+    const closeAlert = () => {
+        setAlertConfig({ ...alertConfig, isOpen: false });
+    };
+
+    // --- Render ---
     if (isLoading) return <div style={styles.centerMessage}>加载中...</div>;
     if (error) return <div style={{...styles.centerMessage, color: 'red'}}>{error}</div>;
     if (!profileUser) return <div style={styles.centerMessage}>未找到该用户。</div>;
 
     return (
         <main style={styles.mainContent}>
+            {/* 左侧栏 */}
             <div style={styles.leftColumn}>
                 <UserInfo
                     user={profileUser}
@@ -356,7 +322,10 @@ const ProfilePage: React.FC = () => {
                     onCancel={handleCancelEdit}
                 />
             </div>
+            
+            {/* 右侧栏 */}
             <div style={styles.rightColumn}>
+                {/* Tabs */}
                 <div style={styles.tabContainer}>
                     <button 
                         style={activeTab === 'organizations' ? styles.activeTabButton : styles.tabButton}
@@ -370,7 +339,6 @@ const ProfilePage: React.FC = () => {
                     >
                         动态
                     </button>
-                    {/* 更改: 只有当是用户自己的主页时，才渲染“最近浏览”按钮 */}
                     {isOwnProfile && (
                         <button 
                             style={activeTab === 'recent' ? styles.activeTabButton : styles.tabButton}
@@ -381,6 +349,7 @@ const ProfilePage: React.FC = () => {
                     )}
                 </div>
                 
+                {/* Tab 内容 */}
                 {activeTab === 'organizations' && (
                     <Organizations 
                         orgs={organizations} 
@@ -405,10 +374,22 @@ const ProfilePage: React.FC = () => {
                     />
                 )}
             </div>
+
+            {/* 5. ★ 修正 ★：渲染 Alert 组件 */}
+            <Alert
+                isOpen={alertConfig.isOpen}
+                onClose={closeAlert}
+                onConfirm={alertConfig.onConfirm}
+                title={alertConfig.title}
+                confirmColor={alertConfig.confirmColor} // 传递 color
+            >
+                {alertConfig.children} {/* 将内容作为 children 传递 */}
+            </Alert>
         </main>
     );
 };
 
+// 样式 (保持不变)
 const styles: { [key: string]: React.CSSProperties } = {
     mainContent: { maxWidth: '1200px', margin: '20px auto', display: 'flex', gap: '20px', alignItems: 'flex-start' },
     leftColumn: { flex: '1 1 350px', display: 'flex', flexDirection: 'column', gap: '20px' },

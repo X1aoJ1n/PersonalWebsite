@@ -1,9 +1,9 @@
 // src/pages/HomePage.tsx
 import React, { useState, useEffect } from 'react';
-import { useOutletContext } from 'react-router-dom';
+// ★ 修正 ★：导入 Link 组件
+import { useOutletContext, Link } from 'react-router-dom'; 
 import type { OutletContextType } from '@/layouts/RootLayout';
 
-// 1. 引入 getFavoritePost
 import { getVisiblePost, getFollowPost, getFavoritePost } from '@/api/post';
 import type { SimplePostData } from '@/models';
 
@@ -20,54 +20,57 @@ const HomePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // 2. 更新 activeFeed 的类型和初始值
   const [activeFeed, setActiveFeed] = useState<'favorite' | 'latest' | 'following'>('favorite');
   
   const [currentPageNum, setCurrentPageNum] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadMoreLoading, setIsLoadMoreLoading] = useState(false);
 
+  // ... useEffect 和 handleLoadMore 逻辑保持不变 ...
   useEffect(() => {
-    // 切换 Tab 时，重置分页并获取第一页数据
-      const fetchInitialPosts = async () => {
-    setIsLoading(true);
-    setError(null);
-    setHasMore(true);
-    
-    const pageQuery = { pageNum: 1, pageSize: POSTS_PER_PAGE };
-    try {
-      let res;
-      if (activeFeed === 'latest') {
-        res = await getVisiblePost(pageQuery);
-      } else if (activeFeed === 'favorite') {
-        res = await getFavoritePost(pageQuery);
-      } else { // following
-        if (!currentUser) {
-          setPosts([]);
-          setIsLoading(false);
-          return;
+    const fetchInitialPosts = async () => {
+      setIsLoading(true);
+      setError(null);
+      setHasMore(true);
+      
+      const pageQuery = { pageNum: 1, pageSize: POSTS_PER_PAGE };
+      try {
+        let res;
+        if (activeFeed === 'latest') {
+          res = await getVisiblePost(pageQuery);
+        } else if (activeFeed === 'favorite') {
+          res = await getFavoritePost(pageQuery);
+        } else { // following
+          if (!currentUser) {
+            // ★ 修正 ★：
+            // 即使用户未登录，我们也允许切换到此 Tab。
+            // 在这里设置空帖子并返回，渲染逻辑将处理提示。
+            setPosts([]);
+            setIsLoading(false);
+            setHasMore(false); // 没有更多内容可加载
+            return;
+          }
+          res = await getFollowPost(pageQuery);
         }
-        res = await getFollowPost(pageQuery);
-      }
 
-      if (res.code === 200 && res.data) {
-        setPosts(res.data);
-        setCurrentPageNum(2);
-        if (res.data.length < POSTS_PER_PAGE) {
-          setHasMore(false);
+        if (res.code === 200 && res.data) {
+          setPosts(res.data);
+          setCurrentPageNum(2);
+          if (res.data.length < POSTS_PER_PAGE) {
+            setHasMore(false);
+          }
+        } else {
+          throw new Error(res.message || '获取帖子失败');
         }
-      } else {
-        throw new Error(res.message || '获取帖子失败');
+      } catch (err: any) {
+        setError(err.message || '数据加载失败，请稍后再试。');
+        console.error(err);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err: any) {
-      setError(err.message || '数据加载失败，请稍后再试。');
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  fetchInitialPosts();
-}, [activeFeed, currentUser]);
+    };
+    fetchInitialPosts();
+  }, [activeFeed, currentUser]);
 
   const handleLoadMore = async () => {
     if (isLoadMoreLoading || !hasMore) return;
@@ -106,7 +109,6 @@ const HomePage: React.FC = () => {
 
   const isLoggedIn = !!currentUser;
   
-  // 5. 使用一个 map 来动态设置标题，更清晰
   const titleMap = {
     latest: '最新帖子',
     favorite: '热门帖子',
@@ -125,9 +127,21 @@ const HomePage: React.FC = () => {
         {isLoading && <p style={{textAlign: 'center', padding: '20px'}}>加载中...</p>}
         {!isLoading && error && <p style={{ color: 'red', textAlign: 'center', padding: '20px' }}>{error}</p>}
         {!isLoading && posts.length > 0 && posts.map(post => <PostCard key={post.id} post={post} />)}
+        
+        {/* ★ 修正 ★：更新空状态的渲染逻辑 */}
         {!isLoading && posts.length === 0 && (
           <div style={styles.emptyState}>
-            {activeFeed === 'following' && !isLoggedIn ? '请登录后查看关注内容' : '这里什么都没有哦～'}
+            {activeFeed === 'following' && !isLoggedIn ? (
+              // 当在"我的关注" Tab 且未登录时，显示这个
+              <span style={styles.emptyStateText}>
+                请先 <Link to="/auth" style={styles.loginLink}>登录</Link> 查看关注内容
+              </span>
+            ) : (
+              // 其他情况的空状态
+              <span style={styles.emptyStateText}>
+                这里什么都没有哦～
+              </span>
+            )}
           </div>
         )}
 
@@ -150,7 +164,6 @@ const HomePage: React.FC = () => {
   );
 };
 
-// ... (styles 对象保持不变)
 const styles: { [key: string]: React.CSSProperties } = {
   mainContent: {
     display: 'flex',
@@ -176,9 +189,18 @@ const styles: { [key: string]: React.CSSProperties } = {
     backgroundColor: '#fff',
     padding: '40px',
     textAlign: 'center',
-    color: '#999',
     borderRadius: '8px',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+  },
+  emptyStateText: { // (推荐) 包装一下文本，确保行高和颜色一致
+    color: '#999',
+    fontSize: '16px',
+    lineHeight: 1.5,
+  },
+  loginLink: { // (新增) Link 样式
+    color: '#4f46e5',
+    textDecoration: 'underline',
+    fontWeight: '500',
   },
   loadMoreContainer: {
     display: 'flex',

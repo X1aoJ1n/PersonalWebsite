@@ -1,17 +1,12 @@
 import React, { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import type { CommentData, ReplyData, AddReplyRequest, LikeDTO, UserData } from '@/models';
+import { Link, useOutletContext } from 'react-router-dom';
+import type { CommentData, ReplyData, AddReplyRequest, LikeDTO } from '@/models';
 import { createReply, getRepliesByCommentId, updateReply, deleteReply } from '@/api/reply';
 import { like, unlike } from '@/api/like';
 import { FaHeart, FaRegHeart, FaEdit, FaTrash } from 'react-icons/fa';
 import CommentForm from './CommentForm';
-
-// --- Interfaces from your original code (no changes needed here) ---
-interface CommentPreviewHandlers {
-  onCommentAuthorMouseEnter: (e: React.MouseEvent, userId: string, anchor: HTMLElement | null) => void;
-  onReplyAuthorMouseEnter: (e: React.MouseEvent, userId: string, anchor: HTMLElement | null) => void;
-  onUserMouseLeave: () => void;
-}
+import type { OutletContextType } from '@/layouts/RootLayout';
+import { usePostPage } from '@/contexts/PostPageContext';
 
 interface ReplyPreviewHandlers {
   onReplyAuthorMouseEnter: (e: React.MouseEvent, userId: string, anchor: HTMLElement | null) => void;
@@ -26,30 +21,43 @@ interface ReplyItemProps extends ReplyPreviewHandlers {
   isLoggedIn: boolean; 
 }
 
-const ReplyItem: React.FC<ReplyItemProps> = ({ reply, onReplyClick, onReplyAuthorMouseEnter, onUserMouseLeave, onUpdate, onDelete, isLoggedIn }) => {
+const ReplyItem: React.FC<ReplyItemProps> = ({ 
+  reply, 
+  onReplyClick, 
+  onReplyAuthorMouseEnter, 
+  onUserMouseLeave, 
+  onUpdate, 
+  onDelete, 
+  isLoggedIn,
+}) => { 
   const [isLiked, setIsLiked] = useState(reply.isLike);
   const [likeCount, setLikeCount] = useState(reply.likeCount);
   const [isLiking, setIsLiking] = useState(false);
   const replyAuthorNameRef = useRef<HTMLAnchorElement>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const { showToast } = useOutletContext<OutletContextType>();
 
   const handleLikeToggle = async () => {
-    if (isLiking || reply.status === 1) return; // Cannot like a deleted reply
-    // ... rest of your existing like logic
+    if (isLiking || reply.status === 1) return;
     setIsLiking(true);
     const params: LikeDTO = { targetType: 3, targetId: reply.id };
+    const originalIsLiked = isLiked; // 保存原始状态
+    setIsLiked(!isLiked);
+    setLikeCount(prev => !isLiked ? prev + 1 : prev - 1);
     try {
-        if (!isLiked) await like(params); else await unlike(params);
-        setIsLiked(!isLiked);
-        setLikeCount(prev => !isLiked ? prev + 1 : prev - 1);
+        if (!originalIsLiked) await like(params); else await unlike(params);
     } catch (error) {
         console.error("Reply like/unlike failed:", error);
+        showToast('点赞失败', 'error'); // ★ 添加 toast
+        setIsLiked(originalIsLiked); // ★ 回滚
+        setLikeCount(prev => !originalIsLiked ? prev - 1 : prev + 1); // ★ 回滚
     } finally {
         setIsLiking(false);
     }
   };
 
   const handleUpdateSubmit = async (text: string) => {
+    // onUpdate 内部的 try/catch 在 CommentItem 中处理
     await onUpdate(reply.id, text);
     setIsEditing(false);
   };
@@ -141,14 +149,18 @@ const ReplyItem: React.FC<ReplyItemProps> = ({ reply, onReplyClick, onReplyAutho
   );
 };
 
+interface CommentPreviewHandlers {
+  onCommentAuthorMouseEnter: (e: React.MouseEvent, userId: string, anchor: HTMLElement | null) => void;
+  onReplyAuthorMouseEnter: (e: React.MouseEvent, userId: string, anchor: HTMLElement | null) => void;
+  onUserMouseLeave: () => void;
+}
+
 interface CommentItemProps extends CommentPreviewHandlers {
   comment: CommentData;
   onReplyAdded: (targetCommentId: string) => void;
-  currentUser: UserData | null;
   onCommentDeleted: (commentId: string) => Promise<void>;
   onCommentUpdated: (commentId: string, newContent: string) => Promise<void>;
-  onReplyDeleted: (commentId: string) => void;
-  isLoggedIn: boolean;
+  onReplyDeleted: (commentId: string) => void; 
 }
 
 const CommentItem: React.FC<CommentItemProps> = ({ 
@@ -159,7 +171,6 @@ const CommentItem: React.FC<CommentItemProps> = ({
   onUserMouseLeave,
   onCommentDeleted,
   onCommentUpdated,
-  isLoggedIn 
 }) => {
   const [replies, setReplies] = useState<ReplyData[]>([]);
   const [showReplies, setShowReplies] = useState(false);
@@ -171,18 +182,24 @@ const CommentItem: React.FC<CommentItemProps> = ({
   const [isLiking, setIsLiking] = useState(false);
   const commentAuthorNameRef = useRef<HTMLAnchorElement>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const { currentUser, showToast } = useOutletContext<OutletContextType>();
+  const { setConfirm } = usePostPage();
+  const isLoggedIn = !!currentUser;
 
   const handleLikeToggle = async () => {
-    if (isLiking || comment.status === 1) return; // Cannot like a deleted comment
-    // ... rest of your existing like logic
+    if (isLiking || comment.status === 1) return;
     const params: LikeDTO = { targetType: 2, targetId: comment.id };
     setIsLiking(true);
+    const originalIsLiked = isLiked; // 保存
+    setIsLiked(!isLiked);
+    setLikeCount(prev => !isLiked ? prev + 1 : prev - 1);
     try {
-        if (!isLiked) await like(params); else await unlike(params);
-        setIsLiked(!isLiked);
-        setLikeCount(prev => !isLiked ? prev + 1 : prev - 1);
+        if (!originalIsLiked) await like(params); else await unlike(params);
     } catch (error) {
         console.error("Comment like/unlike failed:", error);
+        showToast('点赞失败', 'error'); // ★ 添加 toast
+        setIsLiked(originalIsLiked); // ★ 回滚
+        setLikeCount(prev => !originalIsLiked ? prev - 1 : prev + 1); // ★ 回滚
     } finally {
         setIsLiking(false);
     }
@@ -227,15 +244,19 @@ const CommentItem: React.FC<CommentItemProps> = ({
       content: text,
       replyTo: replyTarget ? replyTarget.id : undefined,
     };
-    const res = await createReply(payload);
-    if (res.code === 200 && res.data) {
-      setReplies(prevReplies => [res.data, ...prevReplies]);
-      onReplyAdded(comment.id);
-      setShowReplyForm(false);
-      setReplyTarget(null);
-      setShowReplies(true);
-    } else {
-      throw new Error(res.message || 'Reply failed');
+    try { // ★ 添加 try/catch
+      const res = await createReply(payload);
+      if (res.code === 200 && res.data) {
+        setReplies(prevReplies => [res.data, ...prevReplies]);
+        onReplyAdded(comment.id);
+        setShowReplyForm(false);
+        setReplyTarget(null);
+        setShowReplies(true);
+      } else {
+        throw new Error(res.message || '回复失败');
+      }
+    } catch (error: any) {
+      showToast(error.message || '回复失败', 'error');
     }
   };
 
@@ -246,10 +267,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   };
 
   const handleDeleteComment = () => {
-    if (window.confirm('确定要删除这条评论吗？')) {
-      // This function now expects the parent to handle the "soft delete" state change
-      onCommentDeleted(comment.id);
-    }
+    onCommentDeleted(comment.id);
   };
   
   const handleUpdateReply = async (replyId: string, newContent: string) => {
@@ -258,29 +276,37 @@ const CommentItem: React.FC<CommentItemProps> = ({
       setReplies(prev => 
         prev.map(r => r.id === replyId ? { ...r, content: newContent } : r)
       );
+      showToast('回复更新成功', 'success'); // ★ 添加 toast
     } catch (error: any) {
-      alert(error.message || '更新回复失败');
+      showToast(error.message || '更新回复失败', 'error'); // 替换 alert
     }
   };
 
-  // ========= MODIFIED: Implement soft delete for replies =========
   const handleDeleteReply = async (replyId: string) => {
-    if (window.confirm('确定要删除这条回复吗？')) {
-      try {
-        await deleteReply(replyId);
-        // Instead of filtering, we map and update the status of the deleted reply
-        setReplies(prev => 
-          prev.map(r => 
-            r.id === replyId 
-            ? { ...r, status: 1, content: '该回复已被删除' } // Mark as deleted
-            : r
-          )
-        );
-        // We no longer call onReplyDeleted because the reply count should not decrease
-      } catch (error: any) {
-        alert(error.message || '删除回复失败');
+    // 使用 setConfirm 替换 window.confirm
+    setConfirm({
+      isOpen: true,
+      title: '删除回复',
+      children: '您确定要删除这条回复吗？',
+      confirmColor: 'danger',
+      confirmText: '删除',
+      onConfirm: async () => { // 确认回调
+        try {
+          await deleteReply(replyId);
+          setReplies(prev => 
+            prev.map(r => 
+              r.id === replyId 
+              ? { ...r, status: 1, content: '该回复已被删除' } 
+              : r
+            )
+          );
+          showToast('回复已删除', 'success'); // ★ 添加 toast
+          // (不再调用 onReplyDeleted，因为我们是软删除，不改变计数)
+        } catch (error: any) {
+          showToast(error.message || '删除回复失败', 'error'); // 替换 alert
+        }
       }
-    }
+    });
   };
 
   return (
@@ -295,7 +321,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
         </Link>
         
         {/* ========= MODIFIED: Render based on comment status ========= */}
-        {comment.status === 1 ? (
+       {comment.status === 1 ? (
           <p style={styles.deletedText}>该评论已被删除</p>
         ) : isEditing ? (
           <CommentForm 
@@ -341,7 +367,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
         )}
       </div>
         
-        {showReplies && (
+      {showReplies && (
         <div style={styles.repliesContainer}>
           {replies.map(reply => 
             <ReplyItem
@@ -352,23 +378,23 @@ const CommentItem: React.FC<CommentItemProps> = ({
               onUserMouseLeave={onUserMouseLeave}
               onUpdate={handleUpdateReply}
               onDelete={handleDeleteReply}
-              isLoggedIn={isLoggedIn} // 7. Pass `isLoggedIn` down to ReplyItem
+              isLoggedIn={isLoggedIn}
             />
           )}
         </div>
       )}
 
 
-        {showReplyForm && comment.status !== 1 && (
-          <CommentForm 
-            onSubmit={handleReplySubmit} 
-            placeholder={replyTarget ? `回复 @${replyTarget.username}...` : `回复 @${comment.userVO.username}...`}
-            cta="回复"
-          />
-        )}
-      </div>
+      {showReplyForm && comment.status !== 1 && (
+        <CommentForm 
+          onSubmit={handleReplySubmit} 
+          placeholder={replyTarget ? `回复 @${replyTarget.username}...` : `回复 @${comment.userVO.username}...`}
+          cta="回复"
+        />
+      )}
     </div>
-  );
+  </div>
+);
 };
 
 const styles: { [key: string]: React.CSSProperties } = {

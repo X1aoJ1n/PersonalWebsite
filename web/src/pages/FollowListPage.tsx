@@ -1,8 +1,6 @@
 // src/pages/FollowListPage.tsx
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useSearchParams, Link, useOutletContext } from 'react-router-dom';
-
 import { getFollowingList, getFollowerList } from '@/api/follow';
 import { follow, unfollow } from '@/api/follow';
 import type { SimpleUserVO, PageQuery } from '@/models';
@@ -11,8 +9,7 @@ import type { OutletContextType } from '@/layouts/RootLayout';
 const FollowListPage: React.FC = () => {
     const { userId } = useParams<{ userId: string }>();
     const [searchParams] = useSearchParams();
-    const { currentUser } = useOutletContext<OutletContextType>();
-
+    const { currentUser, showToast } = useOutletContext<OutletContextType>();
     const [users, setUsers] = useState<SimpleUserVO[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -20,7 +17,7 @@ const FollowListPage: React.FC = () => {
     const [hoveredFollowId, setHoveredFollowId] = useState<string | null>(null);
 
     const activeTab = useMemo(() => searchParams.get('tab') || 'following', [searchParams]);
-
+    
     // useEffect 保持不变
     useEffect(() => {
         if (!userId) {
@@ -50,16 +47,14 @@ const FollowListPage: React.FC = () => {
         fetchData();
     }, [userId, activeTab]);
 
-    // --- 这里是需要修正的地方 ---
     const handleFollowToggle = async (targetUserId: string, isCurrentlyFollowed: boolean) => {
         if (processingFollowId) return;
         setProcessingFollowId(targetUserId);
 
-        // 乐观更新：立即更新UI
+        // 乐观更新 (保持不变)
         setUsers(prevUsers =>
             prevUsers.map(user =>
                 user.id === targetUserId
-                    // *** 修正 #1: 将 isFollow 改为 isFollowed ***
                     ? { ...user, isFollowed: !isCurrentlyFollowed }
                     : user
             )
@@ -73,16 +68,16 @@ const FollowListPage: React.FC = () => {
             }
         } catch (err) {
             console.error('关注/取关操作失败:', err);
-            // 失败时回滚UI
+            // 失败时回滚UI (保持不变)
             setUsers(prevUsers =>
                 prevUsers.map(user =>
                     user.id === targetUserId
-                        // *** 修正 #2: 将 isFollow 改为 isFollowed ***
                         ? { ...user, isFollowed: isCurrentlyFollowed }
                         : user
                 )
             );
-            alert('操作失败，请重试');
+            showToast('操作失败，请稍后重试。', 'error');
+
         } finally {
             setProcessingFollowId(null);
         }
@@ -101,6 +96,8 @@ const FollowListPage: React.FC = () => {
     };
 
     return (
+        // ★ 4. 添加 React Fragment
+      <>
         <main style={styles.container}>
             <div style={styles.card}>
                 {/* Tabs 渲染保持不变 */}
@@ -130,22 +127,22 @@ const FollowListPage: React.FC = () => {
                                     {currentUser && currentUser.id !== user.id && (
                                         <button
                                             style={buttonProps.style}
-                                            // *** 修正 #3: 确认这里传递的是 isFollowed ***
                                             onClick={() => handleFollowToggle(user.id, user.isFollowed)}
                                             disabled={processingFollowId === user.id}
                                             onMouseEnter={() => setHoveredFollowId(user.id)}
                                             onMouseLeave={() => setHoveredFollowId(null)}
                                         >
                                             {processingFollowId === user.id ? '...' : buttonProps.text}
-                                        </button>
+                                    </button>
                                     )}
                                 </div>
                             );
-                        })
+                          })
                     )}
                 </div>
             </div>
         </main>
+      </>
     );
 };
 

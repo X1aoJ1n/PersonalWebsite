@@ -1,12 +1,14 @@
 // src/pages/PostEditPage.tsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams , useOutletContext} from 'react-router-dom';
 import { getPostDetail, updatePost } from '@/api/post';
 import type { PostRequest } from '@/models';
+import type { OutletContextType } from '@/layouts/RootLayout';
 
 const PostEditPage: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
+    const { showToast } = useOutletContext<OutletContextType>();
 
   const [formData, setFormData] = useState<Partial<PostRequest>>({ title: '', preview: '', content: '' });
   const [isLoading, setIsLoading] = useState(false);
@@ -51,7 +53,7 @@ const PostEditPage: React.FC = () => {
     try {
       const res = await updatePost(formData as PostRequest);
       if (res.code === 200) {
-        alert('修改成功！');
+        showToast('帖子修改成功！', 'success');
         navigate(`/post/${formData.id}`);
       } else {
         throw new Error(res.message);
@@ -83,7 +85,7 @@ const PostEditPage: React.FC = () => {
             onChange={handleChange} 
             style={styles.previewTextarea} 
             rows={3}
-            placeholder="如果不填，会自动截取内容前100个字符作为预览"
+            placeholder="如果不填, 会自动截取内容前100个字符作为预览"
           />
         </div>
 

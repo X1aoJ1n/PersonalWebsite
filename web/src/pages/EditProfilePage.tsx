@@ -54,15 +54,13 @@ function getCroppedImg(image: HTMLImageElement, crop: PixelCrop): Promise<File |
 
 
 const EditProfilePage: React.FC = () => {
-  const { currentUser, setCurrentUser } = useOutletContext<OutletContextType>();
+  const { currentUser, setCurrentUser, showToast } = useOutletContext<OutletContextType>();
   const navigate = useNavigate();
 
   const [username, setUsername] = useState('');
   const [introduction, setIntroduction] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Avatar cropping states
   const [imgSrc, setImgSrc] = useState('');
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
@@ -97,8 +95,10 @@ const EditProfilePage: React.FC = () => {
       const res = await updateUserById({ username, introduction });
       if (res.code === 200 && res.data) {
         setCurrentUser(res.data);
-        alert('保存成功！');
+        
+        showToast('您的个人资料已更新。', 'success');
         navigate('/profile');
+
       } else {
         throw new Error(res.message || '更新失败');
       }
@@ -117,7 +117,6 @@ const EditProfilePage: React.FC = () => {
       if (!croppedFile) throw new Error('剪裁图片失败');
 
       const uploadRes = await uploadFile(croppedFile, 'ICON');
-      // **NOTE:** You mentioned `fileUrl` in the prompt, but your model might use `url`. I've seen `url` before, so I'm using that. Please change `uploadRes.data.url` to `uploadRes.data.fileUrl` if needed.
       if (uploadRes.code !== 200 || !uploadRes.data?.fileUrl) {
         throw new Error(uploadRes.message || '上传头像失败');
       }
@@ -128,7 +127,9 @@ const EditProfilePage: React.FC = () => {
         setCurrentUser(changeIconRes.data);
         setShowCropModal(false);
         setImgSrc('');
-        alert('头像更新成功！');
+        
+        showToast('您的头像已更新。', 'success');
+
       } else {
         throw new Error(changeIconRes.message || '设置头像失败');
       }

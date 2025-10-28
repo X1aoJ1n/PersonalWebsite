@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect , useRef } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'; 
 import { getCurrentUser } from '@/api/user';
 import { countAllUnread } from '@/api/notification';
 import type { UserData } from '@/models'; 
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
+import Toast from '@/components/common/Toast';
 
-// ★★★ 1. 更新 Context 类型，加入未读数和其更新函数 ★★★
 export interface OutletContextType {
   currentUser: UserData | null;
   setCurrentUser: React.Dispatch<React.SetStateAction<UserData | null>>;
   unreadCount: number;
   setUnreadCount: React.Dispatch<React.SetStateAction<number>>;
+  showToast: (message: string, type?: 'success' | 'error') => void;
 }
 
 const RootLayout: React.FC = () => {
@@ -21,6 +22,12 @@ const RootLayout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [toast, setToast] = useState({
+    message: '',
+    isVisible: false,
+    type: 'success' as 'success' | 'error',
+  });
+  const toastTimerRef = useRef<number | null>(null);
 
   const handleSearch = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -66,12 +73,38 @@ const RootLayout: React.FC = () => {
     checkLoginStatus();
   }, [location.key]);
 
+
+  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    // 如果已有定时器，先清除
+    if (toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current);
+    }
+
+    // 1. 显示 Toast
+    setToast({ message, type, isVisible: true });
+
+    // 2. 设置一个定时器，在 3 秒后隐藏它
+    toastTimerRef.current = window.setTimeout(() => {
+      setToast(prev => ({ ...prev, isVisible: false }));
+      toastTimerRef.current = null;
+    }, 3000); // 3 秒后自动消失
+  };
+
+
   if (isAuthLoading) {
     return <div>Loading Application...</div>;
   }
 
+  
+
   return (
     <div style={styles.pageContainer}>
+      <Toast 
+        message={toast.message} 
+        isVisible={toast.isVisible} 
+        type={toast.type}
+      />
+
       <Header
         currentUser={currentUser}
         searchTerm={searchTerm}
@@ -81,7 +114,7 @@ const RootLayout: React.FC = () => {
       />
       <main style={styles.mainContent}>
         {/* ★★★ 2. 将未读数和其更新函数传递给 Outlet context ★★★ */}
-        <Outlet context={{ currentUser, setCurrentUser, unreadCount, setUnreadCount }} />
+        <Outlet context={{ currentUser, setCurrentUser, unreadCount, setUnreadCount, showToast }} />
       </main>
       <Footer />
     </div>
